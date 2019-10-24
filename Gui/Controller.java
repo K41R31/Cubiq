@@ -1,4 +1,4 @@
-package Cubiq;
+package Gui;
 
 public class Controller {
 }
