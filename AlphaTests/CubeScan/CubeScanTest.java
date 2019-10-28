@@ -8,15 +8,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
+import org.opencv.features2d.FeatureDetector;
 import org.opencv.imgcodecs.Imgcodecs;
-
+import org.opencv.imgproc.Imgproc;
 import java.io.*;
+import java.util.List;
 
 import static org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR;
 import static org.opencv.imgcodecs.Imgcodecs.imread;
@@ -25,10 +25,13 @@ public class CubeScanTest extends Application {
 
     //TODO BILD IST BGR!!!
 
-    private int[] sliderValues = new int[6];
+    private int[] sliderValues = new int[8];
     private ImageView view;
     private Mat imgMat;
-    boolean showingOriginalImage = true;
+    private boolean showingOriginalImage = true;
+    private Slider[] sliders = new Slider[8];
+    private boolean doBlobDetector = false;
+    List<KeyPoint> list;
 
     /*
     public void blobDetector(Mat img) {
@@ -47,38 +50,71 @@ public class CubeScanTest extends Application {
     */
 
     private void showOriginalImage() {
-        MatOfByte byteMat = new MatOfByte();
-        Imgcodecs.imencode(".jpg", imgMat, byteMat);
-        view.setImage(new Image(new ByteArrayInputStream(byteMat.toArray())));
+        if (doBlobDetector) {
+            Mat blobMat = imgMat.clone();
+            for (int i = 0; i < list.size(); i++) Imgproc.circle(blobMat, list.get(i).pt, (int)list.get(i).size/2, new Scalar(100, 100, 100), 2);
+            MatOfByte byteMat = new MatOfByte();
+            Imgcodecs.imencode(".jpg", blobMat, byteMat);
+            view.setImage(new Image(new ByteArrayInputStream(byteMat.toArray())));
+        } else {
+            MatOfByte byteMat = new MatOfByte();
+            Imgcodecs.imencode(".jpg", imgMat, byteMat);
+            view.setImage(new Image(new ByteArrayInputStream(byteMat.toArray())));
+        }
         showingOriginalImage = true;
     }
 
     private void updateImage() {
         Mat processedImg = new Mat();
-        Core.inRange(imgMat, new Scalar(sliderValues[0], sliderValues[1], sliderValues[2]), new Scalar(sliderValues[3], sliderValues[4], sliderValues[5]), processedImg);
+        Imgproc.GaussianBlur(imgMat, processedImg, new Size(sliderValues[6], sliderValues[6]), sliderValues[6], sliderValues[6]);
+        Imgproc.cvtColor(processedImg, processedImg, Imgproc.COLOR_BGR2HSV);
+        Imgproc.medianBlur(processedImg, processedImg, sliderValues[7]);
+        Core.inRange(processedImg, new Scalar(sliderValues[0], sliderValues[1], sliderValues[2]), new Scalar(sliderValues[3], sliderValues[4], sliderValues[5]), processedImg);
+        if(doBlobDetector) {
+            FeatureDetector detector = FeatureDetector.create(FeatureDetector.SIMPLEBLOB);
+            detector.read("src/AlphaTests/CubeScan/Resources/SavedData/blobdetectorparams1.xml");
+            MatOfKeyPoint keypoints = new MatOfKeyPoint();
+            detector.detect(processedImg, keypoints);
+            list = keypoints.toList();
+            System.out.println(list.size());
+            keypoints.release();
+        }
         MatOfByte byteMat = new MatOfByte();
         Imgcodecs.imencode(".jpg", processedImg, byteMat);
         view.setImage(new Image(new ByteArrayInputStream(byteMat.toArray())));
         showingOriginalImage = false;
     }
 
-    private HBox createControllers() {
-        HBox hBox = new HBox();
+    private VBox createControllers() {
+        VBox vBox = new VBox();
+        HBox hBoxColorRange = new HBox();
+        HBox hBoxGaussianBlur = new HBox();
+        HBox hBoxMedianBlur = new HBox();
 
-        hBox.getChildren().addAll(
-                new ColorRangeSlider(0),
-                new ColorRangeSlider(1),
-                new ColorRangeSlider(2),
-                new ColorRangeSlider(3),
-                new ColorRangeSlider(4),
-                new ColorRangeSlider(5)
-        );
+        hBoxColorRange.getChildren().add(new Text("Color Range"));
+
+        sliders[0] = new ColorRangeSlider(0);
+        sliders[1] = new ColorRangeSlider(1);
+        sliders[2] = new ColorRangeSlider(2);
+        sliders[3] = new ColorRangeSlider(3);
+        sliders[4] = new ColorRangeSlider(4);
+        sliders[5] = new ColorRangeSlider(5);
+
+
+        hBoxColorRange.getChildren().addAll(
+                sliders[0],
+                sliders[1],
+                sliders[2],
+                sliders[3],
+                sliders[4],
+                sliders[5]
+                );
 
         Button saveValuesButton = new Button();
         saveValuesButton.setText("Save Values");
         saveValuesButton.setOnAction(actionEvent -> {
             try (PrintWriter writer = new PrintWriter("src/AlphaTests/CubeScan/rangeValues.txt")) {
-                for (int i = 0; i < 6; i++) writer.println(sliderValues[i]);
+                for (int i = 0; i < 8; i++) writer.println(sliderValues[i]);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -88,10 +124,11 @@ public class CubeScanTest extends Application {
         loadValuesButton.setText("Load Values");
         loadValuesButton.setOnAction(actionEvent -> {
             try {
-                FileReader reader = new FileReader("src/AlphaTests/CubeScan/rangeValues.txt");
+                FileReader reader = new FileReader("src/AlphaTests/CubeScan/Resources/SavedData/rangeValues.txt");
                 BufferedReader bReader = new BufferedReader(reader);
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 8; i++) {
                     sliderValues[i] = Integer.parseInt(bReader.readLine());
+                    sliders[i].setValue(sliderValues[i]);
                     updateImage();
                 }
             } catch (IOException e) {
@@ -111,11 +148,37 @@ public class CubeScanTest extends Application {
             }
         });
 
-        hBox.getChildren().add(saveValuesButton);
-        hBox.getChildren().add(loadValuesButton);
-        hBox.getChildren().add(showOriginalImageButton);
+        Button doBlobDetectorButton = new Button();
+        doBlobDetectorButton.setText("Blob Detector");
+        doBlobDetectorButton.setOnAction(actionEvent -> doBlobDetector = true);
 
-        return hBox;
+        hBoxColorRange.getChildren().addAll(saveValuesButton, loadValuesButton, showOriginalImageButton, doBlobDetectorButton);
+
+        sliders[6] = new Slider();
+        sliderValues[6] = 1;
+        sliders[6].setMin(1);
+        sliders[6].setMax(20);
+        sliders[6].valueProperty().addListener((ov, old_val, new_val) -> {
+            sliderValues[6] = (int)Math.round(sliders[6].getValue());
+            if (sliderValues[6] % 2 == 0) sliderValues[6]++;
+            updateImage();
+        });
+
+        sliders[7] = new Slider();
+        sliderValues[7] = 1;
+        sliders[7].setMin(1);
+        sliders[7].setMax(20);
+        sliders[7].valueProperty().addListener((ov, old_val, new_val) -> {
+            sliderValues[7] = (int)Math.round(sliders[7].getValue());
+            if (sliderValues[7] % 2 == 0) sliderValues[7]++;
+            updateImage();
+        });
+
+        hBoxGaussianBlur.getChildren().addAll(new Text("Gaussian Blur Kernelsize"), sliders[6]);
+        hBoxMedianBlur.getChildren().addAll(new Text("Median Blur Kernelsize"), sliders[7]);
+
+        vBox.getChildren().addAll(hBoxColorRange, hBoxGaussianBlur, hBoxMedianBlur);
+        return vBox;
     }
 
     private class ColorRangeSlider extends Slider {
@@ -164,7 +227,7 @@ public class CubeScanTest extends Application {
     }
 
     private void loadImage() {
-        imgMat = imread("src/AlphaTests/CubeScan/cubeTestImage.jpg", IMREAD_COLOR);
+        imgMat = imread("src/AlphaTests/CubeScan/Resources/Assets/cubeOrange.jpg", IMREAD_COLOR);
         if (imgMat.empty()) System.out.println("Image was not read");
     }
 

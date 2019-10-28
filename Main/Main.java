@@ -6,7 +6,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.opencv.core.Core;
 
 //https://openjfx.io/openjfx-docs/#install-javafx
 
@@ -17,7 +16,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
-        Parent root = FXMLLoader.load(getClass().getResource("/Gui/sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/GUI/sample.fxml"));
         primaryStage.setTitle("Cubiq");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
