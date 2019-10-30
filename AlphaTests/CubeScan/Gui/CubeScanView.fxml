@@ -172,7 +172,7 @@
             </HBox>
          </children>
       </VBox>
-      <Text fx:id="textTotalBlobs" fill="WHITE" layoutX="1125.0" layoutY="678.0" strokeType="OUTSIDE" strokeWidth="0.0" text="kkkkkkkkkkkkkkkkkkkkkkkkkkkk" textAlignment="RIGHT" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+      <Text fx:id="textTotalBlobs" fill="WHITE" layoutX="1125.0" layoutY="678.0" strokeType="OUTSIDE" strokeWidth="0.0" text="blobs" textAlignment="RIGHT" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
          <font>
             <Font name="Kiona Regular" size="30.0" />
          </font>

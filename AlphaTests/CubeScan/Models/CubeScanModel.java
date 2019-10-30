@@ -1,11 +1,21 @@
 package AlphaTests.CubeScan.Models;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 
 import java.util.Observable;
 
 public class CubeScanModel extends Observable {
 
+    private Point frameOrigin = new Point(432, 181);
+    private int searchFrameSize = 350;
+    private Point[][] searchPointGrid = new Point[][] {
+            {new Point(507, 242), new Point(620, 242), new Point(731, 242)},
+            {new Point(507, 359), new Point(620, 359), new Point(731, 359)},
+            {new Point(507, 475), new Point(620, 475), new Point(731, 475)}
+    };
+    private Scalar[][] gridColors = new Scalar[3][3];
     private int loHu, hiHu, loSa, hiSa, loVa, hiVa;
     private int gaBl = 1, meBl = 1;
     private int foundBlobs;
@@ -117,5 +127,24 @@ public class CubeScanModel extends Observable {
         this.binaryImage = mat;
         setChanged();
         notifyObservers("updateBinaryImage");
+    }
+
+    public int getSearchFrameSize() {
+        return this.searchFrameSize;
+    }
+
+    public Point getFrameOrigin() {
+        return this.frameOrigin;
+    }
+
+    public Point[][] getSearchPointGrid() {
+        return this.searchPointGrid;
+    }
+
+    public Scalar[][] getGridColors() {
+        return this.gridColors;
+    }
+    public void setGridColors(Scalar[][] colors) {
+        this.gridColors = colors;
     }
 }

@@ -7,9 +7,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
+import javax.print.attribute.standard.PrinterMoreInfoManufacturer;
 import java.io.ByteArrayInputStream;
 import java.util.Observable;
 import java.util.Observer;
@@ -48,8 +51,10 @@ public class CubeScanController implements Observer {
 
     private void updateBlobImage() {
         if (cubeScanModel.getBlobImage() != null) {
+            Mat mat = cubeScanModel.getBlobImage().clone();
+            Imgproc.cvtColor(mat, mat, Imgproc.COLOR_HSV2BGR);
             MatOfByte matOfByte = new MatOfByte();
-            Imgcodecs.imencode(".jpg", cubeScanModel.getBlobImage(), matOfByte);
+            Imgcodecs.imencode(".jpg", mat, matOfByte);
             imageViewOriginal.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray())));
         }
     }

@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-
+import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -55,6 +55,7 @@ public class ImageLoader implements Observer {
             return;
         }
         imageMat.convertTo(imageMat, CvType.CV_8U);
+        Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2HSV);
         cubeScanModel.setOriginalImage(imageMat);
         cubeScanModel.setBlobImage(imageMat);
         cubeScanModel.setBinaryImage(imageMat);
