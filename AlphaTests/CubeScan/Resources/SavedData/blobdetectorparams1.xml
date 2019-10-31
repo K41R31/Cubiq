@@ -8,8 +8,8 @@
 <filterByColor>1</filterByColor>
 <blobColor>255</blobColor>
 <filterByArea>1</filterByArea>
-<minArea>5000.</minArea>
-<maxArea>8500.</maxArea>
+<minArea>6000.</minArea>
+<maxArea>9000.</maxArea>
 <filterByCircularity>0</filterByCircularity>
 <minCircularity>0</minCircularity>
 <maxCircularity>0</maxCircularity>

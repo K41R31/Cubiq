@@ -57,14 +57,13 @@ public class ImageLoader implements Observer {
         imageMat.convertTo(imageMat, CvType.CV_8U);
         Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2HSV);
         cubeScanModel.setOriginalImage(imageMat);
-        cubeScanModel.setBlobImage(imageMat);
-        cubeScanModel.setBinaryImage(imageMat);
     }
 
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "":
+            case "loadNewImage":
+                loadImage();
                 break;
         }
     }

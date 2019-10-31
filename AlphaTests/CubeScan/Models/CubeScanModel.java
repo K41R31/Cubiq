@@ -3,7 +3,6 @@ package AlphaTests.CubeScan.Models;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-
 import java.util.Observable;
 
 public class CubeScanModel extends Observable {
@@ -16,10 +15,10 @@ public class CubeScanModel extends Observable {
             {new Point(507, 475), new Point(620, 475), new Point(731, 475)}
     };
     private Scalar[][] gridColors = new Scalar[3][3];
-    private int loHu, hiHu, loSa, hiSa, loVa, hiVa;
     private int gaBl = 1, meBl = 1;
     private int foundBlobs;
-    private Mat originalImage, binaryImage, blobImage;
+    private Mat originalImage;
+    private Mat[][] blobImages, binaryImages;
 
 
     public void addSliderListener() {
@@ -27,53 +26,9 @@ public class CubeScanModel extends Observable {
         notifyObservers("addSliderListener");
     }
 
-    public void setLoHu(int value) {
-        this.loHu = value;
+    public void loadNewImage() {
         setChanged();
-        notifyObservers("processImage");
-    }
-    public int getLoHu() {
-        return this.loHu;
-    }
-    public void setHiHu(int value) {
-        this.hiHu = value;
-        setChanged();
-        notifyObservers("processImage");
-    }
-    public int getHiHu() {
-        return this.hiHu;
-    }
-    public void setLoSa(int value) {
-        this.loSa = value;
-        setChanged();
-        notifyObservers("processImage");
-    }
-    public int getLoSa() {
-        return this.loSa;
-    }
-    public void setHiSa(int value) {
-        this.hiSa = value;
-        setChanged();
-        notifyObservers("processImage");
-    }
-    public int getHiSa() {
-        return this.hiSa;
-    }
-    public void setLoVa(int value) {
-        this.loVa = value;
-        setChanged();
-        notifyObservers("processImage");
-    }
-    public int getLoVa() {
-        return this.loVa;
-    }
-    public void setHiVa(int value) {
-        this.hiVa = value;
-        setChanged();
-        notifyObservers("processImage");
-    }
-    public int getHiVa() {
-        return this.hiVa;
+        notifyObservers("loadNewImage");
     }
 
     public void setGaBl(int value) {
@@ -108,25 +63,25 @@ public class CubeScanModel extends Observable {
     public void setOriginalImage(Mat mat) {
         this.originalImage = mat;
         setChanged();
-        notifyObservers("updateOriginalImage");
+        notifyObservers("processImage");
     }
 
-    public Mat getBlobImage() {
-        return this.blobImage;
+    public Mat[][] getBlobImages() {
+        return this.blobImages;
     }
-    public void setBlobImage(Mat mat) {
-        this.blobImage = mat;
+    public void setBlobImages(Mat[][] matArray) {
+        this.blobImages = matArray;
         setChanged();
         notifyObservers("updateBlobImage");
     }
 
-    public Mat getBinaryImage() {
-        return this.binaryImage;
+    public Mat[][] getBinaryImages() {
+        return this.binaryImages;
     }
-    public void setBinaryImage(Mat mat) {
-        this.binaryImage = mat;
+    public void setBinaryImages(Mat[][] matArray) {
+        this.binaryImages = matArray;
         setChanged();
-        notifyObservers("updateBinaryImage");
+        notifyObservers("updateBinaryImages");
     }
 
     public int getSearchFrameSize() {

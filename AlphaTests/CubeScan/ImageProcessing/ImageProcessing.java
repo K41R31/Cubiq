@@ -25,6 +25,8 @@ public class ImageProcessing implements Observer {
     private void checkForCube() {
         Mat frameOfWebcamStream = model.getOriginalImage();
         double[] color = new double[3];
+        Mat[][] binaryMatArray = new Mat[3][3];
+        Mat[][] blobMatArray = new Mat[3][3];
         List<KeyPoint> foundBlobs;
         MatOfKeyPoint keypoints = new MatOfKeyPoint();
         FeatureDetector detector = FeatureDetector.create(FeatureDetector.SIMPLEBLOB);
@@ -33,9 +35,8 @@ public class ImageProcessing implements Observer {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
 
-                //Read colors
+                //Read colors from grid
                 for (int i = 0; i < 3; i++) color[i] = frameOfWebcamStream.get((int)model.getSearchPointGrid()[x][y].y, (int)model.getSearchPointGrid()[x][y].x)[i];
-                System.out.println(frameOfWebcamStream.get(1, 1)[1]);
 
                 //Apply mask to image
                 Mat mask = new Mat(frameOfWebcamStream.size(), CvType.CV_8U, new Scalar(0));
@@ -45,16 +46,21 @@ public class ImageProcessing implements Observer {
                 frameOfWebcamStream.copyTo(processedFrame, mask);
 
                 //Image Operations
-                Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(3, 3), 3, 3);
-                Imgproc.medianBlur(processedFrame, processedFrame, 3);
-                Core.inRange(processedFrame, new Scalar(color[0] - 5, color[1] - 30, color[2] - 30), new Scalar(color[0] + 5, color[1] + 30, color[2] + 30), frameOfWebcamStream);
+                Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(5, 5), 5, 5);
+                Imgproc.medianBlur(processedFrame, processedFrame, 5); //TODO Median Blur dauert lange
+                Core.inRange(processedFrame, new Scalar(color[0] - 10, color[1] - 30, color[2] - 30), new Scalar(color[0] + 10, color[1] + 30, color[2] + 30), processedFrame);
+                binaryMatArray[x][y] = processedFrame;
 
                 //Detect Blobs
                 detector.detect(processedFrame, keypoints);
                 foundBlobs = keypoints.toList();
-                System.out.println(foundBlobs.size());
+                Mat blobMat = model.getOriginalImage().clone();
+                for (KeyPoint foundBlob : foundBlobs) Imgproc.circle(blobMat, foundBlob.pt, (int) foundBlob.size / 2, new Scalar(100, 0, 0), 1);
+                blobMatArray[x][y] = blobMat;
             }
         }
+        model.setBinaryImages(binaryMatArray);
+        model.setBlobImages(blobMatArray);
     }
 
     /*

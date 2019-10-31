@@ -40,9 +40,12 @@ public class CubeScanAlpha extends Application {
 
         cubeScanModel.addSliderListener();
 
+        //Init ImageLoader----------------------------------------------------------------------------------------------
         ImageLoader imageLoader = new ImageLoader(stage);
         imageLoader.initModel(cubeScanModel);
-        imageLoader.loadImage();
+
+        cubeScanModel.addObserver(imageLoader);
+
 
         //Init Scene----------------------------------------------------------------------------------------------------
         stage.setTitle("Cubiq");
