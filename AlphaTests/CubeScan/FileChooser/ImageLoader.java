@@ -27,7 +27,7 @@ public class ImageLoader implements Observer {
         fileChooser = new javafx.stage.FileChooser();
         fileChooser.setTitle("Select an image");
 
-        fileChooser.setInitialDirectory(new File("C:/Users/"));
+        fileChooser.setInitialDirectory(new File("src/AlphaTests/CubeScan/Resources/Assets"));
 
         fileChooser.getExtensionFilters().addAll(
                 new javafx.stage.FileChooser.ExtensionFilter("JPG", "*.jpg"),
