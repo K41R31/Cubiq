@@ -16,13 +16,13 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CubeScanStyle.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScan.GUI.CubeScanController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CubeScanStyle.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScan.GUI.CubeScanController">
    <children>
-      <GridPane fx:id="gp_binaryGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <GridPane fx:id="gp_binaryGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
-          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="-Infinity" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="-Infinity" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
@@ -41,7 +41,7 @@
             <ImageView fx:id="iv_binary8" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
          </children>
       </GridPane>
-      <GridPane fx:id="gp_blobGrid" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <GridPane fx:id="gp_blobGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <columnConstraints>
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -95,11 +95,11 @@
                         </Text>
                         <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
                            <children>
-                              <ProgressBar fx:id="pb_hueRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.0" />
-                              <Slider fx:id="sl_hueRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" max="50.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" />
+                              <ProgressBar fx:id="pb_hueRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.2" />
+                              <Slider fx:id="sl_hueRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" max="50.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="10.0" />
                            </children>
                         </StackPane>
-                        <Text fx:id="tx_hueThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT" wrappingWidth="32.0">
+                        <Text fx:id="tx_hueThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10" textAlignment="RIGHT" wrappingWidth="32.0">
                            <font>
                               <Font name="Kiona Regular" size="20.0" />
                            </font>
@@ -121,11 +121,11 @@
                         </Text>
                         <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
                            <children>
-                              <ProgressBar fx:id="pb_saturationRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.0" />
-                              <Slider fx:id="sl_saturationRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" />
+                              <ProgressBar fx:id="pb_saturationRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.3" />
+                              <Slider fx:id="sl_saturationRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="30.0" />
                            </children>
                         </StackPane>
-                        <Text fx:id="tx_satThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT" wrappingWidth="32.0">
+                        <Text fx:id="tx_satThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="30" textAlignment="RIGHT" wrappingWidth="32.0">
                            <font>
                               <Font name="Kiona Regular" size="20.0" />
                            </font>
@@ -144,11 +144,11 @@
                         </Text>
                         <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
                            <children>
-                              <ProgressBar fx:id="pb_valueRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.0" />
-                              <Slider fx:id="sl_valueRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" />
+                              <ProgressBar fx:id="pb_valueRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.3" />
+                              <Slider fx:id="sl_valueRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="30.0" />
                            </children>
                         </StackPane>
-                        <Text fx:id="tx_valThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT" wrappingWidth="32.0">
+                        <Text fx:id="tx_valThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="30" textAlignment="RIGHT" wrappingWidth="32.0">
                            <font>
                               <Font name="Kiona Regular" size="20.0" />
                            </font>
@@ -192,11 +192,11 @@
                         </Text>
                         <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
                            <children>
-                              <ProgressBar fx:id="pb_gaussKernel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.0" />
-                              <Slider fx:id="sl_gaussKernel" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" />
+                              <ProgressBar fx:id="pb_gaussKernel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.25" />
+                              <Slider fx:id="sl_gaussKernel" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="5.0" />
                            </children>
                         </StackPane>
-                        <Text fx:id="tx_gaussKernel" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT" wrappingWidth="32.0">
+                        <Text fx:id="tx_gaussKernel" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5" textAlignment="RIGHT" wrappingWidth="32.0">
                            <font>
                               <Font name="Kiona Regular" size="20.0" />
                            </font>
@@ -218,11 +218,11 @@
                         </Text>
                         <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
                            <children>
-                              <ProgressBar fx:id="pb_medianKernel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.0" />
-                              <Slider fx:id="sl_medianKernel" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" />
+                              <ProgressBar fx:id="pb_medianKernel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.25" />
+                              <Slider fx:id="sl_medianKernel" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="5.0" />
                            </children>
                         </StackPane>
-                        <Text fx:id="tx_medianKernel" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT" wrappingWidth="32.0">
+                        <Text fx:id="tx_medianKernel" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5" textAlignment="RIGHT" wrappingWidth="32.0">
                            <font>
                               <Font name="Kiona Regular" size="20.0" />
                            </font>

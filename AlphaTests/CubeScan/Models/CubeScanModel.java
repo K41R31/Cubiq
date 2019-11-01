@@ -15,8 +15,9 @@ public class CubeScanModel extends Observable {
             {new Point(507, 475), new Point(620, 475), new Point(731, 475)}
     };
     private Scalar[][] gridColors = new Scalar[3][3];
-    private int gaBl = 1, meBl = 1;
-    private int foundBlobs;
+    private int huTh, saTh, vaTh;
+    private int gaBl = 5, meBl = 5;
+    private int[][] foundBlobs;
     private Mat originalImage;
     private Mat[][] blobImages, binaryImages;
 
@@ -31,29 +32,44 @@ public class CubeScanModel extends Observable {
         notifyObservers("loadNewImage");
     }
 
+    public void setHuTh(int value) {
+        this.huTh = value;
+    }
+    public int getHuTh() {
+        return this.huTh;
+    }
+
+    public void setSaTh(int value) {
+        this.saTh = value;
+    }
+    public int getSaTh() {
+        return this.saTh;
+    }
+
+    public void setVaTh(int value) {
+        this.vaTh = value;
+    }
+    public int getVaTh() {
+        return this.vaTh;
+    }
+
     public void setGaBl(int value) {
         this.gaBl = value;
-        setChanged();
-        notifyObservers("processImage");
     }
     public int getGaBl() {
         return this.gaBl;
     }
     public void setMeBl(int value) {
         this.meBl = value;
-        setChanged();
-        notifyObservers("processImage");
     }
     public int getMeBl() {
         return this.meBl;
     }
 
-    public void setFoundBlobs(int value) {
-        this.foundBlobs = value;
-        setChanged();
-        notifyObservers("foundBlobsUpdated");
+    public void setFoundBlobs(int[][] array) {
+        this.foundBlobs = array;
     }
-    public int getFoundBlobs() {
+    public int[][] getFoundBlobs() {
         return this.foundBlobs;
     }
 
@@ -62,8 +78,6 @@ public class CubeScanModel extends Observable {
     }
     public void setOriginalImage(Mat mat) {
         this.originalImage = mat;
-        setChanged();
-        notifyObservers("processImage");
     }
 
     public Mat[][] getBlobImages() {
@@ -71,8 +85,6 @@ public class CubeScanModel extends Observable {
     }
     public void setBlobImages(Mat[][] matArray) {
         this.blobImages = matArray;
-        setChanged();
-        notifyObservers("updateBlobImage");
     }
 
     public Mat[][] getBinaryImages() {
@@ -80,8 +92,6 @@ public class CubeScanModel extends Observable {
     }
     public void setBinaryImages(Mat[][] matArray) {
         this.binaryImages = matArray;
-        setChanged();
-        notifyObservers("updateBinaryImages");
     }
 
     public int getSearchFrameSize() {
@@ -101,5 +111,15 @@ public class CubeScanModel extends Observable {
     }
     public void setGridColors(Scalar[][] colors) {
         this.gridColors = colors;
+    }
+
+    public void updateImageViews() {
+        setChanged();
+        notifyObservers("updateImageViews");
+    }
+
+    public void processImages() {
+        setChanged();
+        notifyObservers("processImages");
     }
 }

@@ -27,6 +27,7 @@ public class ImageProcessing implements Observer {
         double[] color = new double[3];
         Mat[][] binaryMatArray = new Mat[3][3];
         Mat[][] blobMatArray = new Mat[3][3];
+        int[][] totalFoundBlobs = new int[3][3];
         List<KeyPoint> foundBlobs;
         MatOfKeyPoint keypoints = new MatOfKeyPoint();
         FeatureDetector detector = FeatureDetector.create(FeatureDetector.SIMPLEBLOB);
@@ -46,8 +47,8 @@ public class ImageProcessing implements Observer {
                 frameOfWebcamStream.copyTo(processedFrame, mask);
 
                 //Image Operations
-                Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(5, 5), 5, 5);
-                Imgproc.medianBlur(processedFrame, processedFrame, 5); //TODO Median Blur dauert lange
+                Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
+                Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl()); //TODO Median Blur dauert lange
                 Core.inRange(processedFrame, new Scalar(color[0] - 10, color[1] - 30, color[2] - 30), new Scalar(color[0] + 10, color[1] + 30, color[2] + 30), processedFrame);
                 binaryMatArray[x][y] = processedFrame;
 
@@ -55,12 +56,16 @@ public class ImageProcessing implements Observer {
                 detector.detect(processedFrame, keypoints);
                 foundBlobs = keypoints.toList();
                 Mat blobMat = model.getOriginalImage().clone();
-                for (KeyPoint foundBlob : foundBlobs) Imgproc.circle(blobMat, foundBlob.pt, (int) foundBlob.size / 2, new Scalar(100, 0, 0), 1);
+                for (KeyPoint foundBlob : foundBlobs) Imgproc.circle(blobMat, foundBlob.pt, (int) foundBlob.size / 2, new Scalar(0, 0, 255), 1);
+                totalFoundBlobs[x][y] = foundBlobs.size();
+                Imgproc.cvtColor(blobMat, blobMat, Imgproc.COLOR_HSV2BGR);
                 blobMatArray[x][y] = blobMat;
             }
         }
         model.setBinaryImages(binaryMatArray);
         model.setBlobImages(blobMatArray);
+        model.setFoundBlobs(totalFoundBlobs);
+        model.updateImageViews();
     }
 
     /*
@@ -116,7 +121,7 @@ public class ImageProcessing implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "processImage":
+            case "processImages":
                 checkForCube();
                 break;
         }

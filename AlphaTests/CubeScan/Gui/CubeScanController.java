@@ -3,6 +3,7 @@ package AlphaTests.CubeScan.GUI;
 import AlphaTests.CubeScan.Models.CubeScanModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
@@ -10,8 +11,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
+
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Observable;
@@ -59,49 +62,50 @@ public class CubeScanController implements Observer, Initializable {
         sl_hueRangeThreshold.valueProperty().addListener((ov, old_val, new_val) -> {
             pb_hueRangeThreshold.setProgress(new_val.doubleValue() / 50);
             tx_hueThreshold.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
+            model.setHuTh((int)Math.round(new_val.doubleValue()));
+            model.processImages();
         });
         sl_saturationRangeThreshold.valueProperty().addListener((ov, old_val, new_val) -> {
             pb_saturationRangeThreshold.setProgress(new_val.doubleValue() / 100);
             tx_satThreshold.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
+            model.setSaTh((int)Math.round(new_val.doubleValue()));
+            model.processImages();
         });
         sl_valueRangeThreshold.valueProperty().addListener((ov, old_val, new_val) -> {
             pb_valueRangeThreshold.setProgress(new_val.doubleValue() / 100);
             tx_valThreshold.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
+            model.setVaTh((int)Math.round(new_val.doubleValue()));
+            model.processImages();
         });
 
         sl_gaussKernel.valueProperty().addListener((ov, old_val, new_val) -> {
             pb_gaussKernel.setProgress(new_val.doubleValue() / 20);
             tx_gaussKernel.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
+            model.setGaBl((int)Math.round(new_val.doubleValue()));
+            model.processImages();
         });
         sl_medianKernel.valueProperty().addListener((ov, old_val, new_val) -> {
             pb_medianKernel.setProgress(new_val.doubleValue() / 20);
             tx_medianKernel.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
+            model.setMeBl((int)Math.round(new_val.doubleValue()));
+            model.processImages();
         });
     }
 
-
-    private void updateBinaryImages() {
-        if (model.getBinaryImages() == null) {
-            return;
-        }
+    private void updateImageViews() {
+        MatOfByte matOfByte = new MatOfByte();
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
-                MatOfByte matOfByte = new MatOfByte();
-                Imgcodecs.imencode(".jpg", model.getBinaryImages()[x][y], matOfByte);
-                binaryImageViews[x][y].setImage(new Image(new ByteArrayInputStream(matOfByte.toArray())));
+                setImage(model.getBinaryImages()[x][y], binaryImageViews[x][y], matOfByte);
+                setImage(model.getBlobImages()[x][y], blobImageViews[x][y], matOfByte);
             }
         }
     }
 
-    private void updateBlobImages() {
-        if (model.getBlobImages() == null) return;
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                MatOfByte matOfByte = new MatOfByte();
-                Imgcodecs.imencode(".jpg", model.getBlobImages()[x][y], matOfByte);
-                blobImageViews[x][y].setImage(new Image(new ByteArrayInputStream(matOfByte.toArray())));
-            }
-        }
+    private void setImage(Mat image, ImageView iv, MatOfByte matOfByte) {
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        iv.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray())));
+        iv.setViewport(new Rectangle2D(390, 165, iv.getFitWidth() * 1.58, iv.getFitHeight() * 1.58));
     }
 
     @FXML
@@ -129,11 +133,8 @@ public class CubeScanController implements Observer, Initializable {
             case "addSliderListener":
                 addSliderListener();
                 break;
-            case "updateBinaryImages":
-                updateBinaryImages();
-                break;
-            case"updateBlobImages":
-                updateBlobImages();
+            case "updateImageViews":
+                updateImageViews();
                 break;
         }
     }

@@ -14,7 +14,7 @@ import java.util.Observer;
 
 public class ImageLoader implements Observer {
 
-    private CubeScanModel cubeScanModel;
+    private CubeScanModel model;
     private Stage stage;
     private FileChooser fileChooser;
 
@@ -27,7 +27,7 @@ public class ImageLoader implements Observer {
         fileChooser = new javafx.stage.FileChooser();
         fileChooser.setTitle("Select an image");
 
-        fileChooser.setInitialDirectory(new File("E:/IntelliJ Projekte/Cubiq/src/AlphaTests/CubeScan/Resources/Assets"));
+        fileChooser.setInitialDirectory(new File("D:/IntelliJ Projekte/Cubiq/src/AlphaTests/CubeScan/Resources/Assets"));
 
         fileChooser.getExtensionFilters().addAll(
                 new javafx.stage.FileChooser.ExtensionFilter("JPG", "*.jpg"),
@@ -56,7 +56,8 @@ public class ImageLoader implements Observer {
         }
         imageMat.convertTo(imageMat, CvType.CV_8U);
         Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2HSV);
-        cubeScanModel.setOriginalImage(imageMat);
+        model.setOriginalImage(imageMat);
+        model.processImages();
     }
 
     @Override
@@ -69,6 +70,6 @@ public class ImageLoader implements Observer {
     }
 
     public void initModel(CubeScanModel model) {
-        this.cubeScanModel = model;
+        this.model = model;
     }
 }
