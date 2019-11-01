@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CubeScanStyle.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScan.GUI.CubeScanController">
+   <children>
+      <GridPane fx:id="gp_binaryGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="-Infinity" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="-Infinity" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <ImageView fx:id="iv_binary0" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="iv_binary1" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
+            <ImageView fx:id="iv_binary2" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" />
+            <ImageView fx:id="iv_binary3" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1" />
+            <ImageView fx:id="iv_binary4" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ImageView fx:id="iv_binary5" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <ImageView fx:id="iv_binary6" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2" />
+            <ImageView fx:id="iv_binary7" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ImageView fx:id="iv_binary8" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
+      <GridPane fx:id="gp_blobGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <ImageView fx:id="iv_blob0" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="iv_blob1" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
+            <ImageView fx:id="iv_bloby2" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" />
+            <ImageView fx:id="iv_blob3" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1" />
+            <ImageView fx:id="iv_blob4" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ImageView fx:id="iv_blob5" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <ImageView fx:id="iv_blob6" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2" />
+            <ImageView fx:id="iv_blob7" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ImageView fx:id="iv_blob8" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="420.0" spacing="40.0" style="-fx-background-color: #1d1e22;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="232.0" prefWidth="386.0" spacing="10.0" style="-fx-background-color: #1a1b1f;">
+               <children>
+                  <Text fill="#c8c9d0" strokeType="OUTSIDE" strokeWidth="0.0" text="hsv thresholds">
+                     <font>
+                        <Font name="Kiona Regular" size="30.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Text>
+                  <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="5.0" prefWidth="320.0">
+                     <children>
+                        <Line endX="160.0" startX="-160.0" stroke="#595a5e" />
+                        <Line endX="20.0" startX="-20.0" stroke="#1a1b1f" />
+                        <Line endX="18.0" startX="-18.0" stroke="#ee5b59" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="5.0" />
+                     </VBox.margin>
+                  </StackPane>
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="360.0" spacing="20.0">
+                     <children>
+                        <Text fill="#a1a2a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Hue Threshold">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
+                           <children>
+                              <ProgressBar fx:id="pb_hueRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.2" />
+                              <Slider fx:id="sl_hueRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" max="50.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="10.0" />
+                           </children>
+                        </StackPane>
+                        <Text fx:id="tx_hueThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10" textAlignment="RIGHT" wrappingWidth="32.0">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <padding>
+                        <Insets left="15.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="135.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="360.0" spacing="20.0">
+                     <children>
+                        <Text fill="#a1a2a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Sat Threshold">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
+                           <children>
+                              <ProgressBar fx:id="pb_saturationRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.3" />
+                              <Slider fx:id="sl_saturationRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="30.0" />
+                           </children>
+                        </StackPane>
+                        <Text fx:id="tx_satThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="30" textAlignment="RIGHT" wrappingWidth="32.0">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <padding>
+                        <Insets left="15.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="155.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="360.0" spacing="20.0">
+                     <children>
+                        <Text fill="#a1a2a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Val Threshold">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
+                           <children>
+                              <ProgressBar fx:id="pb_valueRangeThreshold" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.3" />
+                              <Slider fx:id="sl_valueRangeThreshold" blockIncrement="1.0" majorTickUnit="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="30.0" />
+                           </children>
+                        </StackPane>
+                        <Text fx:id="tx_valThreshold" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="30" textAlignment="RIGHT" wrappingWidth="32.0">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <padding>
+                        <Insets left="15.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="201.0" prefWidth="386.0" spacing="10.0" style="-fx-background-color: #1a1b1f;">
+               <children>
+                  <Text fill="#c8c9d0" strokeType="OUTSIDE" strokeWidth="0.0" text="Blur kernel">
+                     <font>
+                        <Font name="Kiona Regular" size="30.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Text>
+                  <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="5.0" prefWidth="320.0">
+                     <children>
+                        <Line endX="160.0" startX="-160.0" stroke="#595a5e" />
+                        <Line endX="20.0" startX="-20.0" stroke="#1a1b1f" />
+                        <Line endX="18.0" startX="-18.0" stroke="#ee5b59" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="5.0" />
+                     </VBox.margin>
+                  </StackPane>
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="360.0" spacing="20.0">
+                     <children>
+                        <Text fill="#a1a2a8" strokeType="OUTSIDE" strokeWidth="0.0" text="gauss blur">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets right="7.0" />
+                           </HBox.margin>
+                        </Text>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
+                           <children>
+                              <ProgressBar fx:id="pb_gaussKernel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.25" />
+                              <Slider fx:id="sl_gaussKernel" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="5.0" />
+                           </children>
+                        </StackPane>
+                        <Text fx:id="tx_gaussKernel" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5" textAlignment="RIGHT" wrappingWidth="32.0">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <padding>
+                        <Insets left="15.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="135.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="360.0" spacing="20.0">
+                     <children>
+                        <Text fill="#a1a2a8" strokeType="OUTSIDE" strokeWidth="0.0" text="median blur">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="9.0" prefWidth="100.0">
+                           <children>
+                              <ProgressBar fx:id="pb_medianKernel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1.0" prefWidth="100.0" progress="0.25" />
+                              <Slider fx:id="sl_medianKernel" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="1" prefHeight="9.0" prefWidth="100.0" value="5.0" />
+                           </children>
+                        </StackPane>
+                        <Text fx:id="tx_medianKernel" fill="#f95e5c" layoutX="130.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5" textAlignment="RIGHT" wrappingWidth="32.0">
+                           <font>
+                              <Font name="Kiona Regular" size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <padding>
+                        <Insets left="15.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+               <children>
+                  <Button fx:id="btn_toggleImageViews" mnemonicParsing="false" onAction="#toggleImageViews" styleClass="redButtons" text="show blobs" textFill="#f95e5c">
+                     <font>
+                        <Font name="Kiona Regular" size="22.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btn_loadImage" mnemonicParsing="false" onAction="#loadImage" styleClass="redButtons" text="load image" textFill="#f95e5c">
+                     <font>
+                        <Font name="Kiona Regular" size="22.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
