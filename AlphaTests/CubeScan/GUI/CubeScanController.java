@@ -9,6 +9,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import org.opencv.core.Mat;
@@ -38,9 +39,11 @@ public class CubeScanController implements Observer, Initializable {
     @FXML
     private ProgressBar pb_hueRangeThreshold, pb_saturationRangeThreshold, pb_valueRangeThreshold, pb_gaussKernel, pb_medianKernel;
     @FXML
-    private Text tx_hueThreshold, tx_satThreshold, tx_valThreshold, tx_gaussKernel, tx_medianKernel;
+    private Text tx_lowHue, tx_highHue, tx_lowSat, tx_highSat, tx_lowVal, tx_highVal, tx_satThreshold, tx_valThreshold, tx_gaussKernel, tx_medianKernel;
     @FXML
     private Button btn_toggleImageViews;
+    @FXML
+    private AnchorPane sliderPaneHue, sliderPaneSat, sliderPaneVal;
 
 
     @Override
@@ -59,22 +62,48 @@ public class CubeScanController implements Observer, Initializable {
     }
 
     private void addSliderListener() {
-        sl_hueRangeThreshold.valueProperty().addListener((ov, old_val, new_val) -> {
-            pb_hueRangeThreshold.setProgress(new_val.doubleValue() / 50);
-            tx_hueThreshold.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
-            model.setHuTh((int)Math.round(new_val.doubleValue()));
+        RangeSlider rangeSliderHue = new RangeSlider(0, 179, 20, 150, 170);
+        sliderPaneHue.getChildren().add(rangeSliderHue);
+        tx_lowHue.setText(String.valueOf(Math.round(rangeSliderHue.getLowValue())));
+        tx_highHue.setText(String.valueOf(Math.round(rangeSliderHue.getHighValue())));
+        rangeSliderHue.lowValueProperty().addListener((ov, old_val, new_val) -> {
+            tx_lowHue.setText(String.valueOf(Math.round(new_val.doubleValue())));
+            model.setLoHu((int)Math.round(new_val.doubleValue()));
             model.processImages();
         });
-        sl_saturationRangeThreshold.valueProperty().addListener((ov, old_val, new_val) -> {
-            pb_saturationRangeThreshold.setProgress(new_val.doubleValue() / 100);
-            tx_satThreshold.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
-            model.setSaTh((int)Math.round(new_val.doubleValue()));
+        rangeSliderHue.highValueProperty().addListener((ov, old_val, new_val) -> {
+            tx_highHue.setText(String.valueOf(Math.round(new_val.doubleValue())));
+            model.setHiHu((int)Math.round(new_val.doubleValue()));
             model.processImages();
         });
-        sl_valueRangeThreshold.valueProperty().addListener((ov, old_val, new_val) -> {
-            pb_valueRangeThreshold.setProgress(new_val.doubleValue() / 100);
-            tx_valThreshold.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
-            model.setVaTh((int)Math.round(new_val.doubleValue()));
+
+        RangeSlider rangeSliderSat = new RangeSlider(0, 179, 20, 150, 170);
+        sliderPaneSat.getChildren().add(rangeSliderSat);
+        tx_lowSat.setText(String.valueOf(Math.round(rangeSliderSat.getLowValue())));
+        tx_highSat.setText(String.valueOf(Math.round(rangeSliderSat.getHighValue())));
+        rangeSliderSat.lowValueProperty().addListener((ov, old_val, new_val) -> {
+            tx_lowSat.setText(String.valueOf(Math.round(new_val.doubleValue())));
+            model.setLoSa((int)Math.round(new_val.doubleValue()));
+            model.processImages();
+        });
+        rangeSliderSat.highValueProperty().addListener((ov, old_val, new_val) -> {
+            tx_highSat.setText(String.valueOf(Math.round(new_val.doubleValue())));
+            model.setHiSa((int)Math.round(new_val.doubleValue()));
+            model.processImages();
+        });
+
+        RangeSlider rangeSliderVal = new RangeSlider(0, 179, 20, 150, 170);
+        sliderPaneVal.getChildren().add(rangeSliderVal);
+        tx_lowVal.setText(String.valueOf(Math.round(rangeSliderVal.getLowValue())));
+        tx_highVal.setText(String.valueOf(Math.round(rangeSliderVal.getHighValue())));
+        rangeSliderVal.lowValueProperty().addListener((ov, old_val, new_val) -> {
+            tx_lowVal.setText(String.valueOf(Math.round(new_val.doubleValue())));
+            model.setLoVa((int)Math.round(new_val.doubleValue()));
+            model.processImages();
+        });
+        rangeSliderVal.highValueProperty().addListener((ov, old_val, new_val) -> {
+            tx_highVal.setText(String.valueOf(Math.round(new_val.doubleValue())));
+            model.setHiVa((int)Math.round(new_val.doubleValue()));
             model.processImages();
         });
 

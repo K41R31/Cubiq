@@ -15,7 +15,7 @@ public class CubeScanModel extends Observable {
             {new Point(507, 475), new Point(620, 475), new Point(731, 475)}
     };
     private Scalar[][] gridColors = new Scalar[3][3];
-    private int huTh, saTh, vaTh;
+    private int loHu, hiHu, loSa, hiSa, loVa, hiVa;
     private int gaBl = 5, meBl = 5;
     private int[][] foundBlobs;
     private Mat originalImage;
@@ -32,45 +32,63 @@ public class CubeScanModel extends Observable {
         notifyObservers("loadNewImage");
     }
 
-    public void setHuTh(int value) {
-        this.huTh = value;
+    public int getLoHu() {
+        return this.loHu;
     }
-    public int getHuTh() {
-        return this.huTh;
+    public void setLoHu(int value) {
+        this.loHu = value;
     }
-
-    public void setSaTh(int value) {
-        this.saTh = value;
+    public int getHiHu() {
+        return hiHu;
     }
-    public int getSaTh() {
-        return this.saTh;
-    }
-
-    public void setVaTh(int value) {
-        this.vaTh = value;
-    }
-    public int getVaTh() {
-        return this.vaTh;
+    public void setHiHu(int hiHu) {
+        this.hiHu = hiHu;
     }
 
-    public void setGaBl(int value) {
-        this.gaBl = value;
+    public int getLoSa() {
+        return this.loSa;
     }
+    public void setLoSa(int value) {
+        this.loSa = value;
+    }
+    public int getHiSa() {
+        return hiSa;
+    }
+    public void setHiSa(int hiSa) {
+        this.hiSa = hiSa;
+    }
+
+    public int getLoVa() {
+        return this.loVa;
+    }
+    public void setLoVa(int value) {
+        this.loVa = value;
+    }
+    public int getHiVa() {
+        return hiVa;
+    }
+    public void setHiVa(int hiVa) {
+        this.hiVa = hiVa;
+    }
+
     public int getGaBl() {
         return this.gaBl;
     }
-    public void setMeBl(int value) {
-        this.meBl = value;
+    public void setGaBl(int value) {
+        this.gaBl = value;
     }
     public int getMeBl() {
         return this.meBl;
     }
-
-    public void setFoundBlobs(int[][] array) {
-        this.foundBlobs = array;
+    public void setMeBl(int value) {
+        this.meBl = value;
     }
+
     public int[][] getFoundBlobs() {
         return this.foundBlobs;
+    }
+    public void setFoundBlobs(int[][] array) {
+        this.foundBlobs = array;
     }
 
     public Mat getOriginalImage() {
