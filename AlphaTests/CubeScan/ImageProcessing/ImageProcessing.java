@@ -25,6 +25,7 @@ public class ImageProcessing implements Observer {
     private void checkForCube() {
         Mat frameOfWebcamStream = model.getOriginalImage();
         double[] color = new double[3];
+        Scalar[][] colors = new Scalar[3][3];
         Mat[][] binaryMatArray = new Mat[3][3];
         Mat[][] blobMatArray = new Mat[3][3];
         int[][] totalFoundBlobs = new int[3][3];
@@ -33,11 +34,18 @@ public class ImageProcessing implements Observer {
         FeatureDetector detector = FeatureDetector.create(FeatureDetector.SIMPLEBLOB);
         detector.read("src/AlphaTests/CubeScan/Resources/SavedData/blobdetectorparams1.xml");
 
+        //Read colors from grid
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
-
-                //Read colors from grid
                 for (int i = 0; i < 3; i++) color[i] = frameOfWebcamStream.get((int)model.getSearchPointGrid()[x][y].y, (int)model.getSearchPointGrid()[x][y].x)[i];
+                colors[x][y] = new Scalar(color[0], color[1], color[2]);
+            }
+        }
+
+        model.setGridColors(colors);
+
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
 
                 //Apply mask to image
                 Mat mask = new Mat(frameOfWebcamStream.size(), CvType.CV_8U, new Scalar(0));
@@ -47,10 +55,16 @@ public class ImageProcessing implements Observer {
                 frameOfWebcamStream.copyTo(processedFrame, mask);
 
                 //Image Operations
-                Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
-                Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl()); //TODO Median Blur dauert lange
-                Core.inRange(processedFrame, new Scalar(color[0] - 10, color[1] - 30, color[2] - 30), new Scalar(color[0] + 10, color[1] + 30, color[2] + 30), processedFrame);
+                if (model.getGaBl() != 0) Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
+                if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl()); //TODO Median Blur dauert lange
+                Core.inRange(processedFrame,
+                        new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
+                        new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
                 binaryMatArray[x][y] = processedFrame;
+
+                System.out.println("loHu: " + model.getLoHu() + ", loSa: " + model.getLoSa() + ", loVa: " + model.getLoVa());
+                System.out.println("hiHu: " + model.getHiHu() + ", hiSa: " + model.getHiSa() + ", hiVa: " + model.getHiVa());
+                System.out.println(" ");
 
                 //Detect Blobs
                 detector.detect(processedFrame, keypoints);

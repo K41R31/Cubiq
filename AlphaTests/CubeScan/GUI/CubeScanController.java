@@ -1,6 +1,7 @@
 package AlphaTests.CubeScan.GUI;
 
 import AlphaTests.CubeScan.Models.CubeScanModel;
+import com.sun.javafx.scene.paint.MaterialHelper;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -35,11 +36,11 @@ public class CubeScanController implements Observer, Initializable {
     @FXML
     private GridPane gp_binaryGrid, gp_blobGrid;
     @FXML
-    private Slider sl_hueRangeThreshold, sl_saturationRangeThreshold, sl_valueRangeThreshold, sl_gaussKernel, sl_medianKernel;
+    private Slider sl_gaussKernel, sl_medianKernel;
     @FXML
-    private ProgressBar pb_hueRangeThreshold, pb_saturationRangeThreshold, pb_valueRangeThreshold, pb_gaussKernel, pb_medianKernel;
+    private ProgressBar pb_gaussKernel, pb_medianKernel;
     @FXML
-    private Text tx_lowHue, tx_highHue, tx_lowSat, tx_highSat, tx_lowVal, tx_highVal, tx_satThreshold, tx_valThreshold, tx_gaussKernel, tx_medianKernel;
+    private Text tx_lowHue, tx_highHue, tx_lowSat, tx_highSat, tx_lowVal, tx_highVal, tx_gaussKernel, tx_medianKernel;
     @FXML
     private Button btn_toggleImageViews;
     @FXML
@@ -62,7 +63,7 @@ public class CubeScanController implements Observer, Initializable {
     }
 
     private void addSliderListener() {
-        RangeSlider rangeSliderHue = new RangeSlider(0, 179, 20, 150, 170);
+        RangeSlider rangeSliderHue = new RangeSlider(0, 179, 0, 179, 170);
         sliderPaneHue.getChildren().add(rangeSliderHue);
         tx_lowHue.setText(String.valueOf(Math.round(rangeSliderHue.getLowValue())));
         tx_highHue.setText(String.valueOf(Math.round(rangeSliderHue.getHighValue())));
@@ -77,7 +78,7 @@ public class CubeScanController implements Observer, Initializable {
             model.processImages();
         });
 
-        RangeSlider rangeSliderSat = new RangeSlider(0, 179, 20, 150, 170);
+        RangeSlider rangeSliderSat = new RangeSlider(0, 255, 0, 255, 170);
         sliderPaneSat.getChildren().add(rangeSliderSat);
         tx_lowSat.setText(String.valueOf(Math.round(rangeSliderSat.getLowValue())));
         tx_highSat.setText(String.valueOf(Math.round(rangeSliderSat.getHighValue())));
@@ -92,7 +93,7 @@ public class CubeScanController implements Observer, Initializable {
             model.processImages();
         });
 
-        RangeSlider rangeSliderVal = new RangeSlider(0, 179, 20, 150, 170);
+        RangeSlider rangeSliderVal = new RangeSlider(0, 255, 0, 255, 170);
         sliderPaneVal.getChildren().add(rangeSliderVal);
         tx_lowVal.setText(String.valueOf(Math.round(rangeSliderVal.getLowValue())));
         tx_highVal.setText(String.valueOf(Math.round(rangeSliderVal.getHighValue())));
@@ -108,15 +109,19 @@ public class CubeScanController implements Observer, Initializable {
         });
 
         sl_gaussKernel.valueProperty().addListener((ov, old_val, new_val) -> {
-            pb_gaussKernel.setProgress(new_val.doubleValue() / 20);
-            tx_gaussKernel.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
-            model.setGaBl((int)Math.round(new_val.doubleValue()));
+            double roundedVal = (int)Math.round(new_val.doubleValue());
+            if (roundedVal % 2 == 0 && roundedVal != 0) roundedVal++;
+            pb_gaussKernel.setProgress(roundedVal / 20);
+            tx_gaussKernel.setText(String.valueOf((int)roundedVal));
+            model.setGaBl((int)roundedVal);
             model.processImages();
         });
         sl_medianKernel.valueProperty().addListener((ov, old_val, new_val) -> {
-            pb_medianKernel.setProgress(new_val.doubleValue() / 20);
-            tx_medianKernel.setText(String.valueOf((int)Math.round(new_val.doubleValue())));
-            model.setMeBl((int)Math.round(new_val.doubleValue()));
+            double roundedVal = (int)Math.round(new_val.doubleValue());
+            if (roundedVal % 2 == 0 && roundedVal != 0) roundedVal++;
+            pb_medianKernel.setProgress(roundedVal / 20);
+            tx_medianKernel.setText(String.valueOf((int)roundedVal));
+            model.setMeBl((int)roundedVal);
             model.processImages();
         });
     }
@@ -164,6 +169,8 @@ public class CubeScanController implements Observer, Initializable {
                 break;
             case "updateImageViews":
                 updateImageViews();
+                break;
+            case "updateSlider":
                 break;
         }
     }

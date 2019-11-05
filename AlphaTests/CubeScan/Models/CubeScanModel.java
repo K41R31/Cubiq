@@ -129,6 +129,8 @@ public class CubeScanModel extends Observable {
     }
     public void setGridColors(Scalar[][] colors) {
         this.gridColors = colors;
+        setChanged();
+        notifyObservers("updateSlider");
     }
 
     public void updateImageViews() {
