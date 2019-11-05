@@ -38,8 +38,6 @@ public class CubeScanAlpha extends Application {
         cubeScanModel.addObserver(cubeScanController);
         cubeScanModel.addObserver(imageProcessing);
 
-        cubeScanModel.addSliderListener();
-
         //Init ImageLoader----------------------------------------------------------------------------------------------
         ImageLoader imageLoader = new ImageLoader(stage);
         imageLoader.initModel(cubeScanModel);

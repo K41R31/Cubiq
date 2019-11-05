@@ -22,14 +22,15 @@ public class CubeScanModel extends Observable {
     private Mat[][] blobImages, binaryImages;
 
 
-    public void addSliderListener() {
-        setChanged();
-        notifyObservers("addSliderListener");
-    }
-
     public void loadNewImage() {
         setChanged();
         notifyObservers("loadNewImage");
+        setChanged();
+        notifyObservers("readColorsFromGrid");
+        setChanged();
+        notifyObservers("addSlider");
+        setChanged();
+        notifyObservers("processImages");
     }
 
     public int getLoHu() {

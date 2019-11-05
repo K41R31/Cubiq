@@ -22,10 +22,22 @@ public class ImageProcessing implements Observer {
     }
     */
 
-    private void checkForCube() {
+    private void readColorsFromGrid() {
+
         Mat frameOfWebcamStream = model.getOriginalImage();
         double[] color = new double[3];
         Scalar[][] colors = new Scalar[3][3];
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                for (int i = 0; i < 3; i++) color[i] = frameOfWebcamStream.get((int)model.getSearchPointGrid()[x][y].y, (int)model.getSearchPointGrid()[x][y].x)[i];
+                colors[x][y] = new Scalar(color[0], color[1], color[2]);
+            }
+        }
+        model.setGridColors(colors);
+    }
+
+    private void checkForCube() {
+        Mat frameOfWebcamStream = model.getOriginalImage();
         Mat[][] binaryMatArray = new Mat[3][3];
         Mat[][] blobMatArray = new Mat[3][3];
         int[][] totalFoundBlobs = new int[3][3];
@@ -33,16 +45,6 @@ public class ImageProcessing implements Observer {
         MatOfKeyPoint keypoints = new MatOfKeyPoint();
         FeatureDetector detector = FeatureDetector.create(FeatureDetector.SIMPLEBLOB);
         detector.read("src/AlphaTests/CubeScan/Resources/SavedData/blobdetectorparams1.xml");
-
-        //Read colors from grid
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                for (int i = 0; i < 3; i++) color[i] = frameOfWebcamStream.get((int)model.getSearchPointGrid()[x][y].y, (int)model.getSearchPointGrid()[x][y].x)[i];
-                colors[x][y] = new Scalar(color[0], color[1], color[2]);
-            }
-        }
-
-        model.setGridColors(colors);
 
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
@@ -64,7 +66,7 @@ public class ImageProcessing implements Observer {
 
                 System.out.println("loHu: " + model.getLoHu() + ", loSa: " + model.getLoSa() + ", loVa: " + model.getLoVa());
                 System.out.println("hiHu: " + model.getHiHu() + ", hiSa: " + model.getHiSa() + ", hiVa: " + model.getHiVa());
-                System.out.println(" ");
+                System.out.println("");
 
                 //Detect Blobs
                 detector.detect(processedFrame, keypoints);
@@ -137,6 +139,9 @@ public class ImageProcessing implements Observer {
         switch ((String)arg) {
             case "processImages":
                 checkForCube();
+                break;
+            case "readColorsFromGrid":
+                readColorsFromGrid();
                 break;
         }
     }

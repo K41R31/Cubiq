@@ -13,20 +13,18 @@ public class RangeSlider extends AnchorPane {
     private DoubleProperty lowValue = new SimpleDoubleProperty(), highValue = new SimpleDoubleProperty();
     private double lowThumbX, highThumbX;
     private int width;
-    private int colorFoundValue = 0;
+    private int foundColor = 0;
     private Line highlightTrack;
+    private Thumb lowThumb, highThumb;
 
 
-    public RangeSlider() {
-        this(0, 255, 20, 80, 170);
-    }
-
-    public RangeSlider(double min, double max, double lowValue, double highValue, int width) {
+    public RangeSlider(double min, double max, double lowValue, double highValue, int width, int foundColor) {
         this.min = min;
         this.max = max;
         this.lowValue.set(lowValue);
         this.highValue.set(highValue);
         this.width = width;
+        this.foundColor = foundColor;
         initPane();
         buildRangeSlider();
     }
@@ -45,18 +43,19 @@ public class RangeSlider extends AnchorPane {
         highlightTrack.setStroke(Color.web("#f95e5c"));
 
         Line divider = new Line();
-        divider.setStartX(((double)width / 2) - 1);
-        divider.setEndX(((double)width / 2) + 1);
+        divider.setStartX(((double)width / (max - min) * foundColor) - 1);
+        divider.setEndX(((double)width / (max - min) * foundColor) + 1);
         divider.setLayoutY(3.5);
         divider.setStroke(Color.web("#e8eaf5"));
-        divider.setVisible(false);
 
-        Thumb lowThumb = new Thumb(lowValue.doubleValue());
-        Thumb highThumb = new Thumb(highValue.doubleValue());
+        lowThumb = new Thumb(lowValue.doubleValue());
+        highThumb = new Thumb(highValue.doubleValue());
         lowThumb.isLowThumb();
         highThumb.isHighThumb();
 
         getChildren().addAll(backgorundTrack, highlightTrack, divider, lowThumb, highThumb);
+
+
     }
 
     private void initPane() {
@@ -89,7 +88,7 @@ public class RangeSlider extends AnchorPane {
                 toFront();
                 setX(Math.round(mouseEvent.getX()));
                 if (getX() < 0) setX(0);
-                else if (colorFoundValue != 0 && getX() > getColorFoundX()) setX(getColorFoundX());
+                else if (foundColor != 0 && getX() > getFoundColorX()) setX(getFoundColorX());
                 else if (getX() > highThumbX) setX(highThumbX - 1);
                 lowThumbX = getX();
                 lowValue.set(getX() / width * (max - min));
@@ -102,7 +101,7 @@ public class RangeSlider extends AnchorPane {
                 toFront();
                 setX(Math.round(mouseEvent.getX()));
                 if (getX() > width) setX(width);
-                else if (colorFoundValue != 0 && getX() < getColorFoundX()) setX(getColorFoundX());
+                else if (foundColor != 0 && getX() < getFoundColorX()) setX(getFoundColorX());
                 else if (getX() < lowThumbX) setX(lowThumbX + 1);
                 highThumbX = getX();
                 highValue.set(getX() / width * (max - min));
@@ -126,18 +125,19 @@ public class RangeSlider extends AnchorPane {
     }
     public void setHighValue(double value) {
         highValue.set(value);
+        highThumb.setValue(value);
     }
     public DoubleProperty highValueProperty() {
         return highValue;
     }
 
-    public int getColorFoundValue() {
-        return this.colorFoundValue;
+    public int getFoundColor() {
+        return this.foundColor;
     }
-    public int getColorFoundX() {
-        return (int)Math.round(width / (max - min) * colorFoundValue);
+    public int getFoundColorX() {
+        return (int)Math.round(width / (max - min) * foundColor);
     }
-    public void setColorFoundValue(int colorFoundValue) {
-        this.colorFoundValue = colorFoundValue;
+    public void setFoundColor(int foundColor) {
+        this.foundColor = foundColor;
     }
 }

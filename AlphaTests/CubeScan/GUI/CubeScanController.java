@@ -1,7 +1,6 @@
 package AlphaTests.CubeScan.GUI;
 
 import AlphaTests.CubeScan.Models.CubeScanModel;
-import com.sun.javafx.scene.paint.MaterialHelper;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -62,8 +61,29 @@ public class CubeScanController implements Observer, Initializable {
         };
     }
 
-    private void addSliderListener() {
-        RangeSlider rangeSliderHue = new RangeSlider(0, 179, 0, 179, 170);
+    private void addSlider() {
+        double colorHue = model.getGridColors()[0][0].val[0];
+        double colorSat = model.getGridColors()[0][0].val[1];
+        double colorVal = model.getGridColors()[0][0].val[2];
+
+        //Auf 179 und 255 und 0 begrenzen
+        if (colorHue - 6 > 0) model.setLoHu((int)Math.round(colorHue - 6));
+        else model.setLoHu(1);
+        if (colorHue + 6 < 179) model.setHiHu((int)Math.round(colorHue + 6));
+        else model.setHiHu(179);
+
+        if (colorSat - 30 > 0) model.setLoSa((int)Math.round(colorSat - 30));
+        else model.setLoSa(1);
+        if (colorSat + 30 < 255) model.setHiSa((int)Math.round(colorSat + 30));
+        else model.setHiSa(255);
+
+        if (colorVal - 30 > 0) model.setLoVa((int)Math.round(colorVal - 30));
+        else model.setLoVa(1);
+        if (colorVal + 30 < 255) model.setHiVa((int)Math.round(colorVal + 30));
+        else model.setHiVa(255);
+
+        //Range Slider Initialisieren
+        RangeSlider rangeSliderHue = new RangeSlider(0, 179, model.getLoHu(), model.getHiHu(), 170, (int) colorHue);
         sliderPaneHue.getChildren().add(rangeSliderHue);
         tx_lowHue.setText(String.valueOf(Math.round(rangeSliderHue.getLowValue())));
         tx_highHue.setText(String.valueOf(Math.round(rangeSliderHue.getHighValue())));
@@ -78,7 +98,7 @@ public class CubeScanController implements Observer, Initializable {
             model.processImages();
         });
 
-        RangeSlider rangeSliderSat = new RangeSlider(0, 255, 0, 255, 170);
+        RangeSlider rangeSliderSat = new RangeSlider(0, 255, model.getLoSa(), model.getHiSa(), 170, (int) colorSat);
         sliderPaneSat.getChildren().add(rangeSliderSat);
         tx_lowSat.setText(String.valueOf(Math.round(rangeSliderSat.getLowValue())));
         tx_highSat.setText(String.valueOf(Math.round(rangeSliderSat.getHighValue())));
@@ -93,7 +113,7 @@ public class CubeScanController implements Observer, Initializable {
             model.processImages();
         });
 
-        RangeSlider rangeSliderVal = new RangeSlider(0, 255, 0, 255, 170);
+        RangeSlider rangeSliderVal = new RangeSlider(0, 255, model.getLoVa(), model.getHiVa(), 170, (int) colorVal);
         sliderPaneVal.getChildren().add(rangeSliderVal);
         tx_lowVal.setText(String.valueOf(Math.round(rangeSliderVal.getLowValue())));
         tx_highVal.setText(String.valueOf(Math.round(rangeSliderVal.getHighValue())));
@@ -164,13 +184,11 @@ public class CubeScanController implements Observer, Initializable {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "addSliderListener":
-                addSliderListener();
+            case "addSlider":
+                addSlider();
                 break;
             case "updateImageViews":
                 updateImageViews();
-                break;
-            case "updateSlider":
                 break;
         }
     }

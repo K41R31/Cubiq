@@ -57,7 +57,6 @@ public class ImageLoader implements Observer {
         imageMat.convertTo(imageMat, CvType.CV_8U);
         Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2HSV);
         model.setOriginalImage(imageMat);
-        model.processImages();
     }
 
     @Override
