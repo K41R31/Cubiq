@@ -60,8 +60,10 @@ public class ImageProcessing implements Observer {
                 if (model.getGaBl() != 0) Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
                 if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl()); //TODO Median Blur dauert lange
                 Core.inRange(processedFrame,
-                        new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
-                        new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
+                        //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
+                        //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
+                        new Scalar(model.getGridColors()[x][y].val[0] - 20, model.getGridColors()[x][y].val[1] - 70, model.getGridColors()[x][y].val[2] - 70),
+                        new Scalar(model.getGridColors()[x][y].val[0] + 20, model.getGridColors()[x][y].val[1] + 70, model.getGridColors()[x][y].val[2] + 70), processedFrame);
                 binaryMatArray[x][y] = processedFrame;
 
                 System.out.println("loHu: " + model.getLoHu() + ", loSa: " + model.getLoSa() + ", loVa: " + model.getLoVa());
