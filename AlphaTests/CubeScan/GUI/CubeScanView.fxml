@@ -16,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CubeScanStyle.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScan.GUI.CubeScanController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CubeScanStyle.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScan.GUI.CubeScanController">
    <children>
       <GridPane fx:id="gp_binaryGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="860.0" style="-fx-background-color: #2a2b31;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -234,7 +234,7 @@
                   </HBox>
                </children>
             </VBox>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="20.0">
                <children>
                   <Button fx:id="btn_toggleImageViews" mnemonicParsing="false" onAction="#toggleImageViews" styleClass="redButtons" text="show blobs" textFill="#f95e5c">
                      <font>
@@ -248,6 +248,14 @@
                   </Button>
                </children>
             </HBox>
+            <Button fx:id="btn_toggleuseMeanColor" mnemonicParsing="false" onAction="#toggleUseMeanColor" styleClass="redButtons" text="don't use mean color" textFill="#f95e5c">
+               <font>
+                  <Font name="Kiona Regular" size="22.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="-20.0" />
+               </VBox.margin>
+            </Button>
          </children>
       </VBox>
    </children>

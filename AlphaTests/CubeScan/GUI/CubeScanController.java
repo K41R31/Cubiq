@@ -41,7 +41,7 @@ public class CubeScanController implements Observer, Initializable {
     @FXML
     private Text tx_lowHue, tx_highHue, tx_lowSat, tx_highSat, tx_lowVal, tx_highVal, tx_gaussKernel, tx_medianKernel;
     @FXML
-    private Button btn_toggleImageViews;
+    private Button btn_toggleImageViews, btn_toggleuseMeanColor;
     @FXML
     private AnchorPane sliderPaneHue, sliderPaneSat, sliderPaneVal;
 
@@ -172,6 +172,17 @@ public class CubeScanController implements Observer, Initializable {
             gp_binaryGrid.setVisible(true);
             gp_blobGrid.setVisible(false);
             btn_toggleImageViews.setText("show blobs");
+        }
+    }
+
+    @FXML
+    private void toggleUseMeanColor() {
+        if (model.isUseMeanColor()) {
+            btn_toggleuseMeanColor.setText("don't use mean color");
+            model.setUseMeanColor(false);
+        } else {
+            btn_toggleuseMeanColor.setText("use mean color");
+            model.setUseMeanColor(true);
         }
     }
 

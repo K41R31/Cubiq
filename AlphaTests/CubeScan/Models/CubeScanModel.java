@@ -1,25 +1,29 @@
 package AlphaTests.CubeScan.Models;
 
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+
+import java.util.List;
 import java.util.Observable;
 
 public class CubeScanModel extends Observable {
 
-    private Point frameOrigin = new Point(432, 181);
+    private Point frameOrigin = new Point(466, 185);
     private int searchFrameSize = 350;
     private Point[][] searchPointGrid = new Point[][] {
-            {new Point(507, 242), new Point(620, 242), new Point(731, 242)},
-            {new Point(507, 359), new Point(620, 359), new Point(731, 359)},
-            {new Point(507, 475), new Point(620, 475), new Point(731, 475)}
+            {new Point(524, 243), new Point(640, 243), new Point(757, 243)},
+            {new Point(524, 359), new Point(640, 359), new Point(757, 359)},
+            {new Point(524, 477), new Point(640, 477), new Point(757, 477)}
     };
     private Scalar[][] gridColors = new Scalar[3][3];
     private int loHu, hiHu, loSa, hiSa, loVa, hiVa;
     private int gaBl = 5, meBl = 5;
-    private int[][] foundBlobs;
+    private List<List<KeyPoint>> foundBlobsList;
     private Mat originalImage;
     private Mat[][] blobImages, binaryImages;
+    private boolean useMeanColor = true;
 
 
     public void loadNewImage() {
@@ -85,13 +89,6 @@ public class CubeScanModel extends Observable {
         this.meBl = value;
     }
 
-    public int[][] getFoundBlobs() {
-        return this.foundBlobs;
-    }
-    public void setFoundBlobs(int[][] array) {
-        this.foundBlobs = array;
-    }
-
     public Mat getOriginalImage() {
         return this.originalImage;
     }
@@ -132,6 +129,24 @@ public class CubeScanModel extends Observable {
         this.gridColors = colors;
         setChanged();
         notifyObservers("updateSlider");
+    }
+
+    public List<List<KeyPoint>> getFoundBlobsList() {
+        return foundBlobsList;
+    }
+    public void setFoundBlobsList(List<List<KeyPoint>> foundBlobsList) {
+        this.foundBlobsList = foundBlobsList;
+    }
+
+    public boolean isUseMeanColor() {
+        return useMeanColor;
+    }
+    public void setUseMeanColor(boolean useMeanColor) {
+        this.useMeanColor = useMeanColor;
+        setChanged();
+        notifyObservers("readColorsFromGrid");
+        setChanged();
+        notifyObservers("processImages");
     }
 
     public void updateImageViews() {
