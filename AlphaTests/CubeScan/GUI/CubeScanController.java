@@ -178,10 +178,10 @@ public class CubeScanController implements Observer, Initializable {
     @FXML
     private void toggleUseMeanColor() {
         if (model.isUseMeanColor()) {
-            btn_toggleuseMeanColor.setText("don't use mean color");
+            btn_toggleuseMeanColor.setText("use mean color");
             model.setUseMeanColor(false);
         } else {
-            btn_toggleuseMeanColor.setText("use mean color");
+            btn_toggleuseMeanColor.setText("don't use mean color");
             model.setUseMeanColor(true);
         }
     }

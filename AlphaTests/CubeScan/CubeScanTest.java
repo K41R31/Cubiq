@@ -227,7 +227,7 @@ public class CubeScanTest extends Application {
     }
 
     private void loadImage() {
-        imgMat = imread("src/AlphaTests/CubeScan/Resources/Assets/WIN_20191108_11_57_09_Pro.jpg", IMREAD_COLOR);
+        imgMat = imread("src/AlphaTests/CubeScan/Resources/Assets/handy.jpg", IMREAD_COLOR);
         if (imgMat.empty()) System.out.println("Image was not read");
     }
 
