@@ -55,7 +55,7 @@
          <children>
             <ImageView fx:id="iv_blob0" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="iv_blob1" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
-            <ImageView fx:id="iv_bloby2" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" />
+            <ImageView fx:id="iv_blob2" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" />
             <ImageView fx:id="iv_blob3" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1" />
             <ImageView fx:id="iv_blob4" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <ImageView fx:id="iv_blob5" fitHeight="240.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />

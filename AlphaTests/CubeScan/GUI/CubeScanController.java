@@ -30,7 +30,7 @@ public class CubeScanController implements Observer, Initializable {
     private ImageView iv_binary0, iv_binary1, iv_binary2, iv_binary3, iv_binary4, iv_binary5, iv_binary6, iv_binary7, iv_binary8;
     private ImageView[][] binaryImageViews;
     @FXML
-    private ImageView iv_blob0, iv_blob1, iv_bloby2, iv_blob3, iv_blob4, iv_blob5, iv_blob6, iv_blob7, iv_blob8;
+    private ImageView iv_blob0, iv_blob1, iv_blob2, iv_blob3, iv_blob4, iv_blob5, iv_blob6, iv_blob7, iv_blob8;
     private ImageView[][] blobImageViews;
     @FXML
     private GridPane gp_binaryGrid, gp_blobGrid;
@@ -50,14 +50,14 @@ public class CubeScanController implements Observer, Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Init Arrays
         binaryImageViews = new ImageView[][] {
-                {iv_binary0, iv_binary1, iv_binary2},
-                {iv_binary3, iv_binary4, iv_binary5},
-                {iv_binary6, iv_binary7, iv_binary8}
+                {iv_binary0, iv_binary3, iv_binary6},
+                {iv_binary1, iv_binary4, iv_binary7},
+                {iv_binary2, iv_binary5, iv_binary8}
         };
         blobImageViews = new ImageView[][] {
-                {iv_blob0, iv_blob1, iv_bloby2},
-                {iv_blob3, iv_blob4, iv_blob5},
-                {iv_blob6, iv_blob7, iv_blob8}
+                {iv_blob0, iv_blob3, iv_blob6},
+                {iv_blob1, iv_blob4, iv_blob7},
+                {iv_blob2, iv_blob5, iv_blob8}
         };
     }
 
@@ -148,8 +148,8 @@ public class CubeScanController implements Observer, Initializable {
 
     private void updateImageViews() {
         MatOfByte matOfByte = new MatOfByte();
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
                 setImage(model.getBinaryImages()[x][y], binaryImageViews[x][y], matOfByte);
                 setImage(model.getBlobImages()[x][y], blobImageViews[x][y], matOfByte);
             }

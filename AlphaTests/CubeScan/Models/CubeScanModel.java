@@ -13,9 +13,9 @@ public class CubeScanModel extends Observable {
     private Point frameOrigin = new Point(466, 185);
     private int searchFrameSize = 350;
     private Point[][] searchPointGrid = new Point[][] {
-            {new Point(524, 243), new Point(640, 243), new Point(757, 243)},
-            {new Point(524, 359), new Point(640, 359), new Point(757, 359)},
-            {new Point(524, 477), new Point(640, 477), new Point(757, 477)}
+            {new Point(524, 243), new Point(524, 359), new Point(524, 477)},
+            {new Point(640, 243), new Point(640, 359), new Point(640, 477)},
+            {new Point(757, 243), new Point(757, 359), new Point(757, 477)}
     };
     private Scalar[][] gridColors = new Scalar[3][3];
     private int loHu, hiHu, loSa, hiSa, loVa, hiVa;
