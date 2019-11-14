@@ -86,6 +86,7 @@ public class ImageProcessing implements Observer {
                     Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
                 if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl());
                 if (x == 1 && y == 0) System.out.println("x - 5: " + (model.getGridColors()[x][y].val[0] - 5));
+                if (model.getGridColors()[x][y].val[0] - 5 < 0) model.getGridColors()[x][y].val[0] - 5
                 Core.inRange(processedFrame,
                         //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
                         //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
