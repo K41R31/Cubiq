@@ -86,11 +86,29 @@ public class ImageProcessing implements Observer {
                     Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
                 if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl());
                 if (x == 1 && y == 0) System.out.println("x - 5: " + (model.getGridColors()[x][y].val[0] - 5));
-                if (model.getGridColors()[x][y].val[0] - 5 < 0) model.getGridColors()[x][y].val[0] - 5
+
+                /*
+                double lowRed, highRed;
+                if (model.getGridColors()[x][y].val[0] - 5 < 0) lowRed = 180 + model.getGridColors()[x][y].val[0] - 5;
+                else lowRed = model.getGridColors()[x][y].val[0] - 5;
+                if (model.getGridColors()[x][y].val[0] + 5 > 180) highRed = model.getGridColors()[x][y].val[0] + 5;
+                else highRed = model.getGridColors()[x][y].val[0] + 5;
+                if (x == 0 && y == 1) {
+                    System.out.println("readRed: " + model.getGridColors()[x][y].val[0]);
+                    System.out.println("lowRed: " + lowRed);
+                    System.out.println("highRed: " + highRed);
+                }
+                */
+
+                //TODO In RGB-----Eine Farbe in RGB---------------------------------------------------------------------
+                Mat convertColorMap = new Mat(new Size(1,1), CvType.CV_8U, model.getGridColors()[x][y]);
+                Imgproc.cvtColor(convertColorMap, convertColorMap, Imgproc.COLOR_HSV2BGR);
+                Scalar rgbColor = new Scalar(convertColorMap.get(0, 0));
+                System.out.println("Color: " + Arrays.toString(rgbColor.val));
+
                 Core.inRange(processedFrame,
                         //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
                         //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
-                        //TODO Wenn val < 0 -> 180 + val - 5------------------------------------------------------------
                         new Scalar(model.getGridColors()[x][y].val[0] - 5, model.getGridColors()[x][y].val[1] - 50, model.getGridColors()[x][y].val[2] - 50),
                         new Scalar(model.getGridColors()[x][y].val[0] + 5, model.getGridColors()[x][y].val[1] + 50, model.getGridColors()[x][y].val[2] + 50), processedFrame);
                 binaryMatArray[x][y] = processedFrame;
