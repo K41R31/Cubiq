@@ -16,6 +16,7 @@ import org.opencv.features2d.FeatureDetector;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR;
@@ -162,6 +163,7 @@ public class CubeScanTest extends Application {
             sliderValues[6] = (int)Math.round(sliders[6].getValue());
             if (sliderValues[6] % 2 == 0) sliderValues[6]++;
             updateImage();
+            printSliderValues();
         });
 
         sliders[7] = new Slider();
@@ -172,6 +174,7 @@ public class CubeScanTest extends Application {
             sliderValues[7] = (int)Math.round(sliders[7].getValue());
             if (sliderValues[7] % 2 == 0) sliderValues[7]++;
             updateImage();
+            printSliderValues();
         });
 
         hBoxGaussianBlur.getChildren().addAll(new Text("Gaussian Blur Kernelsize"), sliders[6]);
@@ -190,36 +193,42 @@ public class CubeScanTest extends Application {
                     valueProperty().addListener((ov, old_val, new_val) -> {
                         sliderValues[0] = (int)Math.round(getValue());
                         updateImage();
+                        printSliderValues();
                     });
                     break;
                 case 1:
                     valueProperty().addListener((ov, old_val, new_val) -> {
                         sliderValues[1] = (int)Math.round(getValue());
                         updateImage();
+                        printSliderValues();
                     });
                     break;
                 case 2:
                     valueProperty().addListener((ov, old_val, new_val) -> {
                         sliderValues[2] = (int)Math.round(getValue());
                         updateImage();
+                        printSliderValues();
                     });
                     break;
                 case 3:
                     valueProperty().addListener((ov, old_val, new_val) -> {
                         sliderValues[3] = (int)Math.round(getValue());
                         updateImage();
+                        printSliderValues();
                     });
                     break;
                 case 4:
                     valueProperty().addListener((ov, old_val, new_val) -> {
                         sliderValues[4] = (int)Math.round(getValue());
                         updateImage();
+                        printSliderValues();
                     });
                     break;
                 case 5:
                     valueProperty().addListener((ov, old_val, new_val) -> {
                         sliderValues[5] = (int)Math.round(getValue());
                         updateImage();
+                        printSliderValues();
                     });
                     break;
             }
@@ -227,8 +236,14 @@ public class CubeScanTest extends Application {
     }
 
     private void loadImage() {
-        imgMat = imread("src/AlphaTests/CubeScan/Resources/Assets/handy.jpg", IMREAD_COLOR);
+        imgMat = imread("src/AlphaTests/CubeScan/Resources/Assets/gan.jpg", IMREAD_COLOR);
         if (imgMat.empty()) System.out.println("Image was not read");
+    }
+
+    private void printSliderValues() {
+        for (int i = 0; i < sliders.length; i++) {
+            System.out.println("Slider " + i + ": "  + sliders[i].getValue());
+        }
     }
 
     @Override

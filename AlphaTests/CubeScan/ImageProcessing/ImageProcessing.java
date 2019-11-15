@@ -7,6 +7,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import java.util.*;
 
+import static org.opencv.imgproc.Imgproc.COLOR_HSV2RGB;
 import static org.opencv.imgproc.Imgproc.initUndistortRectifyMap;
 import static org.opencv.imgproc.Imgproc.rectangle;
 
@@ -38,12 +39,6 @@ public class ImageProcessing implements Observer {
                         System.out.println(scalar.val[2] / 2.55);
                         Imgcodecs.imwrite("orgImage.jpg", frameOfWebcamStream);
                         */
-                        System.out.println((int)searchPoint.y + ", " + (int)searchPoint.x);
-                        System.out.println(new Scalar(
-                                frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)[0] * 2,
-                                frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)[1] / 2.55,
-                                frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)[2] / 2.55
-                        ));
                     }
 
                 } else {
@@ -85,32 +80,50 @@ public class ImageProcessing implements Observer {
                 if (model.getGaBl() != 0)
                     Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
                 if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl());
-                if (x == 1 && y == 0) System.out.println("x - 5: " + (model.getGridColors()[x][y].val[0] - 5));
+
+                //TODO Range Slider Werte
+                //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
+                //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
+
+                double[] color = model.getGridColors()[x][y].val;
+
+                int rt = 5;
+                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_HSV2BGR);
+                Imgcodecs.imwrite("test.jpg", processedFrame);
+                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_BGR2HSV);
+
+                if (color[0] - rt < 0) {
+                    Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
+                    Core.inRange(processedFrame, new Scalar(0, color[1] - 50, color[2] - 50), new Scalar(color[0] + rt, color[1] + 50, color[2] + 50), lowerRedMat);
+                    Core.inRange(processedFrame, new Scalar(179 + color[0] - rt, color[1] - 50, color[2] - 50), new Scalar(179, color[1] + 50, color[2] + 50), upperRedMat);
+                    Core.add(lowerRedMat, upperRedMat, processedFrame);
+                    if (x == 1 && y == 0) System.out.println("Low: " + 0 + "-" + Math.round(color[0] + rt) + ", High: " + Math.round(179 + color[0] - rt) + "-" + 179);
+                }
+                else if (color[0] + rt > 179) {
+                    Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
+                    Core.inRange(processedFrame, new Scalar(0, color[1] - 50, color[2] - 50), new Scalar(color[0] + rt - 179, color[1] + 50, color[2] + 50), lowerRedMat);
+                    Core.inRange(processedFrame, new Scalar(color[0] - rt, color[1] - 50, color[2] - 50), new Scalar(179, color[1] + 50, color[2] + 50), upperRedMat);
+                    Core.add(lowerRedMat, upperRedMat, processedFrame);
+                    if (x == 1 && y == 0) System.out.println("Low: " + rt + "-" + Math.round(color[0] + rt - 179) + ", High: " + Math.round(color[0] - rt) + "-" + 179);
+                }
+                else {
+                    Core.inRange(processedFrame, new Scalar(color[0] - rt, color[1] - 50, color[2] - 50), new Scalar(color[0] + rt, color[1] + 50, color[2] + 50), processedFrame);
+                    if (x == 1 && y == 0) System.out.println(Math.round(color[0] - rt) + " - " + Math.round(color[0] + rt));
+                }
 
                 /*
+                //TODO  0, 150, 155/ 180, 244, 176
                 double lowRed, highRed;
-                if (model.getGridColors()[x][y].val[0] - 5 < 0) lowRed = 180 + model.getGridColors()[x][y].val[0] - 5;
-                else lowRed = model.getGridColors()[x][y].val[0] - 5;
-                if (model.getGridColors()[x][y].val[0] + 5 > 180) highRed = model.getGridColors()[x][y].val[0] + 5;
-                else highRed = model.getGridColors()[x][y].val[0] + 5;
-                if (x == 0 && y == 1) {
-                    System.out.println("readRed: " + model.getGridColors()[x][y].val[0]);
-                    System.out.println("lowRed: " + lowRed);
-                    System.out.println("highRed: " + highRed);
+                if (color[0] - 5 < 0 || color[0] + 5 > 180) {
+                    lowRed = 0;
+                    highRed = 179;
+                } else {
+                    lowRed = color[0] - 8;
+                    highRed = color[0] + 8;
                 }
+                Core.inRange(processedFrame, new Scalar(lowRed, color[1] - 50, color[2] - 50), new Scalar(highRed, color[1] + 50, color[2] + 50), processedFrame);
                 */
 
-                //TODO In RGB-----Eine Farbe in RGB---------------------------------------------------------------------
-                Mat convertColorMap = new Mat(new Size(1,1), CvType.CV_8U, model.getGridColors()[x][y]);
-                Imgproc.cvtColor(convertColorMap, convertColorMap, Imgproc.COLOR_HSV2BGR);
-                Scalar rgbColor = new Scalar(convertColorMap.get(0, 0));
-                System.out.println("Color: " + Arrays.toString(rgbColor.val));
-
-                Core.inRange(processedFrame,
-                        //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
-                        //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
-                        new Scalar(model.getGridColors()[x][y].val[0] - 5, model.getGridColors()[x][y].val[1] - 50, model.getGridColors()[x][y].val[2] - 50),
-                        new Scalar(model.getGridColors()[x][y].val[0] + 5, model.getGridColors()[x][y].val[1] + 50, model.getGridColors()[x][y].val[2] + 50), processedFrame);
                 binaryMatArray[x][y] = processedFrame;
 
                 //Detect Blobs
