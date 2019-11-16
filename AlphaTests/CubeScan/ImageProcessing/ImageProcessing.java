@@ -74,12 +74,15 @@ public class ImageProcessing implements Observer {
                 Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_GRAY2BGR);
                 frameOfWebcamStream.copyTo(processedFrame, mask);
 
-                //TODO Blur-Filter dauern lange
+                //TODO Gaussian-Blur Produziert Grüne Artefakte
                 //TODO Für jedes Bild ein Rangeslider-paar
                 //Image Operations
-                if (model.getGaBl() != 0)
-                    Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
+                //if (model.getGaBl() != 0) Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
                 if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl());
+
+                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_HSV2BGR);
+                Imgcodecs.imwrite("test.jpg", processedFrame);
+                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_BGR2HSV);
 
                 //TODO Range Slider Werte
                 //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
@@ -88,9 +91,6 @@ public class ImageProcessing implements Observer {
                 double[] color = model.getGridColors()[x][y].val;
 
                 int rt = 5;
-                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_HSV2BGR);
-                Imgcodecs.imwrite("test.jpg", processedFrame);
-                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_BGR2HSV);
 
                 if (color[0] - rt < 0) {
                     Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
