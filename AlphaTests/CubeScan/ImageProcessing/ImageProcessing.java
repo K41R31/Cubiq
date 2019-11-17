@@ -7,15 +7,13 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import java.util.*;
 
-import static org.opencv.imgproc.Imgproc.COLOR_HSV2RGB;
-import static org.opencv.imgproc.Imgproc.initUndistortRectifyMap;
 import static org.opencv.imgproc.Imgproc.rectangle;
 
 public class ImageProcessing implements Observer {
 
     private CubeScanModel model;
 
-    private double meanColorRect = 60; //TODO Ins Model, meanColorRect % 2 != 0
+    private double meanColorRectSize = 60; //TODO Ins Model, meanColorRectSize % 2 != 0
 
 
     private void readColorsFromGrid() {
@@ -27,10 +25,49 @@ public class ImageProcessing implements Observer {
                 if (model.isUseMeanColor()) {
                     Mat mask = new Mat(frameOfWebcamStream.height(), frameOfWebcamStream.width(), CvType.CV_8U, new Scalar(0));
 
-                    rectangle(mask, new Point(searchPoint.x - meanColorRect / 2, searchPoint.y - meanColorRect / 2), new Point(searchPoint.x + meanColorRect / 2, searchPoint.y + meanColorRect / 2), new Scalar(255), Core.FILLED);
+                    Point point0 = new Point(searchPoint.x - meanColorRectSize / 2, searchPoint.y - meanColorRectSize / 2);
+                    Point point1 = new Point(searchPoint.x + meanColorRectSize / 2, searchPoint.y + meanColorRectSize / 2);
+
+                    rectangle(mask, point0, point1, new Scalar(255), Core.FILLED);
+
+                    if (x == 1 && y == 0) {
+                        //TODO RICHTIGE FARBE: 179
+                        //Custom Mean-----------------------------------------------------------------------------------
+
+                        double[] readColor;
+                        double unitVectorX = 0, unitVectorY = 0;
+                        for (int col = 0; col < meanColorRectSize; col++) {
+                            for (int row = 0; row < meanColorRectSize; row++) {
+                                readColor = frameOfWebcamStream.get((int) Math.round(row + point0.y), (int) Math.round(col + point0.x));
+                                unitVectorX += Math.abs(Math.cos(readColor[0]*2));
+                                unitVectorY += Math.abs(Math.sin(readColor[0]*2));
+                            }
+                        }
+                        unitVectorX = unitVectorX / (meanColorRectSize*meanColorRectSize);
+                        unitVectorY = unitVectorY / (meanColorRectSize*meanColorRectSize);
+                        System.out.println("Mean: " + Math.toDegrees((Math.atan(unitVectorX)+Math.atan(unitVectorY)) / 2));
+                        /*
+                        double[] readColor;
+                        double[] processColor = new double[3];
+                        for (int col = 0; col < meanColorRectSize; col++) {
+                            for (int row = 0; row < meanColorRectSize; row++) {
+                                readColor = frameOfWebcamStream.get((int) Math.round(row + point0.y), (int) Math.round(col + point0.x));
+                                for (int i = 0; i < 3; i ++) processColor[i] += readColor[i];
+                            }
+                        }
+                        for (int i = 0; i < 3; i++) processColor[i] = processColor[i] / (60*60);
+                        //Custom Mean Ende------------------------------------------------------------------------------
+                        System.out.println("CustomMeanColor: " + Arrays.toString(processColor));
+                        System.out.println("MeanColor: " + Core.mean(frameOfWebcamStream, mask));
+                        System.out.println("SingleColor: " + Arrays.toString(frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)));
+
+                        Mat mat = new Mat();
+                        Imgproc.cvtColor(frameOfWebcamStream, mat, Imgproc.COLOR_HSV2BGR);
+                        Imgcodecs.imwrite("mask.jpg", mat);
+                        */
+                    }
                     colors[x][y] = Core.mean(frameOfWebcamStream, mask);
 
-                    //TODO aus irgend einem Grund kommt beim Mittelstein (Beim GAN Cube) Blau raus
                     if (x == 0 && y == 1) {
                         /*
                         Scalar scalar = Core.mean(frameOfWebcamStream, mask);
@@ -51,6 +88,66 @@ public class ImageProcessing implements Observer {
             }
         }
         model.setGridColors(colors);
+        RGBtoHSV();
+    }
+
+    private void RGBtoHSV() {
+        double[] bgr = new double[] {139, 192, 120};
+        double h, s, v;
+        double min, max, delta;
+        //Get the min, max value of rgb
+        min = bgr[0];
+        max = bgr[0];
+        for (int i = 1; i < bgr.length; i++) {
+            min = Math.min(min, bgr[i]);
+            max = Math.max(max, bgr[i]);
+        }
+        v = max;                        // v
+        delta = max - min;
+        if (max != 0) s = delta / max * 255; //s
+        else {                           // r = g = b = 0
+            s = 0;
+            h = -1;
+            System.out.println("hsv: " + h + ", " + s + ", " + v);
+            return;
+        }
+        if (max == min) {                // hier ist alles Grau
+            h = 0;
+            s = 0;
+            System.out.println("hsv: " + h + ", " + s + ", " + v);
+            return;
+        }
+        if (bgr[2] == max) h = (bgr[1] - bgr[0]) / delta;       // zwischen Gelb und Magenta
+        else if (bgr[1] == max) h = 2 + (bgr[0] - bgr[2]) / delta;   // zwischen Cyan und Gelb
+        else h = 4 + (bgr[2] - bgr[1]) / delta;   // zwischen Magenta und Zyan
+        h *= 60;                     // degrees
+        if (h < 0) h += 360;
+        h /= 2;
+        System.out.println("hsv: " + h + ", " + s + ", " + v);
+    }
+
+    void HSVtoRGB( float r, float g, float b, float h, float s, float v) { //rgb -> [0,1] hsv -> [0,255; 0,1; 0,1]
+        int i;
+        float f, p, q, t;
+        if(s == 0) { // achromatisch (Grau)
+            r = g = b = v;
+            return;
+        }
+        h /= 60;           // sector 0 to 5
+        i = Math.round(h);
+        f = h - i;         // factorial part of h
+        p = v * (1 - s);
+        q = v * (1 - s * f);
+        t = v * (1 - s * (1 - f));
+        switch(i) {
+            case 0: r = v; g = t; b = p; break;
+            case 1: r = q; g = v; b = p; break;
+            case 2: r = p; g = v; b = t; break;
+            case 3: r = p; g = q; b = v; break;
+            case 4: r = t; g = p; b = v; break;
+            default: r = v; g = p; b = q; //case 5
+            break;
+        }
     }
 
     private void checkForCube() {
@@ -79,10 +176,6 @@ public class ImageProcessing implements Observer {
                 //Image Operations
                 //if (model.getGaBl() != 0) Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
                 if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl());
-
-                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_HSV2BGR);
-                Imgcodecs.imwrite("test.jpg", processedFrame);
-                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_BGR2HSV);
 
                 //TODO Range Slider Werte
                 //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
@@ -146,10 +239,10 @@ public class ImageProcessing implements Observer {
                     Point BlobPosition = totalBlobList[x][y].get(i).pt;
                     Point girdPos = model.getSearchPointGrid()[x][y];
 
-                    if (BlobPosition.x < girdPos.x - meanColorRect / 2) continue;
-                    if (BlobPosition.x > girdPos.x + meanColorRect / 2) continue;
-                    if (BlobPosition.y < girdPos.y - meanColorRect / 2) continue;
-                    if (BlobPosition.y > girdPos.y + meanColorRect / 2) continue;
+                    if (BlobPosition.x < girdPos.x - meanColorRectSize / 2) continue;
+                    if (BlobPosition.x > girdPos.x + meanColorRectSize / 2) continue;
+                    if (BlobPosition.y < girdPos.y - meanColorRectSize / 2) continue;
+                    if (BlobPosition.y > girdPos.y + meanColorRectSize / 2) continue;
                     counter++;
                 }
             }
@@ -176,7 +269,7 @@ public class ImageProcessing implements Observer {
     }
 
     private String colorDetection(Scalar color) {
-        if (color.val[1] < 100 && color.val[2] > 160) return "WHITE";
+        if (color.val[1] < 100 && color.val[2] > 110) return "WHITE";
         else if (color.val[0] < 5) return "RED";
         else if (color.val[0] < 18) return "ORANGE";
         else if (color.val[0] < 36) return "YELLOW";
