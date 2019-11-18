@@ -30,53 +30,31 @@ public class ImageProcessing implements Observer {
 
                     rectangle(mask, point0, point1, new Scalar(255), Core.FILLED);
 
-                    if (x == 1 && y == 0) {
-                        //TODO RICHTIGE FARBE: 179
-                        //Custom Mean-----------------------------------------------------------------------------------
-
-                        double[] readColor;
-                        double unitVectorX = 0, unitVectorY = 0;
-                        for (int col = 0; col < meanColorRectSize; col++) {
-                            for (int row = 0; row < meanColorRectSize; row++) {
-                                readColor = frameOfWebcamStream.get((int) Math.round(row + point0.y), (int) Math.round(col + point0.x));
-                                unitVectorX += Math.abs(Math.cos(readColor[0]*2));
-                                unitVectorY += Math.abs(Math.sin(readColor[0]*2));
-                            }
+                    //Get the mean HSV Color----------------------------------------------------------------------------
+                    double[] readColor;
+                    double unitVectorX = 0, unitVectorY = 0;
+                    for (int col = 0; col < meanColorRectSize; col++) {
+                        for (int row = 0; row < meanColorRectSize; row++) {
+                            //Read the Color from a pixel in the given rectangle
+                            readColor = frameOfWebcamStream.get((int)Math.round(row + point0.y), (int)Math.round(col + point0.x));
+                            //Convert the hue in unit vectors
+                            unitVectorX += Math.cos(Math.toRadians(readColor[0]*2));
+                            unitVectorY += Math.sin(Math.toRadians(readColor[0]*2));
                         }
-                        unitVectorX = unitVectorX / (meanColorRectSize*meanColorRectSize);
-                        unitVectorY = unitVectorY / (meanColorRectSize*meanColorRectSize);
-                        System.out.println("Mean: " + Math.toDegrees((Math.atan(unitVectorX)+Math.atan(unitVectorY)) / 2));
-                        /*
-                        double[] readColor;
-                        double[] processColor = new double[3];
-                        for (int col = 0; col < meanColorRectSize; col++) {
-                            for (int row = 0; row < meanColorRectSize; row++) {
-                                readColor = frameOfWebcamStream.get((int) Math.round(row + point0.y), (int) Math.round(col + point0.x));
-                                for (int i = 0; i < 3; i ++) processColor[i] += readColor[i];
-                            }
-                        }
-                        for (int i = 0; i < 3; i++) processColor[i] = processColor[i] / (60*60);
-                        //Custom Mean Ende------------------------------------------------------------------------------
-                        System.out.println("CustomMeanColor: " + Arrays.toString(processColor));
-                        System.out.println("MeanColor: " + Core.mean(frameOfWebcamStream, mask));
-                        System.out.println("SingleColor: " + Arrays.toString(frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)));
-
-                        Mat mat = new Mat();
-                        Imgproc.cvtColor(frameOfWebcamStream, mat, Imgproc.COLOR_HSV2BGR);
-                        Imgcodecs.imwrite("mask.jpg", mat);
-                        */
                     }
+                    //Get the mean of all unit vectors
+                    unitVectorX = unitVectorX / (Math.pow(meanColorRectSize, 2));
+                    unitVectorY = unitVectorY / (Math.pow(meanColorRectSize, 2));
+                    //Convert the calculated unit vector to an angle that can be used as a hue value
+                    double degrees = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
+                    //Because the hue value is a circle, negative values should be added with 360°
+                    if (degrees < 0) degrees += 360;
+                    //Open Cv uses hue values between 0 - 179
+                    degrees /= 2;
+                    System.out.println("Mean: " + Math.round(degrees));
+                    //--------------------------------------------------------------------------------------------------
+
                     colors[x][y] = Core.mean(frameOfWebcamStream, mask);
-
-                    if (x == 0 && y == 1) {
-                        /*
-                        Scalar scalar = Core.mean(frameOfWebcamStream, mask);
-                        System.out.print("color: " + scalar.val[0] * 2 + ", ");
-                        System.out.print(scalar.val[1] / 2.55 + ", ");
-                        System.out.println(scalar.val[2] / 2.55);
-                        Imgcodecs.imwrite("orgImage.jpg", frameOfWebcamStream);
-                        */
-                    }
 
                 } else {
                     colors[x][y] = new Scalar(
@@ -88,66 +66,6 @@ public class ImageProcessing implements Observer {
             }
         }
         model.setGridColors(colors);
-        RGBtoHSV();
-    }
-
-    private void RGBtoHSV() {
-        double[] bgr = new double[] {139, 192, 120};
-        double h, s, v;
-        double min, max, delta;
-        //Get the min, max value of rgb
-        min = bgr[0];
-        max = bgr[0];
-        for (int i = 1; i < bgr.length; i++) {
-            min = Math.min(min, bgr[i]);
-            max = Math.max(max, bgr[i]);
-        }
-        v = max;                        // v
-        delta = max - min;
-        if (max != 0) s = delta / max * 255; //s
-        else {                           // r = g = b = 0
-            s = 0;
-            h = -1;
-            System.out.println("hsv: " + h + ", " + s + ", " + v);
-            return;
-        }
-        if (max == min) {                // hier ist alles Grau
-            h = 0;
-            s = 0;
-            System.out.println("hsv: " + h + ", " + s + ", " + v);
-            return;
-        }
-        if (bgr[2] == max) h = (bgr[1] - bgr[0]) / delta;       // zwischen Gelb und Magenta
-        else if (bgr[1] == max) h = 2 + (bgr[0] - bgr[2]) / delta;   // zwischen Cyan und Gelb
-        else h = 4 + (bgr[2] - bgr[1]) / delta;   // zwischen Magenta und Zyan
-        h *= 60;                     // degrees
-        if (h < 0) h += 360;
-        h /= 2;
-        System.out.println("hsv: " + h + ", " + s + ", " + v);
-    }
-
-    void HSVtoRGB( float r, float g, float b, float h, float s, float v) { //rgb -> [0,1] hsv -> [0,255; 0,1; 0,1]
-        int i;
-        float f, p, q, t;
-        if(s == 0) { // achromatisch (Grau)
-            r = g = b = v;
-            return;
-        }
-        h /= 60;           // sector 0 to 5
-        i = Math.round(h);
-        f = h - i;         // factorial part of h
-        p = v * (1 - s);
-        q = v * (1 - s * f);
-        t = v * (1 - s * (1 - f));
-        switch(i) {
-            case 0: r = v; g = t; b = p; break;
-            case 1: r = q; g = v; b = p; break;
-            case 2: r = p; g = v; b = t; break;
-            case 3: r = p; g = q; b = v; break;
-            case 4: r = t; g = p; b = v; break;
-            default: r = v; g = p; b = q; //case 5
-            break;
-        }
     }
 
     private void checkForCube() {
@@ -295,3 +213,65 @@ public class ImageProcessing implements Observer {
         this.model = model;
     }
 }
+
+
+/*
+    private void RGBtoHSV() {
+        double[] bgr = new double[] {139, 192, 120};
+        double h, s, v;
+        double min, max, delta;
+        //Get the min, max value of rgb
+        min = bgr[0];
+        max = bgr[0];
+        for (int i = 1; i < bgr.length; i++) {
+            min = Math.min(min, bgr[i]);
+            max = Math.max(max, bgr[i]);
+        }
+        v = max;                        // v
+        delta = max - min;
+        if (max != 0) s = delta / max * 255; //s
+        else {                           // r = g = b = 0
+            s = 0;
+            h = -1;
+            System.out.println("hsv: " + h + ", " + s + ", " + v);
+            return;
+        }
+        if (max == min) {                // Alles Grau
+            h = 0;
+            s = 0;
+            System.out.println("hsv: " + h + ", " + s + ", " + v);
+            return;
+        }
+        if (bgr[2] == max) h = (bgr[1] - bgr[0]) / delta;       // Zwischen Gelb und Magenta
+        else if (bgr[1] == max) h = 2 + (bgr[0] - bgr[2]) / delta;   // Zwischen Cyan und Gelb
+        else h = 4 + (bgr[2] - bgr[1]) / delta;   // Zwischen Magenta und Zyan
+        h *= 60;                     // Degrees
+        if (h < 0) h += 360;
+        h /= 2;
+        System.out.println("hsv: " + h + ", " + s + ", " + v);
+    }
+
+    void HSVtoRGB( float r, float g, float b, float h, float s, float v) { //rgb -> [0,1] hsv -> [0,255; 0,1; 0,1]
+        int i;
+        float f, p, q, t;
+        if(s == 0) { // achromatisch (Grau)
+            r = g = b = v;
+            return;
+        }
+        h /= 60;           // sector 0 to 5
+        i = Math.round(h);
+        f = h - i;         // factorial part of h
+        p = v * (1 - s);
+        q = v * (1 - s * f);
+        t = v * (1 - s * (1 - f));
+        switch(i) {
+            case 0: r = v; g = t; b = p; break;
+            case 1: r = q; g = v; b = p; break;
+            case 2: r = p; g = v; b = t; break;
+            case 3: r = p; g = q; b = v; break;
+            case 4: r = t; g = p; b = v; break;
+            default: r = v; g = p; b = q; //case 5
+            break;
+        }
+    }
+ */
