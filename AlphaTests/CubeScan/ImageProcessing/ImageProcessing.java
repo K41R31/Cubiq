@@ -3,68 +3,31 @@ package AlphaTests.CubeScan.ImageProcessing;
 import AlphaTests.CubeScan.Models.CubeScanModel;
 import org.opencv.core.*;
 import org.opencv.features2d.FeatureDetector;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import java.util.*;
-
-import static org.opencv.imgproc.Imgproc.rectangle;
 
 public class ImageProcessing implements Observer {
 
     private CubeScanModel model;
 
     private double meanColorRectSize = 60; //TODO Ins Model, meanColorRectSize % 2 != 0
+    private boolean debug = true;
 
 
     private void readColorsFromGrid() {
+        //Clones the unprocessed input Mat
         Mat frameOfWebcamStream = model.getOriginalImage().clone();
         Scalar[][] colors = new Scalar[3][3];
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                Point searchPoint = model.getSearchPointGrid()[x][y];
-                if (model.isUseMeanColor()) {
-                    Mat mask = new Mat(frameOfWebcamStream.height(), frameOfWebcamStream.width(), CvType.CV_8U, new Scalar(0));
-
-                    Point point0 = new Point(searchPoint.x - meanColorRectSize / 2, searchPoint.y - meanColorRectSize / 2);
-                    Point point1 = new Point(searchPoint.x + meanColorRectSize / 2, searchPoint.y + meanColorRectSize / 2);
-
-                    rectangle(mask, point0, point1, new Scalar(255), Core.FILLED);
-
-                    //Get the mean HSV Color----------------------------------------------------------------------------
-                    double[] readColor;
-                    double unitVectorX = 0, unitVectorY = 0;
-                    for (int col = 0; col < meanColorRectSize; col++) {
-                        for (int row = 0; row < meanColorRectSize; row++) {
-                            //Read the Color from a pixel in the given rectangle
-                            readColor = frameOfWebcamStream.get((int)Math.round(row + point0.y), (int)Math.round(col + point0.x));
-                            //Convert the hue in unit vectors
-                            unitVectorX += Math.cos(Math.toRadians(readColor[0]*2));
-                            unitVectorY += Math.sin(Math.toRadians(readColor[0]*2));
-                        }
-                    }
-                    //Get the mean of all unit vectors
-                    unitVectorX = unitVectorX / (Math.pow(meanColorRectSize, 2));
-                    unitVectorY = unitVectorY / (Math.pow(meanColorRectSize, 2));
-                    //Convert the calculated unit vector to an angle that can be used as a hue value
-                    double degrees = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
-                    //Because the hue value is a circle, negative values should be added with 360°
-                    if (degrees < 0) degrees += 360;
-                    //Open Cv uses hue values between 0 - 179
-                    degrees /= 2;
-                    System.out.println("Mean: " + Math.round(degrees));
-                    //--------------------------------------------------------------------------------------------------
-
-                    colors[x][y] = Core.mean(frameOfWebcamStream, mask);
-
-                } else {
-                    colors[x][y] = new Scalar(
-                            frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)[0],
-                            frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)[1],
-                            frameOfWebcamStream.get((int)searchPoint.y, (int)searchPoint.x)[2]
-                    );
-                }
+                //Executes getMeanHSVColor with the current point from the search grid and writes the value into colors
+                colors[x][y] = getMeanHSVColor(frameOfWebcamStream, new Point(
+                        model.getSearchPointGrid()[x][y].x - meanColorRectSize / 2,
+                        model.getSearchPointGrid()[x][y].y - meanColorRectSize / 2)
+                );
             }
         }
+        //Passes the found average colors to the model
         model.setGridColors(colors);
     }
 
@@ -101,25 +64,27 @@ public class ImageProcessing implements Observer {
 
                 double[] color = model.getGridColors()[x][y].val;
 
-                int rt = 5;
+                int hueThreshold = 5;
+                int satThreshold = 40;
+                int valThreshold = 40;
 
-                if (color[0] - rt < 0) {
+                if (color[0] - hueThreshold < 0) {
                     Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
-                    Core.inRange(processedFrame, new Scalar(0, color[1] - 50, color[2] - 50), new Scalar(color[0] + rt, color[1] + 50, color[2] + 50), lowerRedMat);
-                    Core.inRange(processedFrame, new Scalar(179 + color[0] - rt, color[1] - 50, color[2] - 50), new Scalar(179, color[1] + 50, color[2] + 50), upperRedMat);
+                    Core.inRange(processedFrame, new Scalar(0, color[1] - satThreshold, color[2] - valThreshold), new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), lowerRedMat);
+                    Core.inRange(processedFrame, new Scalar(179 + color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold), new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
                     Core.add(lowerRedMat, upperRedMat, processedFrame);
-                    if (x == 1 && y == 0) System.out.println("Low: " + 0 + "-" + Math.round(color[0] + rt) + ", High: " + Math.round(179 + color[0] - rt) + "-" + 179);
+                    if (debug && x == 0 && y == 0) System.out.println("Low: " + 0 + "-" + Math.round(color[0] + hueThreshold) + ", High: " + Math.round(179 + color[0] - hueThreshold) + "-" + 179);
                 }
-                else if (color[0] + rt > 179) {
+                else if (color[0] + hueThreshold > 179) {
                     Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
-                    Core.inRange(processedFrame, new Scalar(0, color[1] - 50, color[2] - 50), new Scalar(color[0] + rt - 179, color[1] + 50, color[2] + 50), lowerRedMat);
-                    Core.inRange(processedFrame, new Scalar(color[0] - rt, color[1] - 50, color[2] - 50), new Scalar(179, color[1] + 50, color[2] + 50), upperRedMat);
+                    Core.inRange(processedFrame, new Scalar(0, color[1] - satThreshold, color[2] - valThreshold), new Scalar(color[0] + hueThreshold - 179, color[1] + satThreshold, color[2] + valThreshold), lowerRedMat);
+                    Core.inRange(processedFrame, new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold), new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
                     Core.add(lowerRedMat, upperRedMat, processedFrame);
-                    if (x == 1 && y == 0) System.out.println("Low: " + rt + "-" + Math.round(color[0] + rt - 179) + ", High: " + Math.round(color[0] - rt) + "-" + 179);
+                    if (debug && x == 0 && y == 0) System.out.println("Low: " + 0 + "-" + Math.round(color[0] + hueThreshold - 179) + ", High: " + Math.round(color[0] - hueThreshold) + "-" + 179);
                 }
                 else {
-                    Core.inRange(processedFrame, new Scalar(color[0] - rt, color[1] - 50, color[2] - 50), new Scalar(color[0] + rt, color[1] + 50, color[2] + 50), processedFrame);
-                    if (x == 1 && y == 0) System.out.println(Math.round(color[0] - rt) + " - " + Math.round(color[0] + rt));
+                    Core.inRange(processedFrame, new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold), new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), processedFrame);
+                    if (debug && x == 0 && y == 0) System.out.println(Math.round(color[0] - hueThreshold) + " - " + Math.round(color[0] + hueThreshold));
                 }
 
                 /*
@@ -165,25 +130,54 @@ public class ImageProcessing implements Observer {
                 }
             }
         }
-
-        if (counter > 7) {
-            System.out.println("-------------------------------");
-            System.out.println("Cube found: " + counter + " / 9");
-            System.out.print("\n");
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    System.out.print(colorDetection(model.getGridColors()[x][y]));
-                    if (x < 2) System.out.print(", ");
-                }
+        if (debug) {
+            if (counter > 7) {
+                System.out.println("-------------------------------");
+                System.out.println("Cube found: " + counter + " / 9");
                 System.out.print("\n");
-            }
-            System.out.println("-------------------------------");
+                for (int y = 0; y < 3; y++) {
+                    for (int x = 0; x < 3; x++) {
+                        System.out.print(colorDetection(model.getGridColors()[x][y]));
+                        if (x < 2) System.out.print(", ");
+                    }
+                    System.out.print("\n");
+                }
+                System.out.println("-------------------------------");
+            } else System.out.println("No Cube found: " + counter + " / 9");
         }
-        else System.out.println("No Cube found: " + counter + " / 9");
 
         model.setBinaryImages(binaryMatArray);
         model.setBlobImages(blobMatArray);
         model.updateImageViews();
+    }
+
+    private Scalar getMeanHSVColor(Mat frameOfWebcamStream, Point searchGridPoint) {
+        double hue, sat = 0, val = 0;
+        double[] readColor;
+        double unitVectorX = 0, unitVectorY = 0;
+        for (int col = 0; col < meanColorRectSize; col++) {
+            for (int row = 0; row < meanColorRectSize; row++) {
+                //Read the Color from a pixel in the given rectangle
+                readColor = frameOfWebcamStream.get((int)Math.round(row + searchGridPoint.y), (int)Math.round(col + searchGridPoint.x));
+                //Convert the hue in unit vectors
+                unitVectorX += Math.cos(Math.toRadians(readColor[0]*2));
+                unitVectorY += Math.sin(Math.toRadians(readColor[0]*2));
+                sat += readColor[1];
+                val += readColor[2];
+            }
+        }
+        //Get the mean of all unit vectors
+        unitVectorX /= Math.pow(meanColorRectSize, 2);
+        unitVectorY /= Math.pow(meanColorRectSize, 2);
+        //Convert the calculated unit vector to an angle that can be used as a hue value
+        hue = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
+        //Because the hue value is a circle, negative values should be added with 360°
+        if (hue < 0) hue += 360;
+        //Open Cv uses hue values between 0 - 179
+        hue /= 2;
+        sat /= Math.pow(meanColorRectSize, 2);
+        val /= Math.pow(meanColorRectSize, 2);
+        return new Scalar(Math.round(hue), Math.round(sat), Math.round(val));
     }
 
     private String colorDetection(Scalar color) {
