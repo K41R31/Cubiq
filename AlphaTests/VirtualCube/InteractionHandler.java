@@ -1,3 +1,5 @@
+package AlphaTests.VirtualCube;
+
 import java.awt.*;
 import java.awt.event.*;
 

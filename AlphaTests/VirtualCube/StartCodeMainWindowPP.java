@@ -1,3 +1,5 @@
+package AlphaTests.VirtualCube;
+
 /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
  *

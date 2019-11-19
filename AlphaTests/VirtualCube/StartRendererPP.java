@@ -1,3 +1,5 @@
+package AlphaTests.VirtualCube;
+
 /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
  *
@@ -65,7 +67,7 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
     // Defining shader source code file paths and names
-    final String shaderPath = ".\\resources\\";
+    final String shaderPath = "src/AlphaTests/VirtualCube/Resources/";
     final String vertexShaderFileName = "Basic.vert";
     final String fragmentShaderFileName = "Basic.frag";
 //    final String vertexShaderFileName = "BasicMacOS.vert";
@@ -209,7 +211,8 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
         gl.glGenBuffers(1, iboName, 0);
         if (iboName[0] < 1)
             System.err.println("Error allocating index buffer object.");
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]); gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER,
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER,
                 cubeIndices.length * 4,
                 IntBuffer.wrap(cubeIndices), GL.GL_STATIC_DRAW);
 
@@ -275,6 +278,15 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
 
         gl.glDrawElements(GL.GL_TRIANGLE_STRIP, totalInices, GL.GL_UNSIGNED_INT, 1);
     }
+
+    /*
+    pmvMatrix.glPushMatrix();
+    displayCube(gl);pmvMatrix.glPopMatrix();
+    pmvMatrix.glPushMatrix();
+    pmvMatrix.glTranslatef(0f, (1.2f/3f)+0.25f, 0f);
+    pmvMatrix.glRotatef(90, 0f, 0f, 1f); displayRoof(gl);
+    pmvMatrix.glPopMatrix();
+     */
 
 
     /**
