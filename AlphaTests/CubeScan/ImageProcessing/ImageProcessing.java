@@ -12,6 +12,9 @@ public class ImageProcessing implements Observer {
 
     private double meanColorRectSize = 60; //TODO Ins Model, meanColorRectSize % 2 != 0
     private boolean debug = true;
+    private int hueThreshold = 5;
+    private int satThreshold = 40;
+    private int valThreshold = 40;
 
 
     private void readColorsFromGrid() {
@@ -48,62 +51,24 @@ public class ImageProcessing implements Observer {
                 //Apply mask to image
                 Mat mask = new Mat(frameOfWebcamStream.size(), CvType.CV_8U, new Scalar(0));
                 Imgproc.rectangle(mask, model.getFrameOrigin(), new Point(model.getFrameOrigin().x + model.getSearchFrameSize(), model.getFrameOrigin().y + model.getSearchFrameSize()), new Scalar(255), Core.FILLED);
-                Mat processedFrame = new Mat(frameOfWebcamStream.size(), CvType.CV_8U, new Scalar(0));
-                Imgproc.cvtColor(processedFrame, processedFrame, Imgproc.COLOR_GRAY2BGR);
-                frameOfWebcamStream.copyTo(processedFrame, mask);
+                Mat processMat = new Mat(frameOfWebcamStream.size(), CvType.CV_8U, new Scalar(0));
+                Imgproc.cvtColor(processMat, processMat, Imgproc.COLOR_GRAY2BGR);
+                frameOfWebcamStream.copyTo(processMat, mask);
 
                 //TODO Gaussian-Blur Produziert Grüne Artefakte
-                //TODO Für jedes Bild ein Rangeslider-paar
                 //Image Operations
-                //if (model.getGaBl() != 0) Imgproc.GaussianBlur(processedFrame, processedFrame, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
-                if (model.getMeBl() != 0) Imgproc.medianBlur(processedFrame, processedFrame, model.getMeBl());
+                //if (model.getGaBl() != 0) Imgproc.GaussianBlur(processMat, processMat, new Size(model.getGaBl(), model.getGaBl()), model.getGaBl(), model.getGaBl());
+                if (model.getMeBl() != 0) Imgproc.medianBlur(processMat, processMat, model.getMeBl());
 
                 //TODO Range Slider Werte
                 //new Scalar(model.getLoHu(), model.getLoSa(), model.getLoVa()),
-                //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processedFrame);
+                //new Scalar(model.getHiHu(), model.getHiSa(), model.getHiVa()), processMat);
 
-                double[] color = model.getGridColors()[x][y].val;
-
-                int hueThreshold = 5;
-                int satThreshold = 40;
-                int valThreshold = 40;
-
-                if (color[0] - hueThreshold < 0) {
-                    Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
-                    Core.inRange(processedFrame, new Scalar(0, color[1] - satThreshold, color[2] - valThreshold), new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), lowerRedMat);
-                    Core.inRange(processedFrame, new Scalar(179 + color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold), new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
-                    Core.add(lowerRedMat, upperRedMat, processedFrame);
-                    if (debug && x == 0 && y == 0) System.out.println("Low: " + 0 + "-" + Math.round(color[0] + hueThreshold) + ", High: " + Math.round(179 + color[0] - hueThreshold) + "-" + 179);
-                }
-                else if (color[0] + hueThreshold > 179) {
-                    Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
-                    Core.inRange(processedFrame, new Scalar(0, color[1] - satThreshold, color[2] - valThreshold), new Scalar(color[0] + hueThreshold - 179, color[1] + satThreshold, color[2] + valThreshold), lowerRedMat);
-                    Core.inRange(processedFrame, new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold), new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
-                    Core.add(lowerRedMat, upperRedMat, processedFrame);
-                    if (debug && x == 0 && y == 0) System.out.println("Low: " + 0 + "-" + Math.round(color[0] + hueThreshold - 179) + ", High: " + Math.round(color[0] - hueThreshold) + "-" + 179);
-                }
-                else {
-                    Core.inRange(processedFrame, new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold), new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), processedFrame);
-                    if (debug && x == 0 && y == 0) System.out.println(Math.round(color[0] - hueThreshold) + " - " + Math.round(color[0] + hueThreshold));
-                }
-
-                /*
-                //TODO  0, 150, 155/ 180, 244, 176
-                double lowRed, highRed;
-                if (color[0] - 5 < 0 || color[0] + 5 > 180) {
-                    lowRed = 0;
-                    highRed = 179;
-                } else {
-                    lowRed = color[0] - 8;
-                    highRed = color[0] + 8;
-                }
-                Core.inRange(processedFrame, new Scalar(lowRed, color[1] - 50, color[2] - 50), new Scalar(highRed, color[1] + 50, color[2] + 50), processedFrame);
-                */
-
-                binaryMatArray[x][y] = processedFrame;
+                processMat = processInRange(x, y, processMat, model.getGridColors()[x][y]);
+                binaryMatArray[x][y] = processMat;
 
                 //Detect Blobs
-                detector.detect(processedFrame, keypoints);
+                detector.detect(processMat, keypoints);
                 blobList = keypoints.toList();
                 Mat blobMat = model.getOriginalImage().clone();
                 for (KeyPoint foundBlob : blobList) Imgproc.circle(blobMat, foundBlob.pt, (int) foundBlob.size / 2, new Scalar(0, 0, 255), 1);
@@ -116,6 +81,7 @@ public class ImageProcessing implements Observer {
 
         int counter = 0;
 
+        //Calculates how many frames found a cube
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 for (int i = 0; i < totalBlobList[x][y].size(); i++) {
@@ -130,8 +96,9 @@ public class ImageProcessing implements Observer {
                 }
             }
         }
+        //If a cube is found in more than 6 images, there is a cube in the window
         if (debug) {
-            if (counter > 7) {
+            if (counter > 6) {
                 System.out.println("-------------------------------");
                 System.out.println("Cube found: " + counter + " / 9");
                 System.out.print("\n");
@@ -145,7 +112,6 @@ public class ImageProcessing implements Observer {
                 System.out.println("-------------------------------");
             } else System.out.println("No Cube found: " + counter + " / 9");
         }
-
         model.setBinaryImages(binaryMatArray);
         model.setBlobImages(blobMatArray);
         model.updateImageViews();
@@ -157,7 +123,7 @@ public class ImageProcessing implements Observer {
         double unitVectorX = 0, unitVectorY = 0;
         for (int col = 0; col < meanColorRectSize; col++) {
             for (int row = 0; row < meanColorRectSize; row++) {
-                //Read the Color from a pixel in the given rectangle
+                //Reads the Color from a pixel in the given rectangle
                 readColor = frameOfWebcamStream.get((int)Math.round(row + searchGridPoint.y), (int)Math.round(col + searchGridPoint.x));
                 //Convert the hue in unit vectors
                 unitVectorX += Math.cos(Math.toRadians(readColor[0]*2));
@@ -180,7 +146,57 @@ public class ImageProcessing implements Observer {
         return new Scalar(Math.round(hue), Math.round(sat), Math.round(val));
     }
 
+    private Mat processInRange(int x, int y, Mat processMat, Scalar scalar) {
+        double[] color = scalar.val;
+
+        //If the hue - threshold is less than 0, two in range operations must be performed, which are then added to each other
+        if (color[0] - hueThreshold < 0) {
+            Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
+            Core.inRange(processMat,
+                    new Scalar(0, color[1] - satThreshold, color[2] - valThreshold),
+                    new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), lowerRedMat);
+            Core.inRange(processMat,
+                    new Scalar(179 + color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold),
+                    new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
+            Core.add(lowerRedMat, upperRedMat, processMat);
+
+            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
+                    "lowHue: " + 0 + "-" + Math.round(color[0] + hueThreshold) + ", HighHue: " + Math.round(179 + color[0] - hueThreshold) + "-" + 179 +
+                    "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
+                    "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
+        }
+        //If the hue + threshold is greater than 179, two in range operations must be performed, which are then added to each other
+        else if (color[0] + hueThreshold > 179) {
+            Mat lowerRedMat = new Mat(), upperRedMat = new Mat();
+            Core.inRange(processMat,
+                    new Scalar(0, color[1] - satThreshold, color[2] - valThreshold),
+                    new Scalar(color[0] + hueThreshold - 179, color[1] + satThreshold, color[2] + valThreshold), lowerRedMat);
+            Core.inRange(processMat,
+                    new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold),
+                    new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
+            Core.add(lowerRedMat, upperRedMat, processMat);
+
+            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
+                    "lowHue: " + 0 + "-" + Math.round(color[0] + hueThreshold - 179) + ", Highue: " + Math.round(color[0] - hueThreshold) + "-" + 179 +
+                    "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
+                    "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
+        }
+        //Performs a Range operation with the found hue +- Threshold
+        else {
+            Core.inRange(processMat,
+                    new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold),
+                    new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), processMat);
+
+            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
+                    "hue: " + Math.round(color[0] - hueThreshold) + " - " + Math.round(color[0] + hueThreshold) +
+                    "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
+                    "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
+        }
+        return processMat;
+    }
+
     private String colorDetection(Scalar color) {
+        //Calculates the respective color from the color values
         if (color.val[1] < 100 && color.val[2] > 110) return "WHITE";
         else if (color.val[0] < 5) return "RED";
         else if (color.val[0] < 18) return "ORANGE";

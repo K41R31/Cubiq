@@ -267,17 +267,17 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
         // Could be placed into the init-method for this simple example.
         gl.glUseProgram(shaderProgram.getShaderProgramID());
 
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the GPU
-        // via uniforms
-        // Transfer projection matrix via uniform layout position 0
+    // Transfer the PVM-Matrix (model-view and projection matrix) to the GPU
+    // via uniforms
+    // Transfer projection matrix via uniform layout position 0
         gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        // Transfer model-view matrix via layout position 1
+    // Transfer model-view matrix via layout position 1
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
 
-        // Use all (6 Vertices per 6 sides) vertices in the VBO to draw a triangle.
+    // Use all (6 Vertices per 6 sides) vertices in the VBO to draw a triangle.
 
         gl.glDrawElements(GL.GL_TRIANGLE_STRIP, totalInices, GL.GL_UNSIGNED_INT, 1);
-    }
+}
 
     /*
     pmvMatrix.glPushMatrix();
@@ -286,7 +286,7 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
     pmvMatrix.glTranslatef(0f, (1.2f/3f)+0.25f, 0f);
     pmvMatrix.glRotatef(90, 0f, 0f, 1f); displayRoof(gl);
     pmvMatrix.glPopMatrix();
-     */
+    */
 
 
     /**
