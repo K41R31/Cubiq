@@ -17,6 +17,32 @@ public class ImageProcessing implements Observer {
     private int valThreshold = 40;
 
 
+    private void checkForCubeNew() {
+        Mat inputMat = model.getOriginalImage();
+
+        //Convert hsv to gray
+        List<Mat> splittedMat = new ArrayList<>();
+        Core.split(inputMat, splittedMat);
+        Mat grayMat = splittedMat.get(2);
+
+        //Add gaussian blur
+        Mat blurredMat = new Mat();
+        Imgproc.GaussianBlur(grayMat, blurredMat, new Size(3, 3), 0);
+
+        //Add Canny
+        Mat cannyMat = new Mat();
+        Imgproc.Canny(blurredMat, cannyMat, 20, 40);
+
+        Mat[][] matList = new Mat[3][3];
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                matList[x][y] = cannyMat;
+            }
+        }
+        model.setBinaryImages(matList);
+        model.updateImageViews();
+    }
+
     private void readColorsFromGrid() {
         //Clones the unprocessed input Mat
         Mat frameOfWebcamStream = model.getOriginalImage().clone();
@@ -211,7 +237,7 @@ public class ImageProcessing implements Observer {
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
             case "processImages":
-                checkForCube();
+                checkForCubeNew();
                 break;
             case "readColorsFromGrid":
                 readColorsFromGrid();
