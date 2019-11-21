@@ -33,16 +33,11 @@ public class ImageProcessing implements Observer {
         Mat cannyMat = new Mat();
         Imgproc.Canny(blurredMat, cannyMat, 20, 40);
 
-        Mat[][] matList = new Mat[3][3];
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
-                matList[x][y] = cannyMat;
-            }
-        }
-        model.setBinaryImages(matList);
-        model.updateImageViews();
+        model.setBinaryImage(cannyMat);
+        model.updateImageView();
     }
 
+    /*
     private void readColorsFromGrid() {
         //Clones the unprocessed input Mat
         Mat frameOfWebcamStream = model.getOriginalImage().clone();
@@ -142,6 +137,7 @@ public class ImageProcessing implements Observer {
         model.setBlobImages(blobMatArray);
         model.updateImageViews();
     }
+    */
 
     private Scalar getMeanHSVColor(Mat frameOfWebcamStream, Point searchGridPoint) {
         double hue, sat = 0, val = 0;
@@ -236,11 +232,11 @@ public class ImageProcessing implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "processImages":
+            case "processImage":
                 checkForCubeNew();
                 break;
             case "readColorsFromGrid":
-                readColorsFromGrid();
+                //readColorsFromGrid();
                 break;
         }
     }

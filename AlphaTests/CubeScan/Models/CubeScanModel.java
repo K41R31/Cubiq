@@ -11,18 +11,9 @@ import java.util.Observable;
 public class CubeScanModel extends Observable {
 
     private Point frameOrigin = new Point(466, 185);
-    private int searchFrameSize = 350;
-    private Point[][] searchPointGrid = new Point[][] {
-            {new Point(524, 243), new Point(524, 359), new Point(524, 477)},
-            {new Point(640, 243), new Point(640, 359), new Point(640, 477)},
-            {new Point(757, 243), new Point(757, 359), new Point(757, 477)}
-    };
-    private Scalar[][] gridColors = new Scalar[3][3];
     private int loHu, hiHu, loSa, hiSa, loVa, hiVa;
     private int gaBl = 5, meBl = 5;
-    private List<List<KeyPoint>> foundBlobsList;
-    private Mat originalImage;
-    private Mat[][] blobImages, binaryImages;
+    private Mat originalImage, binaryImages;
     private boolean useMeanColor = true;
 
 
@@ -30,11 +21,9 @@ public class CubeScanModel extends Observable {
         setChanged();
         notifyObservers("loadNewImage");
         setChanged();
-        notifyObservers("readColorsFromGrid");
-        setChanged();
         notifyObservers("addSlider");
         setChanged();
-        notifyObservers("processImages");
+        notifyObservers("processImage");
     }
 
     public int getLoHu() {
@@ -96,46 +85,15 @@ public class CubeScanModel extends Observable {
         this.originalImage = mat;
     }
 
-    public Mat[][] getBlobImages() {
-        return this.blobImages;
-    }
-    public void setBlobImages(Mat[][] matArray) {
-        this.blobImages = matArray;
-    }
-
-    public Mat[][] getBinaryImages() {
+    public Mat getBinaryImage() {
         return this.binaryImages;
     }
-    public void setBinaryImages(Mat[][] matArray) {
+    public void setBinaryImage(Mat matArray) {
         this.binaryImages = matArray;
-    }
-
-    public int getSearchFrameSize() {
-        return this.searchFrameSize;
     }
 
     public Point getFrameOrigin() {
         return this.frameOrigin;
-    }
-
-    public Point[][] getSearchPointGrid() {
-        return this.searchPointGrid;
-    }
-
-    public Scalar[][] getGridColors() {
-        return this.gridColors;
-    }
-    public void setGridColors(Scalar[][] colors) {
-        this.gridColors = colors;
-        setChanged();
-        notifyObservers("updateSlider");
-    }
-
-    public List<List<KeyPoint>> getFoundBlobsList() {
-        return foundBlobsList;
-    }
-    public void setFoundBlobsList(List<List<KeyPoint>> foundBlobsList) {
-        this.foundBlobsList = foundBlobsList;
     }
 
     public boolean isUseMeanColor() {
@@ -146,16 +104,16 @@ public class CubeScanModel extends Observable {
         setChanged();
         notifyObservers("readColorsFromGrid");
         setChanged();
-        notifyObservers("processImages");
+        notifyObservers("processImage");
     }
 
-    public void updateImageViews() {
+    public void updateImageView() {
         setChanged();
-        notifyObservers("updateImageViews");
+        notifyObservers("updateImageView");
     }
 
-    public void processImages() {
+    public void processImage() {
         setChanged();
-        notifyObservers("processImages");
+        notifyObservers("processImage");
     }
 }
