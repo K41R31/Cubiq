@@ -17,27 +17,6 @@ public class ImageProcessing implements Observer {
     private int valThreshold = 40;
 
 
-    private void checkForCubeNew() {
-        Mat inputMat = model.getOriginalImage();
-
-        //Convert hsv to gray
-        List<Mat> splittedMat = new ArrayList<>();
-        Core.split(inputMat, splittedMat);
-        Mat grayMat = splittedMat.get(2);
-
-        //Add gaussian blur
-        Mat blurredMat = new Mat();
-        Imgproc.GaussianBlur(grayMat, blurredMat, new Size(3, 3), 0);
-
-        //Add Canny
-        Mat cannyMat = new Mat();
-        Imgproc.Canny(blurredMat, cannyMat, 20, 40);
-
-        model.setBinaryImage(cannyMat);
-        model.updateImageView();
-    }
-
-    /*
     private void readColorsFromGrid() {
         //Clones the unprocessed input Mat
         Mat frameOfWebcamStream = model.getOriginalImage().clone();
@@ -54,7 +33,7 @@ public class ImageProcessing implements Observer {
         //Passes the found average colors to the model
         model.setGridColors(colors);
     }
-
+    
     private void checkForCube() {
         Mat frameOfWebcamStream = model.getOriginalImage();
         Mat[][] binaryMatArray = new Mat[3][3];
@@ -137,7 +116,6 @@ public class ImageProcessing implements Observer {
         model.setBlobImages(blobMatArray);
         model.updateImageViews();
     }
-    */
 
     private Scalar getMeanHSVColor(Mat frameOfWebcamStream, Point searchGridPoint) {
         double hue, sat = 0, val = 0;
@@ -182,7 +160,7 @@ public class ImageProcessing implements Observer {
                     new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
             Core.add(lowerRedMat, upperRedMat, processMat);
 
-            if (debug) System.out.println("Image " + x + ", " + y + " -> " +
+            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
                     "lowHue: " + 0 + "-" + Math.round(color[0] + hueThreshold) + ", HighHue: " + Math.round(179 + color[0] - hueThreshold) + "-" + 179 +
                     "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
                     "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
@@ -198,7 +176,7 @@ public class ImageProcessing implements Observer {
                     new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
             Core.add(lowerRedMat, upperRedMat, processMat);
 
-            if (debug) System.out.println("Image " + x + ", " + y + " -> " +
+            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
                     "lowHue: " + 0 + "-" + Math.round(color[0] + hueThreshold - 179) + ", Highue: " + Math.round(color[0] - hueThreshold) + "-" + 179 +
                     "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
                     "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
@@ -209,7 +187,7 @@ public class ImageProcessing implements Observer {
                     new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold),
                     new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), processMat);
 
-            if (debug) System.out.println("Image " + x + ", " + y + " -> " +
+            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
                     "hue: " + Math.round(color[0] - hueThreshold) + " - " + Math.round(color[0] + hueThreshold) +
                     "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
                     "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
@@ -232,11 +210,11 @@ public class ImageProcessing implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "processImage":
-                checkForCubeNew();
+            case "processImages":
+                checkForCube();
                 break;
             case "readColorsFromGrid":
-                //readColorsFromGrid();
+                readColorsFromGrid();
                 break;
         }
     }
