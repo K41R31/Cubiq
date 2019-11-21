@@ -38,6 +38,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * Container class of the graphics application.
@@ -75,6 +76,7 @@ public class StartCodeMainWindowPP extends JFrame {
         GLProfile profile = GLProfile.get(GLProfile.GL3);
         GLCapabilities capabilities = new GLCapabilities(profile);
         // Create the OpenGL Canvas for rendering content
+
         GLCanvas canvas = new StartRendererPP(capabilities);
         canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
@@ -83,6 +85,7 @@ public class StartCodeMainWindowPP extends JFrame {
         final FPSAnimator animator = new FPSAnimator(canvas, FRAME_RATE, true);
 
         // Create the window container
+
         this.getContentPane().add(canvas);
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -100,27 +103,15 @@ public class StartCodeMainWindowPP extends JFrame {
         });
         this.setTitle(FRAME_TITLE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setUndecorated(true);
+        this.setLocation(640, 200);
         this.pack();
         this.setVisible(true);
         animator.start(); // start the animation loop
+        System.out.println(this.getWidth());
+        System.out.println(this.getHeight());
 
         // OpenGL: request focus for canvas
         canvas.requestFocusInWindow();
     }
-
-
-    /**
-     * Creates the main window and starts the program
-     * @param args The arguments are not used
-     */
-    public static void main(String[] args) {
-    // Ensure thread safety
-        SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-            new StartCodeMainWindowPP();
-        }
-    }
-    );
-}
 }
