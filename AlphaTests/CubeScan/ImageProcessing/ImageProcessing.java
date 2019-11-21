@@ -160,7 +160,7 @@ public class ImageProcessing implements Observer {
                     new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
             Core.add(lowerRedMat, upperRedMat, processMat);
 
-            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
+            if (debug) System.out.println("Image " + x + ", " + y + " -> " +
                     "lowHue: " + 0 + "-" + Math.round(color[0] + hueThreshold) + ", HighHue: " + Math.round(179 + color[0] - hueThreshold) + "-" + 179 +
                     "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
                     "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
@@ -176,7 +176,7 @@ public class ImageProcessing implements Observer {
                     new Scalar(179, color[1] + satThreshold, color[2] + valThreshold), upperRedMat);
             Core.add(lowerRedMat, upperRedMat, processMat);
 
-            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
+            if (debug) System.out.println("Image " + x + ", " + y + " -> " +
                     "lowHue: " + 0 + "-" + Math.round(color[0] + hueThreshold - 179) + ", Highue: " + Math.round(color[0] - hueThreshold) + "-" + 179 +
                     "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
                     "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
@@ -187,7 +187,7 @@ public class ImageProcessing implements Observer {
                     new Scalar(color[0] - hueThreshold, color[1] - satThreshold, color[2] - valThreshold),
                     new Scalar(color[0] + hueThreshold, color[1] + satThreshold, color[2] + valThreshold), processMat);
 
-            if (debug) System.out.println("Image " + x + ", " + y + " ->" +
+            if (debug) System.out.println("Image " + x + ", " + y + " -> " +
                     "hue: " + Math.round(color[0] - hueThreshold) + " - " + Math.round(color[0] + hueThreshold) +
                     "/ saturation: " + (color[1] - satThreshold) + " - " + (color[1] + satThreshold) +
                     "/ value: " + (color[2] - valThreshold) + " - " + (color[2] + valThreshold));
