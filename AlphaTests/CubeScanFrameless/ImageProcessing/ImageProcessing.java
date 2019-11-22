@@ -3,15 +3,14 @@ package AlphaTests.CubeScanFrameless.ImageProcessing;
 import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 
 import java.util.*;
 
 public class ImageProcessing implements Observer {
 
-    private CubeScanFramelessModel model;
-    private int blurThreshold = 0;
-    private int dilateKernelSize = 1;
+        private CubeScanFramelessModel model;
+        private int blurThreshold = 3;
+        private int dilateKernelSize = 2;
 
 
     private void checkForCube() {
@@ -58,7 +57,12 @@ public class ImageProcessing implements Observer {
         }
         */
 
-        System.out.println(Imgproc.contourArea(approximations.get(0))); //TODO Rechnet die Fläche einer (geschlossenen) Kontur aus (gibt einen double zurück)
+        ArrayList<Double> areas = new ArrayList<>();
+        for (int i = 0; i < approximations.size();  i++) {
+            double area = Imgproc.contourArea(approximations.get(0));
+            if (area > 200) areas.add(area);
+        }
+        System.out.println(areas.size()); //TODO Rechnet die Fläche einer (geschlossenen) Kontur aus (gibt einen double zurück)
         System.out.println(Imgproc.moments(approximations.get(100))); //TODO Rechnet die Mitte einer (geschlossenen) Kontur aus (gibt Moments Objekte zurück)
 
         model.setProcessedMat(processedMat);
