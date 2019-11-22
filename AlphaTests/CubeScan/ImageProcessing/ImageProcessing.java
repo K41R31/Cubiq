@@ -10,7 +10,7 @@ public class ImageProcessing implements Observer {
 
     private CubeScanModel model;
 
-    private double meanColorRectSize = 60; //TODO Ins Model, meanColorRectSize % 2 != 0
+    private double meanColorRectSize = 60; //TODO Ins CubeScanFramelessModel, meanColorRectSize % 2 != 0
     private boolean debug = true;
     private int hueThreshold = 5;
     private int satThreshold = 40;

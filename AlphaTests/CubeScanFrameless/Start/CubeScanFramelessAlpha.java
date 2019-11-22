@@ -1,9 +1,9 @@
 package AlphaTests.CubeScanFrameless.Start;
 
-import AlphaTests.CubeScan.FileChooser.ImageLoader;
-import AlphaTests.CubeScan.GUI.CubeScanController;
-import AlphaTests.CubeScan.ImageProcessing.ImageProcessing;
-import AlphaTests.CubeScan.Models.CubeScanModel;
+import AlphaTests.CubeScanFrameless.FileChooser.ImageLoader;
+import AlphaTests.CubeScanFrameless.GUI.CubeScanFramelessController;
+import AlphaTests.CubeScanFrameless.ImageProcessing.ImageProcessing;
+import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.opencv.core.Core;
 
-public class CubeScanAlpha extends Application {
+public class CubeScanFramelessAlpha extends Application {
 
 
     @Override
@@ -23,27 +23,27 @@ public class CubeScanAlpha extends Application {
         //Init GUI------------------------------------------------------------------------------------------------------
         AnchorPane rootPane = new AnchorPane();
 
-        FXMLLoader cubeScanLoader = new FXMLLoader(getClass().getResource("../GUI/CubeScanView.fxml"));
+        FXMLLoader cubeScanLoader = new FXMLLoader(getClass().getResource("../GUI/CubeScanFramelessView.fxml"));
         rootPane.getChildren().add(cubeScanLoader.load());
 
         //Init Classes--------------------------------------------------------------------------------------------------
         ImageProcessing imageProcessing = new ImageProcessing();
 
         //Init Models---------------------------------------------------------------------------------------------------
-        CubeScanModel cubeScanModel = new CubeScanModel();
-        CubeScanController cubeScanController = cubeScanLoader.getController();
-        cubeScanController.initModel(cubeScanModel);
-        imageProcessing.initModel(cubeScanModel);
+        CubeScanFramelessModel model = new CubeScanFramelessModel();
+        CubeScanFramelessController controller = cubeScanLoader.getController();
+        controller.initModel(model);
+        imageProcessing.initModel(model);
 
-        cubeScanModel.addObserver(cubeScanController);
-        cubeScanModel.addObserver(imageProcessing);
+        model.addObserver(controller);
+        model.addObserver(imageProcessing);
 
         //Init ImageLoader----------------------------------------------------------------------------------------------
         ImageLoader imageLoader = new ImageLoader(stage);
-        imageLoader.initModel(cubeScanModel);
+        imageLoader.initModel(model);
+        model.addObserver(imageLoader);
 
-        cubeScanModel.addObserver(imageLoader);
-
+        model.loadImage();
 
         //Init Scene----------------------------------------------------------------------------------------------------
         stage.setTitle("Cubiq");

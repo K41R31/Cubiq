@@ -1,6 +1,6 @@
 package AlphaTests.CubeScanFrameless.FileChooser;
 
-import AlphaTests.CubeScan.Models.CubeScanModel;
+import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -15,7 +15,7 @@ import java.util.Observer;
 
 public class ImageLoader implements Observer {
 
-    private CubeScanModel model;
+    private CubeScanFramelessModel model;
     private Stage stage;
     private FileChooser fileChooser;
 
@@ -57,7 +57,7 @@ public class ImageLoader implements Observer {
         }
         imageMat.convertTo(imageMat, CvType.CV_8U);
         Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2HSV);
-        model.setOriginalImage(imageMat);
+        model.setOriginalMat(imageMat);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ImageLoader implements Observer {
         }
     }
 
-    public void initModel(CubeScanModel model) {
+    public void initModel(CubeScanFramelessModel model) {
         this.model = model;
     }
 }
