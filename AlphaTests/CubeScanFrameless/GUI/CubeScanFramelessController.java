@@ -15,6 +15,7 @@ import java.util.Observer;
 public class CubeScanFramelessController implements Observer {
 
     private CubeScanFramelessModel model;
+    private boolean showUnprocessedImage = false;
     @FXML
     private ImageView imageView;
     @FXML
@@ -40,8 +41,17 @@ public class CubeScanFramelessController implements Observer {
 
     private void updateImageView() {
         MatOfByte matOfByte = new MatOfByte();
-        Imgcodecs.imencode(".jpg", model.getProcessedMat(), matOfByte);
+
+        if (showUnprocessedImage) Imgcodecs.imencode(".jpg", model.getUnprocessedMat(), matOfByte);
+        else Imgcodecs.imencode(".jpg", model.getProcessedMat(), matOfByte);
+
         imageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray())));
+    }
+
+    @FXML
+    private void toggleView() {
+        showUnprocessedImage = !showUnprocessedImage;
+        updateImageView();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class ImageLoader implements Observer {
         fileChooser = new FileChooser();
         fileChooser.setTitle("Select an image");
 
-        fileChooser.setInitialDirectory(new File("src/AlphaTests/CubeScan/Resources/Assets"));
+        fileChooser.setInitialDirectory(new File("src/AlphaTests/CubeScanFrameless/Resources/Assets"));
 
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("JPG", "*.jpg"),
@@ -57,7 +57,7 @@ public class ImageLoader implements Observer {
         }
         imageMat.convertTo(imageMat, CvType.CV_8U);
         Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2HSV);
-        model.setOriginalMat(imageMat);
+        model.setUprocessedMat(imageMat);
     }
 
     @Override
