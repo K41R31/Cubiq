@@ -3,6 +3,7 @@ package AlphaTests.CubeScanFrameless.ImageProcessing;
 import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 
 import java.util.*;
 
@@ -31,8 +32,8 @@ public class ImageProcessing implements Observer {
 
         //Find contours
         List<MatOfPoint> foundContours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(processedMat, foundContours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Mat heirarchy = new Mat();
+        Imgproc.findContours(processedMat, foundContours, heirarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
         //Approximate the shape of the contours
         List<MatOfPoint2f> approximations = new ArrayList<>();
@@ -41,18 +42,64 @@ public class ImageProcessing implements Observer {
             Imgproc.approxPolyDP(new MatOfPoint2f(foundContours.get(i).toArray()), approximations.get(i), 0.1 * Imgproc.arcLength(new MatOfPoint2f(foundContours.get(i).toArray()), true), true);
         }
 
-        //TODO Bei ineinander liegenden Rechecken, das Aüßere aussortieren (moments?)
+        //Find the cube boundarys
+        int index = 0;
+        for (MatOfPoint2f approximation : approximations) {
+            if (isSquare(approximation)) {
+                index++;
+                //Get the centers
+                Moments moments = Imgproc.moments(approximation);
+                /*
+                TODO
+                 1. Von Quadraten mit gleichen Mittelpunkten, alle bis auf das kleinste rausnehmen
+                 3. Linkestes und höchstes Quadrat finden und daraus die Ecke oben links ableiten
+                 4. Zeile durcharbeiten (X Abstand zu Quadrat < Quadrat width * 1.5)
+                 5. Wenn kein Quadrat gefunden wurde trotzdem noch eins weitergehen
+                 6. In nächste Zeile Springen (Y Abstand zu Quadrat < Quadrat heihgt * 1.5)
+                 7. Wenn keine neue Zeile gefunden wurde, prüfen wie viele Steine gefunden wurden.
+                 8. Wenn Reihen != Spalten return kein Würfel gefunden
+                 9. Else return Quadrate
+                 10.Farbwerte von Kreis mit (Mittelpunkt = moment; radius = kleinste Seite
+                */
+                /*
+                TODO
+                 1. Von Quadraten mit gleichen Mittelpunkten, alle bis auf das kleinste rausnehmen
+                 2. yOffset = oberstes Quadrat
+                    2.1. Nach links und rechts suchen bis keine Quadrate mehr gefunden werden
+                    2.2. Wenn < 2 gefunden -> yOffset = Quadrat.y
+                        2.2.1. continue
+                    2.3. Else -> nach x Werten sortieren und in Array speichern
+                        2.3.1. yOffset = Quadrat.y + Quadrat.height
+                */
+                if (moments.m00 != 0) {
+                    System.out.println(index + " -> cX: " + moments.m10 / moments.m00);
+                    System.out.println(index + " -> cY: " + moments.m01 / moments.m00);
+                }
+            }
+        }
 
         //Draw the found contours on the unprocessed image
-        Mat contourMat = drawContoursOnUnprocessedImage(approximations);
+        List<MatOfPoint> convertedApproximations = new ArrayList<>();
+        for (MatOfPoint2f approximation : approximations) {
+            if (isSquare(approximation)) {
+                convertedApproximations.add(new MatOfPoint());
+                approximation.convertTo(convertedApproximations.get(convertedApproximations.size() - 1), CvType.CV_32S);
+            }
+        }
+        Mat contourMat = model.getUnprocessedMat().clone();
+        for (int i = 0; i < convertedApproximations.size(); i++) {
+            Imgproc.drawContours(contourMat, convertedApproximations, i, new Scalar(60, 255, 255), 2);
+        }
 
         //Convert mat to bgr
-        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR); //TODO Das wäre woanders besser aufgehoben
+        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR); //TODO Das währe woanders besser aufgehoben
         model.setProcessedMat(contourMat);
     }
 
     /**
-     * Tests whether the given approximations form a square
+     * Test whether the given approximations form a square
+     * that is not too big or too small.
+     * @param cornerMat The matrix, with the found approximations
      */
     private boolean isSquare(MatOfPoint2f cornerMat) {
 
@@ -91,19 +138,19 @@ public class ImageProcessing implements Observer {
         double minAngle = 90 - model.getAngleThreshold();
         double maxAngle = 90 + model.getAngleThreshold();
 
-        double angleTopLeft = Math.toDegrees(getAngle(corners[3], corners[1], corners[0]));
+        double angleTopLeft = getAngle(corners[3], corners[1], corners[0]);
         if (angleTopLeft < minAngle || angleTopLeft > maxAngle)
             return false;
 
-        double angleTopRight = Math.toDegrees(getAngle(corners[0], corners[2], corners[1]));
+        double angleTopRight = getAngle(corners[0], corners[2], corners[1]);
         if (angleTopRight < minAngle || angleTopRight > maxAngle)
             return false;
 
-        double angleBottomRight = Math.toDegrees(getAngle(corners[0], corners[2], corners[3]));
+        double angleBottomRight = getAngle(corners[0], corners[2], corners[3]);
         if (angleBottomRight < minAngle || angleBottomRight > maxAngle)
             return false;
 
-        double angleBottomLeft = Math.toDegrees(getAngle(corners[3], corners[1], corners[2]));
+        double angleBottomLeft = getAngle(corners[3], corners[1], corners[2]);
         if (angleBottomLeft < minAngle || angleBottomLeft > maxAngle)
             return false;
 
@@ -115,13 +162,13 @@ public class ImageProcessing implements Observer {
         Point boundingRectTopRight = new Point(farRight, farUp);
 
         if (corners[0].y < corners[1].y) {
-            double angleLeft = Math.toDegrees(getAngle(corners[1], boundingRectTopRight, corners[0]));
+            double angleLeft = getAngle(corners[1], boundingRectTopRight, corners[0]);
             if (angleLeft > model.getRotationThreshold())
                 return false;
         }
 
         else {
-            double angleRight = Math.toDegrees(getAngle(corners[0], boundingRectTopLeft, corners[1]));
+            double angleRight = getAngle(corners[0], boundingRectTopLeft, corners[1]);
             if (angleRight > model.getRotationThreshold())
                 return false;
         }
@@ -129,32 +176,48 @@ public class ImageProcessing implements Observer {
         return true;
     }
 
-    //Returns the angle at point2 for the triangle formed by the three given points
-    private double getAngle(Point point0, Point point1, Point point2) {
+    /**
+     * Returns the angle at the point anglePoint for the triangle
+     * formed by the three given points.
+     * @param point0 The first point
+     * @param point1 The second point
+     * @param anglePoint The point at which the angle is calculated
+     * @return The angle in degrees
+     */
+    private double getAngle(Point point0, Point point1, Point anglePoint) {
 
         //Get the distance between the points (Side x -> opposite side of point x)
-        double side0 = distanceBetweenTwoPoints(point2, point1);
-        double side1 = distanceBetweenTwoPoints(point0, point2);
+        double side0 = distanceBetweenTwoPoints(anglePoint, point1);
+        double side1 = distanceBetweenTwoPoints(point0, anglePoint);
         double side2 = distanceBetweenTwoPoints(point0, point1);
 
-        //Calculate the cosine angle at point2
+        //Calculate the cosine angle at anglePoint
         double cosAngle = (Math.pow(side0, 2) + Math.pow(side1, 2) - Math.pow(side2, 2)) / (2 * side0 * side1);
 
         //Limit the angle to 0 and 180
         if (cosAngle > 1) cosAngle = 1;
         else if (cosAngle < -1) cosAngle = -1;
 
-        return Math.acos(cosAngle);
+        //Acos
+        cosAngle = Math.acos(cosAngle);
+
+        //Change to degrees
+        cosAngle = Math.toDegrees(cosAngle);
+
+        return cosAngle;
     }
 
     /**
-     * Sort the corners -> topLeft: 0, topRight: 1, bottomRight: 2, bottomLeft: 3
+     * Sorts the points so that they have the following order:
+     * -> topLeft: 0, topRight: 1, bottomRight: 2, bottomLeft: 3
+     * @param corners The points that are to be checked
+     * @return The sorted points in an array
      */
     private Point[] sortCorners(Point[] corners) {
 
         List<Point> results = new ArrayList<>();
 
-        //Get the min and max values for x and y //TODO Könnte man auch mit boundingRect lösen
+        //Get the min and max values for x and y //TODO Könnte man auch mit boundingRect lösenv
         double[] xValues = new double[] {corners[0].x, corners[1].x, corners[2].x, corners[3].x};
         double[] yValues = new double[] {corners[0].y, corners[1].y, corners[2].y, corners[3].y};
         double minX = getMin(xValues);
@@ -175,7 +238,7 @@ public class ImageProcessing implements Observer {
         }
         results.add(topLeft);
 
-        //Top left
+        //Top right
         Point topRight = new Point();
         double topRightDistance = 0;
         for (Point corner : corners) {
@@ -217,12 +280,23 @@ public class ImageProcessing implements Observer {
         return results.toArray(new Point[4]);
     }
 
+    /**
+     * Calculate the euclidean distance between two points
+     * @param point0 The first point
+     * @param point1 The second point
+     * @return The euclidean distance between the two given points
+     */
     private double distanceBetweenTwoPoints(Point point0, Point point1) {
         double xDiff = point0.x - point1.x;
         double yDiff = point0.y - point1.y;
         return Math.sqrt(Math.pow(xDiff,2) + Math.pow(yDiff, 2));
     }
 
+    /**
+     * Calculate the smallest double value in the given array
+     * @param values An array of doubles to be examined
+     * @return The smallest double found
+     */
     private double getMin(double[] values) {
         double min = values[0];
         for (int i = 1; i < values.length; i++) {
@@ -231,27 +305,17 @@ public class ImageProcessing implements Observer {
         return min;
     }
 
+    /**
+     * Calculate the bigest double value in the given array
+     * @param values An array of doubles to be examined
+     * @return The biggest double found
+     */
     private double getMax(double[] values) {
         double max = values[0];
         for (int i = 1; i < values.length; i++) {
             max = Math.max(max, values[i]);
         }
         return max;
-    }
-
-    private Mat drawContoursOnUnprocessedImage(List<MatOfPoint2f> approximations) {
-        List<MatOfPoint> convertedApproximations = new ArrayList<>();
-        for (MatOfPoint2f approximation : approximations) {
-            if (isSquare(approximation)) {
-                convertedApproximations.add(new MatOfPoint());
-                approximation.convertTo(convertedApproximations.get(convertedApproximations.size() - 1), CvType.CV_32S);
-            }
-        }
-        Mat outputMat = model.getUnprocessedMat().clone();
-        for (int i = 0; i < convertedApproximations.size(); i++) {
-            Imgproc.drawContours(outputMat, convertedApproximations, i, new Scalar(60, 255, 255), 2);
-        }
-        return outputMat;
     }
 
     @Override

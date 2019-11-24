@@ -22,8 +22,8 @@
                         <Font name="Kiona Regular" size="20.0" />
                      </font>
                   </Text>
-                  <Slider fx:id="sl_canny1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" value="21.0" />
-                  <Text fx:id="txt_canny1" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="21">
+                  <Slider fx:id="sl_canny1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" value="17.0" />
+                  <Text fx:id="txt_canny1" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="17">
                      <font>
                         <Font name="Kiona Regular" size="21.0" />
                      </font>
@@ -40,8 +40,8 @@
                         <Font name="Kiona Regular" size="20.0" />
                      </font>
                   </Text>
-                  <Slider fx:id="sl_canny2" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" prefWidth="180.0" value="19.0" />
-                  <Text fx:id="txt_canny2" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="19">
+                  <Slider fx:id="sl_canny2" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" prefWidth="180.0" value="23.0" />
+                  <Text fx:id="txt_canny2" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="23">
                      <font>
                         <Font name="Kiona Regular" size="21.0" />
                      </font>
