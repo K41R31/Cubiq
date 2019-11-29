@@ -51,25 +51,20 @@ public class ImageProcessing implements Observer {
                 Moments moments = Imgproc.moments(approximation);
                 /*
                 TODO
-                 1. Von Quadraten mit gleichen Mittelpunkten, alle bis auf das kleinste rausnehmen
-                 3. Linkestes und höchstes Quadrat finden und daraus die Ecke oben links ableiten
-                 4. Zeile durcharbeiten (X Abstand zu Quadrat < Quadrat width * 1.5)
-                 5. Wenn kein Quadrat gefunden wurde trotzdem noch eins weitergehen
-                 6. In nächste Zeile Springen (Y Abstand zu Quadrat < Quadrat heihgt * 1.5)
-                 7. Wenn keine neue Zeile gefunden wurde, prüfen wie viele Steine gefunden wurden.
-                 8. Wenn Reihen != Spalten return kein Würfel gefunden
-                 9. Else return Quadrate
-                 10.Farbwerte von Kreis mit (Mittelpunkt = moment; radius = kleinste Seite
-                */
-                /*
-                TODO
-                 1. Von Quadraten mit gleichen Mittelpunkten, alle bis auf das kleinste rausnehmen
-                 2. yOffset = oberstes Quadrat
-                    2.1. Nach links und rechts suchen bis keine Quadrate mehr gefunden werden
-                    2.2. Wenn < 2 gefunden -> yOffset = Quadrat.y
-                        2.2.1. continue
-                    2.3. Else -> nach x Werten sortieren und in Array speichern
-                        2.3.1. yOffset = Quadrat.y + Quadrat.height
+                 Übereinander liegende Quadrate aussortieren
+                    1. Von Quadraten mit gleichen Mittelpunkten, alle bis auf das kleinste rausnehmen
+                 Überprüfen ob alle Steine vorhanden sind und diese sortieren
+                    1. Das Quadrat was oben-links liegt finden
+                    2. Zeile durcharbeiten (X Abstand zu Quadrat < Quadrat width * 1.5)
+                    3. Solange Durchgänge in Zeile < 3, weiter durcharbeiten
+                    4. In nächste Zeile Springen (Y Abstand zu Quadrat < Quadrat heihgt * 1.5)
+                    5. Wenn keine neue Zeile erkannt -> Ausgehend vom Ausgangs-Quadrat das nächste oben-links liegende Quadrat nehmen
+                    5. Wenn keine neue Zeile gefunden wurde, prüfen wie viele Steine gefunden wurden.
+                    6. Wenn Anzahl Quadrate != 9 -> return false
+                    7. Else return -> Quadrat Array
+                 Farben Auslesen
+                    1. Farbwerte von Kreis mit (Mittelpunkt = moment; radius = kleinste Seite)
+                    2. Farbwerte in zweidimensionalem Array speichern
                 */
                 if (moments.m00 != 0) {
                     System.out.println(index + " -> cX: " + moments.m10 / moments.m00);
@@ -92,7 +87,7 @@ public class ImageProcessing implements Observer {
         }
 
         // Convert mat to bgr
-        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR); //TODO Das währe woanders besser aufgehoben
+        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR); //TODO Das wäre woanders besser aufgehoben
         model.setProcessedMat(contourMat);
     }
 
@@ -118,7 +113,7 @@ public class ImageProcessing implements Observer {
 
         // Calculate the threshold for the rectangle
         double maxDistance = getMax(distances);
-        double minDistance = maxDistance * model.getSideLenghtThreshold();
+        double minDistance = maxDistance * model.getSideLengthThreshold();
 
         // If any side is much smaller than the given threshold or is generally very short or long, return false
         for (double distance : distances) {
