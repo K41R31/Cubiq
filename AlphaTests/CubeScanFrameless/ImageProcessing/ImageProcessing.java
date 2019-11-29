@@ -15,34 +15,34 @@ public class ImageProcessing implements Observer {
     private void checkForCube() {
         Mat inputMat = model.getUnprocessedMat();
 
-        //Convert hsv to gray
+        // Convert hsv to gray
         List<Mat> splittedMat = new ArrayList<>();
         Core.split(inputMat, splittedMat);
         Mat processedMat = splittedMat.get(2);
 
-        //Add gaussian blur
+        // Add gaussian blur
         Imgproc.GaussianBlur(processedMat, processedMat, new Size(2 * model.getBlurThreshold() + 1, 2 * model.getBlurThreshold() + 1), 0);
 
-        //Add Canny
+        // Add Canny
         Imgproc.Canny(processedMat, processedMat, model.getCannyThreshold1(), model.getCannyThreshold2());
 
-        //Make the lines thicker
+        // Make the lines thicker
         Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2 * model.getDilateKernel() + 1, 2 * model.getDilateKernel() + 1));
         Imgproc.dilate(processedMat, processedMat, dilateKernel);
 
-        //Find contours
+        // Find contours
         List<MatOfPoint> foundContours = new ArrayList<>();
         Mat heirarchy = new Mat();
         Imgproc.findContours(processedMat, foundContours, heirarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        //Approximate the shape of the contours
+        // Approximate the shape of the contours
         List<MatOfPoint2f> approximations = new ArrayList<>();
         for (int i = 0; i < foundContours.size(); i++) {
             approximations.add(new MatOfPoint2f());
             Imgproc.approxPolyDP(new MatOfPoint2f(foundContours.get(i).toArray()), approximations.get(i), 0.1 * Imgproc.arcLength(new MatOfPoint2f(foundContours.get(i).toArray()), true), true);
         }
 
-        //Find the cube boundarys
+        // Find the cube boundarys
         int index = 0;
         for (MatOfPoint2f approximation : approximations) {
             if (isSquare(approximation)) {
@@ -78,7 +78,7 @@ public class ImageProcessing implements Observer {
             }
         }
 
-        //Draw the found contours on the unprocessed image
+        // Draw the found contours on the unprocessed image
         List<MatOfPoint> convertedApproximations = new ArrayList<>();
         for (MatOfPoint2f approximation : approximations) {
             if (isSquare(approximation)) {
@@ -91,7 +91,7 @@ public class ImageProcessing implements Observer {
             Imgproc.drawContours(contourMat, convertedApproximations, i, new Scalar(60, 255, 255), 2);
         }
 
-        //Convert mat to bgr
+        // Convert mat to bgr
         Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR); //TODO Das währe woanders besser aufgehoben
         model.setProcessedMat(contourMat);
     }
@@ -103,38 +103,38 @@ public class ImageProcessing implements Observer {
      */
     private boolean isSquare(MatOfPoint2f cornerMat) {
 
-        //All approximations that don't have four corners are filtered out
+        // All approximations that don't have four corners are filtered out
         if (cornerMat.rows() != 4) return false;
 
-        //Sort the corners based on their location
+        // Sort the corners based on their location
         Point[] corners = sortCorners(cornerMat.toArray());
 
-        //Calculate the length of all four sides
+        // Calculate the length of all four sides
         double distanceTop = distanceBetweenTwoPoints(corners[0], corners[1]);
         double distanceRight = distanceBetweenTwoPoints(corners[1], corners[2]);
         double distanceBottom = distanceBetweenTwoPoints(corners[2], corners[3]);
         double distanceLeft = distanceBetweenTwoPoints(corners[3], corners[0]);
         double[] distances = new double[] {distanceTop, distanceRight, distanceBottom, distanceLeft};
 
-        //Calculate the threshold for the rectangle
+        // Calculate the threshold for the rectangle
         double maxDistance = getMax(distances);
         double minDistance = maxDistance * model.getSideLenghtThreshold();
 
-        //If any side is much smaller than the given threshold or is generally very short or long, return false
+        // If any side is much smaller than the given threshold or is generally very short or long, return false
         for (double distance : distances) {
-            //Check for great length differences
+            // Check for great length differences
             if (distance < minDistance) {
                 return false;
             }
-            //Check for sides that are shorter than 2% of the image width
+            // Check for sides that are shorter than 2% of the image width
             if (distance < model.getUnprocessedMat().width() * 0.02)
                 return false;
-            //Check for sides that are longer than 15% of the image width
+            // Check for sides that are longer than 15% of the image width
             if (distance > model.getUnprocessedMat().width() * 0.15)
                 return false;
         }
 
-        //The angles of all four corners must not be outside the threshold
+        // The angles of all four corners must not be outside the threshold
         double minAngle = 90 - model.getAngleThreshold();
         double maxAngle = 90 + model.getAngleThreshold();
 
@@ -154,7 +154,7 @@ public class ImageProcessing implements Observer {
         if (angleBottomLeft < minAngle || angleBottomLeft > maxAngle)
             return false;
 
-        //The rectangle must not be rotated further than the threshold
+        // The rectangle must not be rotated further than the threshold
         double farLeft = getMin(new double[] {corners[0].x, corners[1].x, corners[2].x, corners[3].x});
         double farRight = getMax(new double[] {corners[0].x, corners[1].x, corners[2].x, corners[3].x});
         double farUp = getMin(new double[] {corners[0].y, corners[1].y, corners[2].y, corners[3].y});
@@ -186,22 +186,22 @@ public class ImageProcessing implements Observer {
      */
     private double getAngle(Point point0, Point point1, Point anglePoint) {
 
-        //Get the distance between the points (Side x -> opposite side of point x)
+        // Get the distance between the points (Side x -> opposite side of point x)
         double side0 = distanceBetweenTwoPoints(anglePoint, point1);
         double side1 = distanceBetweenTwoPoints(point0, anglePoint);
         double side2 = distanceBetweenTwoPoints(point0, point1);
 
-        //Calculate the cosine angle at anglePoint
+        // Calculate the cosine angle at anglePoint
         double cosAngle = (Math.pow(side0, 2) + Math.pow(side1, 2) - Math.pow(side2, 2)) / (2 * side0 * side1);
 
-        //Limit the angle to 0 and 180
+        // Limit the angle to 0 and 180
         if (cosAngle > 1) cosAngle = 1;
         else if (cosAngle < -1) cosAngle = -1;
 
-        //Acos
+        // Acos
         cosAngle = Math.acos(cosAngle);
 
-        //Change to degrees
+        // Change to degrees
         cosAngle = Math.toDegrees(cosAngle);
 
         return cosAngle;
@@ -217,7 +217,7 @@ public class ImageProcessing implements Observer {
 
         List<Point> results = new ArrayList<>();
 
-        //Get the min and max values for x and y //TODO Könnte man auch mit boundingRect lösenv
+        // Get the min and max values for x and y TODO Könnte man auch mit boundingRect lösen
         double[] xValues = new double[] {corners[0].x, corners[1].x, corners[2].x, corners[3].x};
         double[] yValues = new double[] {corners[0].y, corners[1].y, corners[2].y, corners[3].y};
         double minX = getMin(xValues);
@@ -225,11 +225,10 @@ public class ImageProcessing implements Observer {
         double minY = getMin(yValues);
         double maxY = getMax(yValues);
 
-        //Top left
-        Point topLeft = new Point(); //TODO Kann man in einer externen Methode zusammenfassen
+        // Top left
+        Point topLeft = new Point();
         double topLeftDistance = 0;
         for (Point corner : corners) {
-            if (results.contains(corner)) continue;
             double distance = distanceBetweenTwoPoints(new Point(minX, minY), corner);
             if (topLeftDistance == 0 || distance < topLeftDistance) {
                 topLeft = corner;
@@ -238,7 +237,7 @@ public class ImageProcessing implements Observer {
         }
         results.add(topLeft);
 
-        //Top right
+        // Top right
         Point topRight = new Point();
         double topRightDistance = 0;
         for (Point corner : corners) {
@@ -251,7 +250,7 @@ public class ImageProcessing implements Observer {
         }
         results.add(topRight);
 
-        //Bootom Right
+        // Bootom Right
         Point bottomRight = new Point();
         double bottomRightDistance = 0;
         for (Point corner : corners) {
@@ -264,7 +263,7 @@ public class ImageProcessing implements Observer {
         }
         results.add(bottomRight);
 
-        //Bootom Left
+        // Bootom Left
         Point bottomLeft = new Point();
         double bottomLeftDistance = 0;
         for (Point corner : corners) {
