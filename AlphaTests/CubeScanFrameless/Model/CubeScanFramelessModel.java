@@ -9,9 +9,9 @@ public class CubeScanFramelessModel extends Observable {
     private boolean debug = true;
     private Mat uprocessedMat, processedMat;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
-    private double sideLengthThreshold = 0.6; //0.6
+    private double sideLengthThreshold = 0.8; //0.6
     private double angleThreshold = 50; //50
-    private double rotationThreshold = 30; //80
+    private double rotationThreshold = 20; //20
     private double blurThreshold = 3; //3
     private double dilateKernel = 1; //1
 
