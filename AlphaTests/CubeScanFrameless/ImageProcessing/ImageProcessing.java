@@ -122,15 +122,6 @@ public class ImageProcessing implements Observer {
             }
         }
 
-        /*
-        TODO
-         NEUE METHODE
-         UpperLeftSqare finden
-         Raster von mit dem Durchschnittlichen Abstand zwischen den Centern bilden
-         Ausgehend vom upperLeftSquare Squares die auf dem Raster liegen auslesen
-         Wenn Squares auf dem Raster > 5 -> Würfel gefunden -> Squares auf Rester für berechnungen returnen;
-        */
-
         // Sort und so
         Point[][][] sortedSquares = new Point[3][3][4];
         Point[] sameRowSquares = new Point[2];
@@ -246,10 +237,8 @@ public class ImageProcessing implements Observer {
 
         else {
             double angleLeft = getAngle(corners[1], boundingRectTopRight, corners[0]);
-            if (angleLeft > model.getRotationThreshold()) {
-                System.out.println(Arrays.toString(corners));
+            if (angleLeft > model.getRotationThreshold())
                 return false;
-            }
         }
 
         return true;
