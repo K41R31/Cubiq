@@ -5,12 +5,14 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class ImageProcessing implements Observer {
 
-        private CubeScanFramelessModel model;
-
+    private CubeScanFramelessModel model;
 
     private void checkForCube() {
         Mat inputMat = model.getUnprocessedMat();
@@ -75,31 +77,29 @@ public class ImageProcessing implements Observer {
             }
         }
 
-        /*
-        TODO
-         Bounding Rect
-         isSquare
-            ja
-                Raster aufspannen
-                Center an Rasterpunkten auslesen
-                Fehlende Center hinzufügen
-            nein
 
+        // Bounding rect TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (centers.size() < 4) return;
+        if (centers.size() > 15) return;
 
+        // Get the bounding rect
+        MatOfPoint matOfPoint = new MatOfPoint();
+        matOfPoint.fromList(centers);
+        Rect boundingRect = Imgproc.boundingRect(matOfPoint);
 
-         Überprüfen ob alle Steine vorhanden sind und diese sortieren
-            1. Das Quadrat was oben-links liegt finden
-            2. Zeile durcharbeiten (X Abstand zu Quadrat < Quadrat width * 1.5)
-            3. Solange Durchgänge in Zeile < 3, weiter durcharbeiten
-            4. In nächste Zeile Springen (Y Abstand zu Quadrat < Quadrat heihgt * 1.5)
-            5. Wenn keine neue Zeile erkannt -> Ausgehend vom Ausgangs-Quadrat das nächste oben-links liegende Quadrat nehmen
-            5. Wenn keine neue Zeile gefunden wurde, prüfen wie viele Steine gefunden wurden.
-            6. Wenn Anzahl Quadrate != 9 -> return false
-            7. Else return -> Quadrat Array
-         Farben Auslesen
-            1. Farbwerte von Kreis mit (Mittelpunkt = moment; radius = kleinste Seite)
-            2. Farbwerte in zweidimensionalem Array speichern
-        */
+        // Get the top left corner
+        Point[] centersArray = centers.toArray(); //TODO EXCEPTION
+        getBoundingCorner(centers.toArray(), new ArrayList<>(), new Point(boundingRect.x, boundingRect.y));
+
+        /* TODO
+            Wenn BoundingRect == Suqare -> keine Ausreißer (rotation könnte Probleme machen (rotation ausrechen))
+            Wenn alle centers auf dem Raster liegen -> 100% Würfel gefunden
+            Wenn centers <= 9 -> nur Würfel Steine gefunden
+            Fehlende Steine von Raster ableiten
+            Rasterpositionen == Position von Stein
+            Farben auslesen
+         */
+
 
         // Get the upper-left square
         int upperLeftSquareIndex = -1;
@@ -122,27 +122,6 @@ public class ImageProcessing implements Observer {
             }
         }
 
-        // Sort und so
-        Point[][][] sortedSquares = new Point[3][3][4];
-        Point[] sameRowSquares = new Point[2];
-        int searchAreaSize = 20;
-        //TODO Überprüfen ab alle Squares auf einem Raster liegen -> Ausreißer eliminieren -> fehlende Squares einzeichnen
-        for (int y = 0; y < 3; y++) {
-            //TODO upperLeftSquareIndex unter dem letzten upperLeftSquareIndex - searchAreaSize neu berechenn
-            sortedSquares[0][0] = cubeSquares.get(upperLeftSquareIndex).toArray();
-            for (int x = 0; x < 2; x++) {
-                for (int i = 0; i < cubeSquares.size(); i++) {
-                    if (i == upperLeftSquareIndex) continue;
-                    // If a center is at about the same height, add it to sameRowSquares
-                    if (centers.get(i).y < centers.get(upperLeftSquareIndex).y - searchAreaSize || centers.get(i).y > centers.get(upperLeftSquareIndex).y + searchAreaSize) continue;
-                    sameRowSquares[x] = centers.get(i);
-                    break;
-                }
-            }
-            //TODO if sameRowSquares nach x Werten sortieren und in sortedSqares speichern
-        }
-
-
         // Draw the found contours in the unprocessed image
         List<MatOfPoint> convertedApproximations = new ArrayList<>();
         for (MatOfPoint2f cubeSquare : cubeSquares) {
@@ -154,8 +133,27 @@ public class ImageProcessing implements Observer {
             Imgproc.drawContours(contourMat, convertedApproximations, i, new Scalar(60, 255, 255), 2);
         }
 
+        //TODO DRAW BOUNDING RECT + GRID--------------------------------------------------------------------------------
+        Point boundingPoint1 = new Point(boundingRect.x, boundingRect.y);
+        Point boundingPoint2 = new Point(boundingRect.x + boundingRect.width, boundingRect.y + boundingRect.height);
+        double differenceX = boundingPoint2.x - boundingPoint1.x;
+        double differenceY = boundingPoint2.y - boundingPoint1.y;
+
+        Imgproc.rectangle(contourMat, boundingPoint1, boundingPoint2, new Scalar(5, 255, 255), 5);
+        Imgproc.line(contourMat,
+                new Point(boundingPoint1.x + differenceX / 2, boundingPoint1.y),
+                new Point(boundingPoint1.x + differenceX / 2, boundingPoint2.y),
+                new Scalar(5, 255, 255), 5
+        );
+        Imgproc.line(contourMat,
+                new Point(boundingPoint1.x, boundingPoint1.y + differenceY / 2),
+                new Point(boundingPoint2.x, boundingPoint1.y + differenceY / 2),
+                new Scalar(5, 255, 255), 5
+        );
+        //TODO END------------------------------------------------------------------------------------------------------
+
         // Convert mat to bgr
-        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR); //TODO Das wäre woanders besser aufgehoben
+        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR);
         model.setProcessedMat(contourMat);
     }
 
@@ -244,6 +242,10 @@ public class ImageProcessing implements Observer {
         return true;
     }
 
+    private boolean boundingRectIsSquare() {
+        return false;
+    }
+
     /**
      * Returns the angle at the point anglePoint for the triangle
      * formed by the three given points.
@@ -294,57 +296,32 @@ public class ImageProcessing implements Observer {
         double maxY = getMax(yValues);
 
         // Top left
-        Point topLeft = new Point();
-        double topLeftDistance = -1;
-        for (Point corner : corners) {
-            double distance = distanceBetweenTwoPoints(new Point(minX, minY), corner);
-            if (topLeftDistance == -1 || distance < topLeftDistance) {
-                topLeft = corner;
-                topLeftDistance = distance;
-            }
-        }
-        results.add(topLeft);
+        results.add(getBoundingCorner(corners, results, new Point(minX, minY)));
 
         // Top right
-        Point topRight = new Point();
+        results.add(getBoundingCorner(corners, results, new Point(maxX, minY)));
+
+        // Bootom Right
+        results.add(getBoundingCorner(corners, results, new Point(maxX, maxY)));
+
+        // Bootom Left
+        results.add(getBoundingCorner(corners, results, new Point(minX, maxY)));
+
+        return results.toArray(new Point[4]);
+    }
+
+    private Point getBoundingCorner(Point[] corners, List<Point> results, Point processCorner) {
+        Point outputCorner = new Point();
         double topRightDistance = -1;
         for (Point corner : corners) {
             if (results.contains(corner)) continue;
-            double distance = distanceBetweenTwoPoints(new Point(maxX, minY), corner);
+            double distance = distanceBetweenTwoPoints(processCorner, corner);
             if (topRightDistance == -1 || distance < topRightDistance) {
-                topRight = corner;
+                outputCorner = corner;
                 topRightDistance = distance;
             }
         }
-        results.add(topRight);
-
-        // Bootom Right
-        Point bottomRight = new Point();
-        double bottomRightDistance = -1;
-        for (Point corner : corners) {
-            if (results.contains(corner)) continue;
-            double distance = distanceBetweenTwoPoints(new Point(maxX, maxY), corner);
-            if (bottomRightDistance == -1 || distance < bottomRightDistance) {
-                bottomRight = corner;
-                bottomRightDistance = distance;
-            }
-        }
-        results.add(bottomRight);
-
-        // Bootom Left
-        Point bottomLeft = new Point();
-        double bottomLeftDistance = -1;
-        for (Point corner : corners) {
-            if (results.contains(corner)) continue;
-            double distance = distanceBetweenTwoPoints(new Point(minX, maxY), corner);
-            if (bottomLeftDistance == -1 || distance < bottomLeftDistance) {
-                bottomLeft = corner;
-                bottomLeftDistance = distance;
-            }
-        }
-        results.add(bottomLeft);
-
-        return results.toArray(new Point[4]);
+        return outputCorner;
     }
 
     /**
