@@ -1,23 +1,16 @@
 package AlphaTests.WebcamGrabber;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import org.opencv.core.Core;
-import org.opencv.core.CvException;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
 import java.io.ByteArrayInputStream;
@@ -49,6 +42,8 @@ public class WebcamGrabber extends Application {
 
         // Process Video stream
         videoCapture = new VideoCapture(0);
+        videoCapture.set(3, 1280);
+        videoCapture.set(4, 720);
 
         ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
         timer.scheduleAtFixedRate(this::getFrame, 0, 40, TimeUnit.MILLISECONDS);
@@ -63,7 +58,7 @@ public class WebcamGrabber extends Application {
         }
     }
 
-    private void convertToImageView(Mat frame){
+    private void convertToImageView(Mat frame) {
         MatOfByte buffer = new MatOfByte();
         Imgcodecs.imencode(".png", frame, buffer);
         Image imageToShow = new Image(new ByteArrayInputStream(buffer.toArray()));

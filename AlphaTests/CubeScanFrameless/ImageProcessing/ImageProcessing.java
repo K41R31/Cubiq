@@ -4,22 +4,41 @@ import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.opencv.videoio.VideoCapture;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ImageProcessing implements Observer {
 
     private CubeScanFramelessModel model;
+    private VideoCapture videoCapture;
+
+    private void startWebcamStream() {
+        videoCapture = new VideoCapture(0);
+        videoCapture.set(3, 1280);
+        videoCapture.set(4, 720);
+
+        ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+        timer.scheduleAtFixedRate(this::checkForCube, 0, 40, TimeUnit.MILLISECONDS);
+    }
 
     private void checkForCube() {
-        Mat inputMat = model.getUnprocessedMat();
+        if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
+
+        Mat frame = new Mat();
+        videoCapture.read(frame);
+
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
 
         // Convert hsv to gray
         List<Mat> splittedMat = new ArrayList<>();
-        Core.split(inputMat, splittedMat);
+        Core.split(frame, splittedMat);
         Mat processedMat = splittedMat.get(2);
 
         // Add gaussian blur
@@ -60,7 +79,7 @@ public class ImageProcessing implements Observer {
         // If nothing was found
         if (cubeSquares.isEmpty()) {
             Mat convertedMat = new Mat();
-            Imgproc.cvtColor(model.getUnprocessedMat(), convertedMat, Imgproc.COLOR_HSV2BGR);
+            Imgproc.cvtColor(frame, convertedMat, Imgproc.COLOR_HSV2BGR);
             model.setProcessedMat(convertedMat);
             return;
         }
@@ -79,8 +98,8 @@ public class ImageProcessing implements Observer {
 
 
         // Bounding rect TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (centers.size() < 8) return;
-        if (centers.size() > 12) return;
+        //if (centers.size() < 8) return;
+        //if (centers.size() > 12) return;
 
         // Get the bounding rect
         MatOfPoint matOfPoint = new MatOfPoint();
@@ -128,7 +147,7 @@ public class ImageProcessing implements Observer {
             convertedApproximations.add(new MatOfPoint());
             cubeSquare.convertTo(convertedApproximations.get(convertedApproximations.size() - 1), CvType.CV_32S);
         }
-        Mat contourMat = model.getUnprocessedMat().clone();
+        Mat contourMat = frame.clone();
         for (int i = 0; i < convertedApproximations.size(); i++) {
             Imgproc.drawContours(contourMat, convertedApproximations, i, new Scalar(60, 255, 255), 2);
         }
@@ -192,10 +211,10 @@ public class ImageProcessing implements Observer {
             // If ignoreAbsoluteWidth is true, the general width will be ignored
             if (ignoreAbsoluteWidth) continue;
             // Check for sides that are shorter than 2% of the image width
-            if (distance < model.getUnprocessedMat().width() * 0.02)
+            if (distance < 1280 * 0.02) //TODO Später dynamisch mit width von frame
                 return false;
             // Check for sides that are longer than 15% of the image width
-            if (distance > model.getUnprocessedMat().width() * 0.15)
+            if (distance > 1280 * 0.15) //TODO Später dynamisch mit width von frame
                 return false;
         }
 
@@ -366,7 +385,7 @@ public class ImageProcessing implements Observer {
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
             case "processImage":
-                checkForCube();
+                startWebcamStream();
                 break;
         }
     }

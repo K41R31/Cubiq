@@ -1,58 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScanFrameless.GUI.CubeScanFramelessController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaTests.CubeScanFrameless.GUI.CubeScanFramelessController">
    <children>
       <ImageView fx:id="imageView" fitHeight="720.0" fitWidth="1280.0" layoutX="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <VBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="350.0" style="-fx-background-color: #2b2b2b;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <children>
-            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" spacing="20.0">
-               <children>
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="canny1" textAlignment="RIGHT">
-                     <font>
-                        <Font name="Kiona Regular" size="20.0" />
-                     </font>
-                  </Text>
-                  <Slider fx:id="sl_canny1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" value="17.0" />
-                  <Text fx:id="txt_canny1" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="17">
-                     <font>
-                        <Font name="Kiona Regular" size="21.0" />
-                     </font>
-                  </Text>
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="30.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" spacing="20.0">
-               <children>
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="canny2" textAlignment="RIGHT">
-                     <font>
-                        <Font name="Kiona Regular" size="20.0" />
-                     </font>
-                  </Text>
-                  <Slider fx:id="sl_canny2" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" prefWidth="180.0" value="23.0" />
-                  <Text fx:id="txt_canny2" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="23">
-                     <font>
-                        <Font name="Kiona Regular" size="21.0" />
-                     </font>
-                  </Text>
-               </children>
-            </HBox>
-         </children>
-         <padding>
-            <Insets left="15.0" />
-         </padding>
-      </VBox>
-      <Button layoutX="1178.0" layoutY="14.0" mnemonicParsing="false" onAction="#toggleView" text="toggle view" />
    </children>
 </AnchorPane>

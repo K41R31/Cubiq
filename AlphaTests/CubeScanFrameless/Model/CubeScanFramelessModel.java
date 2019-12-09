@@ -16,9 +16,9 @@ public class CubeScanFramelessModel extends Observable {
     private double dilateKernel = 1; //1
 
 
-    public void loadImage() {
-        setChanged();
-        notifyObservers("loadNewImage");
+    public void loadImage() { //TODO
+        //setChanged();
+        //notifyObservers("loadNewImage");
         setChanged();
         notifyObservers("processImage");
     }
