@@ -79,8 +79,8 @@ public class ImageProcessing implements Observer {
 
 
         // Bounding rect TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (centers.size() < 4) return;
-        if (centers.size() > 15) return;
+        if (centers.size() < 8) return;
+        if (centers.size() > 12) return;
 
         // Get the bounding rect
         MatOfPoint matOfPoint = new MatOfPoint();
@@ -88,8 +88,8 @@ public class ImageProcessing implements Observer {
         Rect boundingRect = Imgproc.boundingRect(matOfPoint);
 
         // Get the top left corner
-        Point[] centersArray = centers.toArray(); //TODO EXCEPTION
-        getBoundingCorner(centers.toArray(), new ArrayList<>(), new Point(boundingRect.x, boundingRect.y));
+        Object[] centersArray = centers.toArray(); //TODO EXCEPTION
+        //getBoundingCorner(centersArray, new ArrayList<>(), new Point(boundingRect.x, boundingRect.y));
 
         /* TODO
             Wenn BoundingRect == Suqare -> keine Ausreißer (rotation könnte Probleme machen (rotation ausrechen))
