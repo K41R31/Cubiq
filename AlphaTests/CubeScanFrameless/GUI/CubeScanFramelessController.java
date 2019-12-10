@@ -3,10 +3,9 @@ package AlphaTests.CubeScanFrameless.GUI;
 import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.Text;
+import javafx.scene.layout.StackPane;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import java.io.ByteArrayInputStream;
@@ -16,17 +15,27 @@ import java.util.Observer;
 public class CubeScanFramelessController implements Observer {
 
     private CubeScanFramelessModel model;
-    private boolean showUnprocessedImage = false;
     @FXML
-    private ImageView imageView;
+    private ImageView iv_imageView;
+    @FXML
+    private StackPane sp_buttonPane;
 
     private void updateImageView() {
         MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", model.getProcessedMat(), matOfByte);
+        Platform.runLater(() -> iv_imageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray()))));
+    }
 
-        if (showUnprocessedImage) Imgcodecs.imencode(".jpg", model.getUnprocessedMat(), matOfByte);
-        else Imgcodecs.imencode(".jpg", model.getProcessedMat(), matOfByte);
+    @FXML
+    private void webcamClicked() {
+        model.startWebcamStream();
+        sp_buttonPane.setVisible(false);
+    }
 
-        Platform.runLater(() -> imageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray()))));
+    @FXML
+    private void fileChooserClicked() {
+        model.loadImage();
+        sp_buttonPane.setVisible(false);
     }
 
     @Override

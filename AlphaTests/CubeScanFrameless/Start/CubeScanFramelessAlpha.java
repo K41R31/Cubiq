@@ -43,8 +43,6 @@ public class CubeScanFramelessAlpha extends Application {
         imageLoader.initModel(model);
         model.addObserver(imageLoader);
 
-        model.loadImage();
-
         //Init Scene----------------------------------------------------------------------------------------------------
         stage.setTitle("Cubiq");
         stage.initStyle(StageStyle.UNDECORATED);
