@@ -6,10 +6,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoCapture;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +15,7 @@ public class ImageProcessing implements Observer {
 
     private CubeScanFramelessModel model;
     private VideoCapture videoCapture;
+    private List<int[][]> scannedCubeSides = new ArrayList<>();
 
     private void startWebcamStream() {
         videoCapture = new VideoCapture(0);
@@ -25,17 +23,68 @@ public class ImageProcessing implements Observer {
         videoCapture.set(4, 720);
 
         ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-        timer.scheduleAtFixedRate(this::checkForCube, 0, 40, TimeUnit.MILLISECONDS);
+        timer.scheduleAtFixedRate(this::process, 0, 40, TimeUnit.MILLISECONDS);
     }
 
-    private void checkForCube() {
-        if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
-
+    private void process() {
         Mat frame = new Mat();
-        videoCapture.read(frame);
+        if (model.getLoadedMat() == null) {
+            if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
+            videoCapture.read(frame);
+            Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
+        }
+        else frame = model.getLoadedMat().clone();
 
-        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
+        model.setProcessedMat(frame);
 
+        // Get the position of the stickers
+        List<Point> centers = cubeBoundarys(frame);
+
+        // If centers is null, show the unprocessed image
+        if (centers == null || centers.size() < 8) { //TODO noch nicht optimal
+            model.updateImageView();
+            return;
+        }
+
+        // Get a rotated bounding Rect
+        RotatedRect boundingRect = Imgproc.minAreaRect(new MatOfPoint2f(centers.toArray(new Point[0])));
+
+        // Check if the boundingRect is a square. If not, show the unprocessed image
+        if (!boundingRectIsSquare(boundingRect)) { //TODO noch nicht optimal
+            model.updateImageView();
+            return;
+        }
+
+        // Get a 3x3 grid based on the bounding rectangle
+        Point[][] scanpoints = gridBasedOnRect(boundingRect);
+
+        // Get the colors at the scanpoints, stored in a two dimensional int array
+        int[][] colorMatrix = colorsAtScanpoints(scanpoints, frame);
+
+        // Test if the scanned color matrix was already stored. If not, store it in the list differentColorMatrices
+        if (isNewCubeSide(colorMatrix)) scannedCubeSides.add(colorMatrix);
+
+        System.out.println(scannedCubeSides.size());
+
+        if (scannedCubeSides.size() == 6) new Output().printSchemes(scannedCubeSides);
+
+        // TODO Wenn alle vorhanden -> Anordnen
+
+        // Draw the found contours in the unprocessed image only if >=8 <=9
+        Mat contourMat = frame.clone();
+        if (model.isDebug()) {
+            for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
+                }
+            }
+        }
+        // Show processedMat
+        model.setProcessedMat(contourMat);
+        model.updateImageView();
+    }
+
+    private List<Point> cubeBoundarys(Mat frame) {
         // Convert hsv to gray
         List<Mat> splittedMat = new ArrayList<>();
         Core.split(frame, splittedMat);
@@ -68,7 +117,7 @@ public class ImageProcessing implements Observer {
         List<MatOfPoint2f> cubeSquares = new ArrayList<>();
         for (MatOfPoint2f approximation : approximations) {
             // Proceed with the approximations that are squares
-            if (!isSquare(approximation, false)) continue;
+            if (!isSquare(approximation)) continue;
             // Save the found squares
             cubeSquares.add(approximation);
             // Get the centers
@@ -76,18 +125,15 @@ public class ImageProcessing implements Observer {
             if (moments.m00 != 0) centers.add(new Point(moments.m10 / moments.m00, moments.m01 / moments.m00));
         }
 
-        // If nothing was found
-        if (cubeSquares.isEmpty()) {
-            Mat convertedMat = new Mat();
-            Imgproc.cvtColor(frame, convertedMat, Imgproc.COLOR_HSV2BGR);
-            model.setProcessedMat(convertedMat);
-            return;
-        }
+        //TODO Bedinung bei der alle squares ungefähr gleich groß sein müssen
 
-        // Remove overlapping squares TODO centerThreshold abhängig von der Quadratgröße machen/ immer das kleinere Quadrat nehmen
+        // If nothing was found
+        if (cubeSquares.isEmpty()) return null;
+
+        // Remove overlapping squares TODO centerThreshold abhängig von der Quadratgröße machen -> immer das kleinere Quadrat nehmen
         int centerThreshold = 20;
         for (int i = 0; i < cubeSquares.size(); i++) {
-            for (int c = 0; c < cubeSquares.size(); c ++) {
+            for (int c = 0; c < cubeSquares.size(); c++) {
                 if (c == i) continue;
                 if (centers.get(c).x < centers.get(i).x - centerThreshold || centers.get(c).x > centers.get(i).x + centerThreshold) continue;
                 if (centers.get(c).y < centers.get(i).y - centerThreshold || centers.get(c).y > centers.get(i).y + centerThreshold) continue;
@@ -95,97 +141,17 @@ public class ImageProcessing implements Observer {
                 cubeSquares.remove(c);
             }
         }
-
-
-        // Bounding rect TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //if (centers.size() < 8) return;
-        //if (centers.size() > 12) return;
-
-        // Get the bounding rect
-        MatOfPoint matOfPoint = new MatOfPoint();
-        matOfPoint.fromList(centers);
-        Rect boundingRect = Imgproc.boundingRect(matOfPoint);
-
-        // Get the top left corner
-        Object[] centersArray = centers.toArray(); //TODO EXCEPTION
-        //getBoundingCorner(centersArray, new ArrayList<>(), new Point(boundingRect.x, boundingRect.y));
-
-        /* TODO
-            Wenn BoundingRect == Suqare -> keine Ausreißer (rotation könnte Probleme machen (rotation ausrechen))
-            Wenn alle centers auf dem Raster liegen -> 100% Würfel gefunden
-            Wenn centers <= 9 -> nur Würfel Steine gefunden
-            Fehlende Steine von Raster ableiten
-            Rasterpositionen == Position von Stein
-            Farben auslesen
-         */
-
-
-        // Get the upper-left square
-        int upperLeftSquareIndex = -1;
-        double[] xValues = new double[cubeSquares.size()];
-        double[] yValues = new double[cubeSquares.size()];
-        for (int i = 0; i < cubeSquares.size(); i++) {
-            xValues[i] = centers.get(i).x;
-            yValues[i] = centers.get(i).y;
-        }
-        double minX = getMin(xValues);
-        double minY = getMin(yValues);
-
-        double topLeftDistance = 0;
-        for (int i = 0; i < centers.size(); i++) {
-            Point center = centers.get(i);
-            double distance = distanceBetweenTwoPoints(new Point(minX, minY), center);
-            if (topLeftDistance == 0 || distance < topLeftDistance) {
-                topLeftDistance = distance;
-                upperLeftSquareIndex = i;
-            }
-        }
-
-        // Draw the found contours in the unprocessed image
-        List<MatOfPoint> convertedApproximations = new ArrayList<>();
-        for (MatOfPoint2f cubeSquare : cubeSquares) {
-            convertedApproximations.add(new MatOfPoint());
-            cubeSquare.convertTo(convertedApproximations.get(convertedApproximations.size() - 1), CvType.CV_32S);
-        }
-        Mat contourMat = frame.clone();
-        for (int i = 0; i < convertedApproximations.size(); i++) {
-            Imgproc.drawContours(contourMat, convertedApproximations, i, new Scalar(60, 255, 255), 2);
-        }
-
-        //TODO DRAW BOUNDING RECT + GRID--------------------------------------------------------------------------------
-        Point boundingPoint1 = new Point(boundingRect.x, boundingRect.y);
-        Point boundingPoint2 = new Point(boundingRect.x + boundingRect.width, boundingRect.y + boundingRect.height);
-        double differenceX = boundingPoint2.x - boundingPoint1.x;
-        double differenceY = boundingPoint2.y - boundingPoint1.y;
-
-        Imgproc.rectangle(contourMat, boundingPoint1, boundingPoint2, new Scalar(5, 255, 255), 5);
-        Imgproc.line(contourMat,
-                new Point(boundingPoint1.x + differenceX / 2, boundingPoint1.y),
-                new Point(boundingPoint1.x + differenceX / 2, boundingPoint2.y),
-                new Scalar(5, 255, 255), 5
-        );
-        Imgproc.line(contourMat,
-                new Point(boundingPoint1.x, boundingPoint1.y + differenceY / 2),
-                new Point(boundingPoint2.x, boundingPoint1.y + differenceY / 2),
-                new Scalar(5, 255, 255), 5
-        );
-        //TODO END------------------------------------------------------------------------------------------------------
-
-        // Convert mat to bgr
-        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR);
-        model.setProcessedMat(contourMat);
+        return centers;
     }
 
     /**
      * Test whether the given approximations form a square
      * that is not too big or too small.
      * @param cornerMat The matrix, with the found approximations
-     * @param ignoreAbsoluteWidth if true, the general width will be ignored
      * @return true if the approximation is a square
      */
-    private boolean isSquare(MatOfPoint2f cornerMat, boolean ignoreAbsoluteWidth) {
-
-        // All approximations that don't have four corners are filtered out
+    private boolean isSquare(MatOfPoint2f cornerMat) {
+        // All approximations that don't have four corners get filtered out
         if (cornerMat.rows() != 4) return false;
 
         // Sort the corners based on their location
@@ -208,13 +174,11 @@ public class ImageProcessing implements Observer {
             if (distance < minDistance) {
                 return false;
             }
-            // If ignoreAbsoluteWidth is true, the general width will be ignored
-            if (ignoreAbsoluteWidth) continue;
             // Check for sides that are shorter than 2% of the image width
-            if (distance < 1280 * 0.02) //TODO Später dynamisch mit width von frame
+            if (distance < model.getProcessedMat().width() * 0.02)
                 return false;
             // Check for sides that are longer than 15% of the image width
-            if (distance > 1280 * 0.15) //TODO Später dynamisch mit width von frame
+            if (distance > model.getProcessedMat().width() * 0.15)
                 return false;
         }
 
@@ -259,10 +223,6 @@ public class ImageProcessing implements Observer {
         }
 
         return true;
-    }
-
-    private boolean boundingRectIsSquare() {
-        return false;
     }
 
     /**
@@ -343,7 +303,94 @@ public class ImageProcessing implements Observer {
         return outputCorner;
     }
 
-    /**
+    private boolean boundingRectIsSquare(RotatedRect rotatedRect) {
+        double thresholdPercentage = 20;
+        // Checks if the width is outside of the threshold
+        if (rotatedRect.size.width < rotatedRect.size.height * (100 - thresholdPercentage) / 100) return false;
+        if (rotatedRect.size.width > rotatedRect.size.height * (100 + thresholdPercentage) / 100) return false;
+
+        // If the rectangle is rotated further than allowed
+        if (rotatedRect.angle < -90 || rotatedRect.angle > 0) return false;
+        if (rotatedRect.angle > -60 && rotatedRect.angle < -30) return false;
+        return true;
+    }
+
+    private Point centerBetweenTwoPoints(Point point0, Point point1) {
+        double x, y;
+        x = (point0.x + point1.x) / 2;
+        y = (point0.y + point1.y) / 2;
+
+        return new Point(x, y);
+    }
+
+    private int[][] colorsAtScanpoints(Point[][] scanpoints, Mat frame) {
+        int[][] colors = new int[3][3];
+        double[] color;
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                color = frame.get((int) Math.round(scanpoints[x][y].y), (int) Math.round(scanpoints[x][y].x));
+                if (color[1] < 100 && color[2] > 110) colors[x][y] = 0; // white
+                else if (color[0] < 5) colors[x][y] = 1; // red
+                else if (color[0] < 18) colors[x][y] = 2; // orange
+                else if (color[0] < 36) colors[x][y] = 3; // yellow
+                else if (color[0] < 100) colors[x][y] = 4; // green
+                else if (color[0] < 128) colors[x][y] = 5; // blue
+                else if (color[0] <= 180) colors[x][y] = 1; // red
+            }
+        }
+        return colors;
+    }
+
+    private boolean isNewCubeSide(int[][] matrix) {
+        if (scannedCubeSides.size() == 0) return true;
+        int sameValuesCounter;
+        for (int[][] scannedCubeSide : scannedCubeSides) {
+            for (int rotation = 0; rotation < 4; rotation++) {
+                sameValuesCounter = 0;
+                for (int y = 0; y < 3; y++) {
+                    for (int x = 0; x < 3; x++) {
+                        // Test if a color of the given matrix exists in the same place at scannedCubeSide
+                        if (matrix[x][y] == scannedCubeSide[x][y]) {
+                            // Raise the counter up
+                            sameValuesCounter++;
+                        }
+                    }
+                }
+                // Sides are the same if more than 6 colors are at the same place
+                if (sameValuesCounter > 6) return false; //TODO Keine gute Lösung. Es gibt denn Fall das zwei Seiten bis auf den Mittelstein identisch sind
+                if (rotation < 3) scannedCubeSide = rotateClockwise(scannedCubeSide);
+            }
+        }
+        return true;
+    }
+
+    private int[][] rotateClockwise(int[][] array) {
+        int[][] newArray = new int[3][3];
+        for (int y = 0; y < 3; ++y)
+            for (int x = 0; x < 3; ++x)
+                newArray[y][x] = array[2 - x][y];
+        return newArray;
+    }
+
+    private Point[][] gridBasedOnRect(RotatedRect boundingRect) {
+        Point[][] scanpoints = new Point[3][3];
+        Point[] boundingRectCorners = new Point[4];
+
+        boundingRect.points(boundingRectCorners);
+
+        scanpoints[0][0] = boundingRectCorners[1];
+        scanpoints[0][1] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[2]);
+        scanpoints[0][2] = boundingRectCorners[2];
+        scanpoints[1][0] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[0]);
+        scanpoints[1][1] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[3]);
+        scanpoints[1][2] = centerBetweenTwoPoints(boundingRectCorners[2], boundingRectCorners[3]);
+        scanpoints[2][0] = boundingRectCorners[0];
+        scanpoints[2][1] = centerBetweenTwoPoints(boundingRectCorners[0], boundingRectCorners[3]);
+        scanpoints[2][2] = boundingRectCorners[3];
+        return scanpoints;
+    }
+
+    /**Get both outer centers
      * Calculate the euclidean distance between two points
      * @param point0 The first point
      * @param point1 The second point
@@ -385,6 +432,9 @@ public class ImageProcessing implements Observer {
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
             case "processImage":
+                process();
+                break;
+            case "startWebcamStream":
                 startWebcamStream();
                 break;
         }

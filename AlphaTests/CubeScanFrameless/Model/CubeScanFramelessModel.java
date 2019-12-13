@@ -7,27 +7,37 @@ import java.util.Observable;
 public class CubeScanFramelessModel extends Observable {
 
     private boolean debug = true;
-    private Mat uprocessedMat, processedMat;
+    private Mat loadedMat, processedMat;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
     private double sideLengthThreshold = 0.8; //0.8
-    private double angleThreshold = 360; //50
-    private double rotationThreshold = 360; //20
+    private double angleThreshold = 50; //50
+    private double rotationThreshold = 20; //30
     private double blurThreshold = 3; //3
     private double dilateKernel = 1; //1
 
 
-    public void loadImage() { //TODO
-        //setChanged();
-        //notifyObservers("loadNewImage");
+    public void loadImage() {
+        setChanged();
+        notifyObservers("loadNewImage");
         setChanged();
         notifyObservers("processImage");
     }
 
-    public Mat getUnprocessedMat() {
-        return uprocessedMat;
+    public void startWebcamStream() {
+        setChanged();
+        notifyObservers("startWebcamStream");
     }
-    public void setUprocessedMat(Mat uprocessedMat) {
-        this.uprocessedMat = uprocessedMat;
+
+    public void updateImageView() {
+        setChanged();
+        notifyObservers("updateImageView");
+    }
+
+    public Mat getLoadedMat() {
+        return loadedMat;
+    }
+    public void setLoadedMat(Mat loadedMat) {
+        this.loadedMat = loadedMat;
     }
 
     public Mat getProcessedMat() {
@@ -35,8 +45,6 @@ public class CubeScanFramelessModel extends Observable {
     }
     public void setProcessedMat(Mat processedMat) {
         this.processedMat = processedMat;
-        setChanged();
-        notifyObservers("updateImageView");
     }
 
     public int getCannyThreshold1() {
