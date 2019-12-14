@@ -14,6 +14,7 @@ public class CubeScanFramelessModel extends Observable {
     private double rotationThreshold = 20; //30
     private double blurThreshold = 3; //3
     private double dilateKernel = 1; //1
+    private boolean mirrorWebcam = false;
 
 
     public void loadImage() {
@@ -105,5 +106,12 @@ public class CubeScanFramelessModel extends Observable {
     }
     public void setDilateKernel(double dilateKernel) {
         this.dilateKernel = dilateKernel;
+    }
+
+    public boolean isMirrorWebcam() {
+        return mirrorWebcam;
+    }
+    public void setMirrorWebcam(boolean mirrorWebcam) {
+        this.mirrorWebcam = mirrorWebcam;
     }
 }

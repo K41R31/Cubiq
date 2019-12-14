@@ -1,5 +1,9 @@
 package AlphaTests.CubeScanFrameless.ImageProcessing;
 
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,13 +13,15 @@ import java.util.List;
 
 public class Output {
 
+    private final String fileLocation = "src/AlphaTests/CubeScanFrameless/Resources/SavedFiles/";
+
     public Output() {
     }
 
     public void printSchemes(List<int[][]> colorSchemes) {
         List<String[][]> convertedSchemes = convertSchemeToString(colorSchemes);
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("colors.txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fileLocation + "colors.txt"));
             for (int i = 0; i < convertedSchemes.size(); i++) {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 3; x++) {
@@ -30,6 +36,11 @@ public class Output {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void printImage(Mat image, String index) {
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_HSV2BGR);
+        Imgcodecs.imwrite(fileLocation + index + ".jpg", image);
     }
 
     private List<String[][]> convertSchemeToString(List<int[][]> colorSchemes) {

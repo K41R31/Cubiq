@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -27,7 +28,8 @@ public class CubeScanFramelessController implements Observer {
     private void updateImageView() {
         Mat convertedMat = new Mat();
         MatOfByte matOfByte = new MatOfByte();
-        Imgproc.cvtColor(model.getProcessedMat(), convertedMat, Imgproc.COLOR_HSV2BGR);
+        Imgproc.cvtColor(model.getProcessedMat().clone(), convertedMat, Imgproc.COLOR_HSV2BGR);
+        if (model.isMirrorWebcam()) Core.flip(convertedMat, convertedMat, 1);
         Imgcodecs.imencode(".jpg", convertedMat, matOfByte);
         Platform.runLater(() -> iv_imageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray()))));
     }

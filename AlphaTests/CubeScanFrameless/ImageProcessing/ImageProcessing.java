@@ -2,6 +2,7 @@ package AlphaTests.CubeScanFrameless.ImageProcessing;
 
 import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoCapture;
@@ -16,14 +17,15 @@ public class ImageProcessing implements Observer {
     private CubeScanFramelessModel model;
     private VideoCapture videoCapture;
     private List<int[][]> scannedCubeSides = new ArrayList<>();
+    private ScheduledExecutorService timer;
 
     private void startWebcamStream() {
         videoCapture = new VideoCapture(0);
         videoCapture.set(3, 1280);
         videoCapture.set(4, 720);
 
-        ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-        timer.scheduleAtFixedRate(this::process, 0, 40, TimeUnit.MILLISECONDS);
+        timer = Executors.newSingleThreadScheduledExecutor();
+        timer.scheduleAtFixedRate(this::process, 10, 33, TimeUnit.MILLISECONDS);
     }
 
     private void process() {
@@ -32,6 +34,7 @@ public class ImageProcessing implements Observer {
             if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
             videoCapture.read(frame);
             Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
+            if (model.isMirrorWebcam()) Core.flip(frame, frame, 1);
         }
         else frame = model.getLoadedMat().clone();
 
@@ -58,15 +61,20 @@ public class ImageProcessing implements Observer {
         // Get a 3x3 grid based on the bounding rectangle
         Point[][] scanpoints = gridBasedOnRect(boundingRect);
 
-        // Get the colors at the scanpoints, stored in a two dimensional int array
+        // Get the colors at the scanpoints
         int[][] colorMatrix = colorsAtScanpoints(scanpoints, frame);
 
-        // Test if the scanned color matrix was already stored. If not, store it in the list differentColorMatrices
-        if (isNewCubeSide(colorMatrix)) scannedCubeSides.add(colorMatrix);
+        // Test if the scanned color matrix is already stored. If not, store it in the list differentColorMatrices
+        if (isNewCubeSide(colorMatrix)) {
+            scannedCubeSides.add(colorMatrix);
+            Output output = new Output();
+            output.printSchemes(scannedCubeSides);
+            output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
+        }
 
-        System.out.println(scannedCubeSides.size());
-
-        if (scannedCubeSides.size() == 6) new Output().printSchemes(scannedCubeSides);
+        if (scannedCubeSides.size() == 6) {
+            timer.shutdown();
+        }
 
         // TODO Wenn alle vorhanden -> Anordnen
 
@@ -328,13 +336,13 @@ public class ImageProcessing implements Observer {
         double[] color;
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                color = frame.get((int) Math.round(scanpoints[x][y].y), (int) Math.round(scanpoints[x][y].x));
-                if (color[1] < 100 && color[2] > 110) colors[x][y] = 0; // white
-                else if (color[0] < 5) colors[x][y] = 1; // red
-                else if (color[0] < 18) colors[x][y] = 2; // orange
-                else if (color[0] < 36) colors[x][y] = 3; // yellow
-                else if (color[0] < 100) colors[x][y] = 4; // green
-                else if (color[0] < 128) colors[x][y] = 5; // blue
+                color = frame.get((int)Math.round(scanpoints[x][y].y), (int)Math.round(scanpoints[x][y].x));
+                if (!(color[0] > 20 && color[0] < 70) && color[1] < 130 && color[2] > 100) colors[x][y] = 0; // white
+                else if (color[0] < 6) colors[x][y] = 1; // red
+                else if (color[0] < 20) colors[x][y] = 2; // orange
+                else if (color[0] < 50) colors[x][y] = 3; // yellow
+                else if (color[0] < 90) colors[x][y] = 4; // green
+                else if (color[0] < 140) colors[x][y] = 5; // blue
                 else if (color[0] <= 180) colors[x][y] = 1; // red
             }
         }
@@ -379,13 +387,13 @@ public class ImageProcessing implements Observer {
         boundingRect.points(boundingRectCorners);
 
         scanpoints[0][0] = boundingRectCorners[1];
-        scanpoints[0][1] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[2]);
-        scanpoints[0][2] = boundingRectCorners[2];
-        scanpoints[1][0] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[0]);
+        scanpoints[1][0] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[2]);
+        scanpoints[2][0] = boundingRectCorners[2];
+        scanpoints[0][1] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[0]);
         scanpoints[1][1] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[3]);
-        scanpoints[1][2] = centerBetweenTwoPoints(boundingRectCorners[2], boundingRectCorners[3]);
-        scanpoints[2][0] = boundingRectCorners[0];
-        scanpoints[2][1] = centerBetweenTwoPoints(boundingRectCorners[0], boundingRectCorners[3]);
+        scanpoints[2][1] = centerBetweenTwoPoints(boundingRectCorners[2], boundingRectCorners[3]);
+        scanpoints[0][2] = boundingRectCorners[0];
+        scanpoints[1][2] = centerBetweenTwoPoints(boundingRectCorners[0], boundingRectCorners[3]);
         scanpoints[2][2] = boundingRectCorners[3];
         return scanpoints;
     }
