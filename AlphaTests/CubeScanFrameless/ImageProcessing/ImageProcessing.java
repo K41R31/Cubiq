@@ -25,7 +25,7 @@ public class ImageProcessing implements Observer {
         videoCapture.set(4, 720);
 
         timer = Executors.newSingleThreadScheduledExecutor();
-        timer.scheduleAtFixedRate(this::process, 10, 33, TimeUnit.MILLISECONDS);
+        timer.scheduleAtFixedRate(this::process, 0, 33, TimeUnit.MILLISECONDS);
     }
 
     private void process() {
@@ -34,7 +34,6 @@ public class ImageProcessing implements Observer {
             if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
             videoCapture.read(frame);
             Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
-            if (model.isMirrorWebcam()) Core.flip(frame, frame, 1);
         }
         else frame = model.getLoadedMat().clone();
 
@@ -44,7 +43,7 @@ public class ImageProcessing implements Observer {
         List<Point> centers = cubeBoundarys(frame);
 
         // If centers is null, show the unprocessed image
-        if (centers == null || centers.size() < 8) { //TODO noch nicht optimal
+        if (centers == null || centers.size() < 8) {
             model.updateImageView();
             return;
         }
@@ -53,7 +52,7 @@ public class ImageProcessing implements Observer {
         RotatedRect boundingRect = Imgproc.minAreaRect(new MatOfPoint2f(centers.toArray(new Point[0])));
 
         // Check if the boundingRect is a square. If not, show the unprocessed image
-        if (!boundingRectIsSquare(boundingRect)) { //TODO noch nicht optimal
+        if (!boundingRectIsSquare(boundingRect)) {
             model.updateImageView();
             return;
         }
@@ -64,6 +63,9 @@ public class ImageProcessing implements Observer {
         // Get the colors at the scanpoints
         int[][] colorMatrix = colorsAtScanpoints(scanpoints, frame);
 
+        // TODO Logo kann Farbe von weißem Mittelstein abfälschen----------------------------------------------------------------------------------
+
+
         // Test if the scanned color matrix is already stored. If not, store it in the list differentColorMatrices
         if (isNewCubeSide(colorMatrix)) {
             scannedCubeSides.add(colorMatrix);
@@ -72,13 +74,15 @@ public class ImageProcessing implements Observer {
             output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
         }
 
+        // If all 6 sides were scanned, stop the loop
         if (scannedCubeSides.size() == 6) {
             timer.shutdown();
+            videoCapture.release();
         }
 
         // TODO Wenn alle vorhanden -> Anordnen
 
-        // Draw the found contours in the unprocessed image only if >=8 <=9
+        // Draw the found contours in the unprocessed image
         Mat contourMat = frame.clone();
         if (model.isDebug()) {
             for (int y = 0; y < 3; y++) {
@@ -331,19 +335,69 @@ public class ImageProcessing implements Observer {
         return new Point(x, y);
     }
 
+    /**
+     * Calculates the mean color from a rectangle with the size scanAreaSize and the center,
+     * given by the two dimensional array scanpoints.
+     * @param scanpoints A 3x3 array of points, where the colors should be scanned
+     * @param frame The mat where the colors should be read from
+     * @return The calculated colors, stored as a two dimensional int array:
+     * 0 = white,
+     * 1 = red,
+     * 2 = orange,
+     * 3 = yellow,
+     * 4 = green,
+     * 5 = blue
+     */
     private int[][] colorsAtScanpoints(Point[][] scanpoints, Mat frame) {
+        double scanAreaHalf = model.getScanAreaSize() / 2;
         int[][] colors = new int[3][3];
-        double[] color;
+        double hue, sat = 0, val = 0;
+        double[] readColor;
+        double unitVectorX, unitVectorY;
+
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                color = frame.get((int)Math.round(scanpoints[x][y].y), (int)Math.round(scanpoints[x][y].x));
-                if (!(color[0] > 20 && color[0] < 70) && color[1] < 130 && color[2] > 100) colors[x][y] = 0; // white
-                else if (color[0] < 6) colors[x][y] = 1; // red
-                else if (color[0] < 20) colors[x][y] = 2; // orange
-                else if (color[0] < 50) colors[x][y] = 3; // yellow
-                else if (color[0] < 90) colors[x][y] = 4; // green
-                else if (color[0] < 140) colors[x][y] = 5; // blue
-                else if (color[0] <= 180) colors[x][y] = 1; // red
+                unitVectorX = 0;
+                unitVectorY = 0;
+
+                // The start and endpoints, where the colors should get read from
+                int startX = (int)Math.round(scanpoints[x][y].x - scanAreaHalf);
+                int startY = (int)Math.round(scanpoints[x][y].y - scanAreaHalf);
+                int endX = (int)Math.round(scanpoints[x][y].x + scanAreaHalf);
+                int endY = (int)Math.round(scanpoints[x][y].y + scanAreaHalf);
+
+                // Read all colors inside the scanRect
+                for (int row = startY; row < endY; row++) {
+                    for (int col = startX; col < endX; col++) {
+                        // Read the Color from a pixel in the given rectangle
+                        readColor = frame.get(row, col);
+                        // Convert the hue into unit vectors
+                        unitVectorX += Math.cos(Math.toRadians(readColor[0]*2));
+                        unitVectorY += Math.sin(Math.toRadians(readColor[0]*2));
+                        sat += readColor[1];
+                        val += readColor[2];
+                    }
+                }
+                // Get the mean of all unit vectors
+                unitVectorX /= Math.pow(model.getScanAreaSize(), 2);
+                unitVectorY /= Math.pow(model.getScanAreaSize(), 2);
+                // Convert the calculated unit vector to an angle that can be used as a hue value
+                hue = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
+                // Because the hue value is a circle, negative values should be added with 360°
+                if (hue < 0) hue += 360;
+                // Open Cv uses hue values between 0 - 179
+                hue /= 2;
+                sat /= Math.pow(model.getScanAreaSize(), 2);
+                val /= Math.pow(model.getScanAreaSize(), 2);
+
+                // TODO Weiß wird bei schlechten Lichtverhältnissen nicht verlässlich erkannt-------------------------------------------------
+                if (!(hue > 20 && hue < 70) && sat < 130 && val > 100) colors[x][y] = 0; // white
+                else if (hue < 6) colors[x][y] = 1; // red
+                else if (hue < 20) colors[x][y] = 2; // orange
+                else if (hue < 45 || hue < 60 && sat < 155) colors[x][y] = 3; // yellow
+                else if (hue < 90) colors[x][y] = 4; // green
+                else if (hue < 140) colors[x][y] = 5; // blue
+                else if (hue <= 180) colors[x][y] = 1; // red
             }
         }
         return colors;
@@ -365,7 +419,8 @@ public class ImageProcessing implements Observer {
                     }
                 }
                 // Sides are the same if more than 6 colors are at the same place
-                if (sameValuesCounter > 6) return false; //TODO Keine gute Lösung. Es gibt denn Fall das zwei Seiten bis auf den Mittelstein identisch sind
+                //TODO Es gibt denn Fall das zwei Seiten bis auf den Mittelstein identisch sind (extrem selten) (ändern?)----------------------------------------------------------------
+                if (sameValuesCounter > 6) return false;
                 if (rotation < 3) scannedCubeSide = rotateClockwise(scannedCubeSide);
             }
         }

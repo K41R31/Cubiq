@@ -11,14 +11,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Output {
+class Output {
 
     private final String fileLocation = "src/AlphaTests/CubeScanFrameless/Resources/SavedFiles/";
 
-    public Output() {
+    Output() {
     }
 
-    public void printSchemes(List<int[][]> colorSchemes) {
+    void printSchemes(List<int[][]> colorSchemes) {
         List<String[][]> convertedSchemes = convertSchemeToString(colorSchemes);
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fileLocation + "colors.txt"));
@@ -38,7 +38,7 @@ public class Output {
         }
     }
 
-    public void printImage(Mat image, String index) {
+    void printImage(Mat image, String index) {
         Imgproc.cvtColor(image, image, Imgproc.COLOR_HSV2BGR);
         Imgcodecs.imwrite(fileLocation + index + ".jpg", image);
     }

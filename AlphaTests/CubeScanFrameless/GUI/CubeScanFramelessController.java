@@ -28,8 +28,11 @@ public class CubeScanFramelessController implements Observer {
     private void updateImageView() {
         Mat convertedMat = new Mat();
         MatOfByte matOfByte = new MatOfByte();
+
         Imgproc.cvtColor(model.getProcessedMat().clone(), convertedMat, Imgproc.COLOR_HSV2BGR);
+
         if (model.isMirrorWebcam()) Core.flip(convertedMat, convertedMat, 1);
+
         Imgcodecs.imencode(".jpg", convertedMat, matOfByte);
         Platform.runLater(() -> iv_imageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray()))));
     }

@@ -7,6 +7,7 @@ import java.util.Observable;
 public class CubeScanFramelessModel extends Observable {
 
     private boolean debug = true;
+    private boolean mirrorWebcam = true;
     private Mat loadedMat, processedMat;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
     private double sideLengthThreshold = 0.8; //0.8
@@ -14,7 +15,7 @@ public class CubeScanFramelessModel extends Observable {
     private double rotationThreshold = 20; //30
     private double blurThreshold = 3; //3
     private double dilateKernel = 1; //1
-    private boolean mirrorWebcam = false;
+    private double scanAreaSize = 20;
 
 
     public void loadImage() {
@@ -113,5 +114,12 @@ public class CubeScanFramelessModel extends Observable {
     }
     public void setMirrorWebcam(boolean mirrorWebcam) {
         this.mirrorWebcam = mirrorWebcam;
+    }
+
+    public double getScanAreaSize() {
+        return scanAreaSize;
+    }
+    public void setScanAreaSize(double scanAreaSize) {
+        this.scanAreaSize = scanAreaSize;
     }
 }
