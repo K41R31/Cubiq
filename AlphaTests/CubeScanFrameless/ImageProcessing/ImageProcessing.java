@@ -2,7 +2,6 @@ package AlphaTests.CubeScanFrameless.ImageProcessing;
 
 import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
 import org.opencv.core.*;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoCapture;
@@ -21,8 +20,10 @@ public class ImageProcessing implements Observer {
 
     private void startWebcamStream() {
         videoCapture = new VideoCapture(0);
-        videoCapture.set(3, 1280);
-        videoCapture.set(4, 720);
+        if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
+
+        int framerate = new FramerateTracker(videoCapture).getFramerate();
+        System.out.println(framerate);
 
         timer = Executors.newSingleThreadScheduledExecutor();
         timer.scheduleAtFixedRate(this::process, 0, 33, TimeUnit.MILLISECONDS);
@@ -31,7 +32,6 @@ public class ImageProcessing implements Observer {
     private void process() {
         Mat frame = new Mat();
         if (model.getLoadedMat() == null) {
-            if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
             videoCapture.read(frame);
             Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
         }
@@ -42,7 +42,7 @@ public class ImageProcessing implements Observer {
         // Get the position of the stickers
         List<Point> centers = cubeBoundarys(frame);
 
-        // If centers is null, show the unprocessed image
+        // If centers is null || centers < 8, show the unprocessed image
         if (centers == null || centers.size() < 8) {
             model.updateImageView();
             return;
@@ -392,7 +392,7 @@ public class ImageProcessing implements Observer {
 
                 // TODO Weiß wird bei schlechten Lichtverhältnissen nicht verlässlich erkannt-------------------------------------------------
                 if (!(hue > 20 && hue < 70) && sat < 130 && val > 100) colors[x][y] = 0; // white
-                else if (hue < 6) colors[x][y] = 1; // red
+                else if (hue < 5) colors[x][y] = 1; // red
                 else if (hue < 20) colors[x][y] = 2; // orange
                 else if (hue < 45 || hue < 60 && sat < 155) colors[x][y] = 3; // yellow
                 else if (hue < 90) colors[x][y] = 4; // green

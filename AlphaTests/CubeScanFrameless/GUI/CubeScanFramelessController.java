@@ -9,6 +9,7 @@ import javafx.scene.layout.StackPane;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -26,10 +27,11 @@ public class CubeScanFramelessController implements Observer {
     private StackPane sp_buttonPane;
 
     private void updateImageView() {
-        Mat convertedMat = new Mat();
+        Mat convertedMat = model.getProcessedMat().clone();
+        System.out.println(convertedMat.size());
         MatOfByte matOfByte = new MatOfByte();
 
-        Imgproc.cvtColor(model.getProcessedMat().clone(), convertedMat, Imgproc.COLOR_HSV2BGR);
+        Imgproc.cvtColor(convertedMat, convertedMat, Imgproc.COLOR_HSV2BGR);
 
         if (model.isMirrorWebcam()) Core.flip(convertedMat, convertedMat, 1);
 
