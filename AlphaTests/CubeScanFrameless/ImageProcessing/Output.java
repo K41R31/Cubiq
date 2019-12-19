@@ -52,15 +52,15 @@ class Output {
                     switch (colorSchemes.get(i)[x][y]) {
                         case 0: convertedSchemes.get(i)[x][y] = "WHITE ";
                         break;
-                        case 1: convertedSchemes.get(i)[x][y] = "RED   ";
+                        case 1: convertedSchemes.get(i)[x][y] = "GREEN ";
                         break;
-                        case 2: convertedSchemes.get(i)[x][y] = "ORANGE";
+                        case 2: convertedSchemes.get(i)[x][y] = "RED   ";
                         break;
-                        case 3: convertedSchemes.get(i)[x][y] = "YELLOW";
+                        case 3: convertedSchemes.get(i)[x][y] = "ORANGE";
                         break;
-                        case 4: convertedSchemes.get(i)[x][y] = "GREEN ";
+                        case 4: convertedSchemes.get(i)[x][y] = "BLUE  ";
                         break;
-                        case 5: convertedSchemes.get(i)[x][y] = "BLUE  ";
+                        case 5: convertedSchemes.get(i)[x][y] = "YELLOW";
                         break;
                     }
                 }

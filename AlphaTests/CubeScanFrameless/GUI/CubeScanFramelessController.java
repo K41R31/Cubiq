@@ -28,7 +28,6 @@ public class CubeScanFramelessController implements Observer {
 
     private void updateImageView() {
         Mat convertedMat = model.getProcessedMat().clone();
-        System.out.println(convertedMat.size());
         MatOfByte matOfByte = new MatOfByte();
 
         Imgproc.cvtColor(convertedMat, convertedMat, Imgproc.COLOR_HSV2BGR);

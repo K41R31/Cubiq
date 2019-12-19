@@ -22,11 +22,18 @@ public class ImageProcessing implements Observer {
         videoCapture = new VideoCapture(0);
         if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
 
+        // Track the framerate
         int framerate = new FramerateTracker(videoCapture).getFramerate();
-        System.out.println(framerate);
 
+        // Set width and height TODO width/ height von webcam auslesen
+        videoCapture.set(3, 1280);
+        videoCapture.set(4, 720);
+        // Set the framerate
+        videoCapture.set(5, framerate);
+
+        // Create a loop, that repeats "process" at the same speed as the framerate of the webcam
         timer = Executors.newSingleThreadScheduledExecutor();
-        timer.scheduleAtFixedRate(this::process, 0, 33, TimeUnit.MILLISECONDS);
+        timer.scheduleAtFixedRate(this::process, 0, 1000 / framerate, TimeUnit.MILLISECONDS);
     }
 
     private void process() {
@@ -42,13 +49,13 @@ public class ImageProcessing implements Observer {
         // Get the position of the stickers
         List<Point> centers = cubeBoundarys(frame);
 
-        // If centers is null || centers < 8, show the unprocessed image
+        // If no or less than 8 stickers were found, show the unprocessed image
         if (centers == null || centers.size() < 8) {
             model.updateImageView();
             return;
         }
 
-        // Get a rotated bounding Rect
+        // Get the boundaries of the cube
         RotatedRect boundingRect = Imgproc.minAreaRect(new MatOfPoint2f(centers.toArray(new Point[0])));
 
         // Check if the boundingRect is a square. If not, show the unprocessed image
@@ -57,18 +64,18 @@ public class ImageProcessing implements Observer {
             return;
         }
 
-        // Get a 3x3 grid based on the bounding rectangle
+        // Get a 3x3 grid (scanpoints) based on the bounding rectangle
         Point[][] scanpoints = gridBasedOnRect(boundingRect);
 
         // Get the colors at the scanpoints
         int[][] colorMatrix = colorsAtScanpoints(scanpoints, frame);
 
-        // TODO Logo kann Farbe von weißem Mittelstein abfälschen----------------------------------------------------------------------------------
+        // TODO Logo kann Farbe von weißem Mittelstein abfälschen
 
-
-        // Test if the scanned color matrix is already stored. If not, store it in the list differentColorMatrices
+        // Check if the scanned color matrix is already stored. If not, store it in the list differentColorMatrices
         if (isNewCubeSide(colorMatrix)) {
             scannedCubeSides.add(colorMatrix);
+            // Save the found colors as .txt, and the frame as .jpg
             Output output = new Output();
             output.printSchemes(scannedCubeSides);
             output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
@@ -79,6 +86,8 @@ public class ImageProcessing implements Observer {
             timer.shutdown();
             videoCapture.release();
         }
+
+        System.out.println(scannedCubeSides.size());
 
         // TODO Wenn alle vorhanden -> Anordnen
 
@@ -100,6 +109,7 @@ public class ImageProcessing implements Observer {
         // Convert hsv to gray
         List<Mat> splittedMat = new ArrayList<>();
         Core.split(frame, splittedMat);
+        // Get the value
         Mat processedMat = splittedMat.get(2);
 
         // Add gaussian blur
@@ -114,8 +124,7 @@ public class ImageProcessing implements Observer {
 
         // Find contours
         List<MatOfPoint> foundContours = new ArrayList<>();
-        Mat heirarchy = new Mat();
-        Imgproc.findContours(processedMat, foundContours, heirarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(processedMat, foundContours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // Approximate the shape of the contours
         List<MatOfPoint2f> approximations = new ArrayList<>();
@@ -342,11 +351,11 @@ public class ImageProcessing implements Observer {
      * @param frame The mat where the colors should be read from
      * @return The calculated colors, stored as a two dimensional int array:
      * 0 = white,
-     * 1 = red,
-     * 2 = orange,
-     * 3 = yellow,
-     * 4 = green,
-     * 5 = blue
+     * 1 = green,
+     * 2 = red,
+     * 3 = orange,
+     * 4 = blue,
+     * 5 = yellow
      */
     private int[][] colorsAtScanpoints(Point[][] scanpoints, Mat frame) {
         double scanAreaHalf = model.getScanAreaSize() / 2;
@@ -392,12 +401,12 @@ public class ImageProcessing implements Observer {
 
                 // TODO Weiß wird bei schlechten Lichtverhältnissen nicht verlässlich erkannt-------------------------------------------------
                 if (!(hue > 20 && hue < 70) && sat < 130 && val > 100) colors[x][y] = 0; // white
-                else if (hue < 5) colors[x][y] = 1; // red
-                else if (hue < 20) colors[x][y] = 2; // orange
-                else if (hue < 45 || hue < 60 && sat < 155) colors[x][y] = 3; // yellow
-                else if (hue < 90) colors[x][y] = 4; // green
-                else if (hue < 140) colors[x][y] = 5; // blue
-                else if (hue <= 180) colors[x][y] = 1; // red
+                else if (hue < 5) colors[x][y] = 2; // red
+                else if (hue < 20) colors[x][y] = 3; // orange
+                else if (hue < 45 || hue < 60 && sat < 155) colors[x][y] = 5; // yellow
+                else if (hue < 90) colors[x][y] = 1; // green
+                else if (hue < 140) colors[x][y] = 4; // blue
+                else if (hue <= 180) colors[x][y] = 2; // red
             }
         }
         return colors;
@@ -479,7 +488,7 @@ public class ImageProcessing implements Observer {
     }
 
     /**
-     * Calculate the bigest double value in the given array
+     * Calculate the biggest double value in the given array
      * @param values An array of doubles to be examined
      * @return The biggest double found
      */
