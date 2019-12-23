@@ -79,15 +79,15 @@ public class ImageProcessing implements Observer {
             Output output = new Output();
             output.printSchemes(scannedCubeSides);
             output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
+            System.out.println(scannedCubeSides.size() + " SIDES SCANNED");
         }
 
         // If all 6 sides were scanned, stop the loop
         if (scannedCubeSides.size() == 6) {
             timer.shutdown();
             videoCapture.release();
+            System.out.println("READY");
         }
-
-        System.out.println(scannedCubeSides.size());
 
         // TODO Wenn alle vorhanden -> Anordnen
 
@@ -450,6 +450,7 @@ public class ImageProcessing implements Observer {
 
         boundingRect.points(boundingRectCorners);
 
+        // Creates a grid based on the centers of the stickers on the cube
         scanpoints[0][0] = boundingRectCorners[1];
         scanpoints[1][0] = centerBetweenTwoPoints(boundingRectCorners[1], boundingRectCorners[2]);
         scanpoints[2][0] = boundingRectCorners[2];
