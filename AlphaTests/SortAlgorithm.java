@@ -95,11 +95,16 @@ public class SortAlgorithm {
 
         // Last side
         for (int[] possibleFourthThing : possibleFourthThings) {
-            for (int i = 0; i < 4; i++) {
-                int[] edge0 = colorScheme.getEdge(possibleFourthThing[i * 2], nextOppositeEdge(possibleFourthThing[1]));
-                int[] edge1 = colorScheme.getEdge(5, i);
-                if (!edgesCouldBeNeighbours(edge0, edge1)) continue;
-                if (i == 3) System.out.println("COMBINATION FOUND");
+            for (int j = 0; j < 4; j++) {
+                for (int i = 0; i < 4; i++) {
+                    int[] edge0 = colorScheme.getEdge(possibleFourthThing[i * 2], nextOppositeEdge(possibleFourthThing[i * 2 + 1]));
+                    int edge1EdgeIndex = i;
+                    for (int r = j; r > 0; r--)
+                        edge1EdgeIndex = nextEdgeClockWise(edge1EdgeIndex);
+                    int[] edge1 = colorScheme.getEdge(5, edge1EdgeIndex);
+                    if (!edgesCouldBeNeighbours(edge0, edge1)) continue;
+                    if (i == 3) System.out.println("COMBINATION FOUND");
+                }
             }
         }
 
