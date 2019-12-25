@@ -84,6 +84,7 @@ public class ImageProcessing implements Observer {
 
         // If all 6 sides were scanned, stop the loop
         if (scannedCubeSides.size() == 6) {
+            logoCorrection();
             timer.shutdown();
             videoCapture.release();
 
@@ -446,6 +447,18 @@ public class ImageProcessing implements Observer {
         return true;
     }
 
+    private void logoCorrection() {
+        // TODO Wenn zwei Mitten gleich sind -> nur weitermachen wenn Weiß fehlt > Farbe identifizieren > Mitte mit weniger Sättigung als Weiß deklarieren
+        List<Integer> centers = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            int color = scannedCubeSides.get(i)[1][1];
+            if (!centers.contains(color)) centers.add(color);
+        }
+        if (centers.size() == 6) return; // Alle centers eingescannt
+        if (centers.size() < 5) return; // Zu wenig centers eingescannt (weniger als 5 verschiedene Farben)
+        if (centers.contains())
+    }
+
     /**
      * Returns the angle at the point anglePoint for the triangle
      * formed by the three given points.
@@ -627,9 +640,8 @@ public class ImageProcessing implements Observer {
                         }
                     }
                 }
-                // Sides are the same if more than 6 colors are at the same place
-                //TODO Es gibt denn Fall das zwei Seiten bis auf den Mittelstein identisch sind (extrem selten) (ändern?)----------------------------------------------------------------
-                if (sameValuesCounter > 6) return false;
+                // Sides are the same if 8 or more colors are at the same place
+                if (sameValuesCounter >= 8) return false;
                 if (rotation < 3) scannedCubeSide = rotateClockwise(scannedCubeSide);
             }
         }
