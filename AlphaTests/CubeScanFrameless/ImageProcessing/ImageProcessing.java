@@ -450,13 +450,18 @@ public class ImageProcessing implements Observer {
     private void logoCorrection() {
         // TODO Wenn zwei Mitten gleich sind -> nur weitermachen wenn Weiß fehlt > Farbe identifizieren > Mitte mit weniger Sättigung als Weiß deklarieren
         List<Integer> centers = new ArrayList<>();
+        int doubleColor = -1;
         for (int i = 0; i < 6; i++) {
             int color = scannedCubeSides.get(i)[1][1];
             if (!centers.contains(color)) centers.add(color);
+            else if (doubleColor == -1) doubleColor = color;
         }
         if (centers.size() == 6) return; // Alle centers eingescannt
         if (centers.size() < 5) return; // Zu wenig centers eingescannt (weniger als 5 verschiedene Farben)
-        if (centers.contains())
+        if (centers.contains(0)) return; //Fehler beim einscannen. Weiß ist vorhanden
+
+        // Ab hier ist klar das das Logo das Ergebnis abgefälscht hat
+        // TODO Farben
     }
 
     /**
