@@ -16,6 +16,7 @@ public class ImageProcessing implements Observer {
     private CubeScanFramelessModel model;
     private VideoCapture videoCapture;
     private List<int[][]> scannedCubeSides = new ArrayList<>();
+    private List<double[]> centerColorValues = new ArrayList<>();
     private ScheduledExecutorService timer;
 
     private void startWebcamStream() {
@@ -76,10 +77,12 @@ public class ImageProcessing implements Observer {
         if (isNewCubeSide(colorMatrix)) {
             scannedCubeSides.add(colorMatrix);
             // Save the found colors as .txt, and the frame as .jpg
-            Output output = new Output();
-            output.printSchemes(scannedCubeSides);
-            output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
-            System.out.println(scannedCubeSides.size() + " SIDES SCANNED");
+            if (model.isDebug()) {
+                Output output = new Output();
+                output.printSchemes(scannedCubeSides);
+                output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
+                System.out.println(scannedCubeSides.size() + " SIDES SCANNED");
+            }
         }
 
         // If all 6 sides were scanned, stop the loop
@@ -449,19 +452,39 @@ public class ImageProcessing implements Observer {
 
     private void logoCorrection() {
         // TODO Wenn zwei Mitten gleich sind -> nur weitermachen wenn Weiß fehlt > Farbe identifizieren > Mitte mit weniger Sättigung als Weiß deklarieren
-        List<Integer> centers = new ArrayList<>();
-        int doubleColor = -1;
+        List<Integer> doubleColorIndexes = new ArrayList<>();
+        List<Integer> centerColors = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             int color = scannedCubeSides.get(i)[1][1];
-            if (!centers.contains(color)) centers.add(color);
-            else if (doubleColor == -1) doubleColor = color;
+            for (int j = 0; j < centerColors.size(); j++) {
+                if (centerColors.get(j) == color) {
+                    doubleColorIndexes.add(i);
+                    doubleColorIndexes.add(j);
+                }
         }
-        if (centers.size() == 6) return; // Alle centers eingescannt
-        if (centers.size() < 5) return; // Zu wenig centers eingescannt (weniger als 5 verschiedene Farben)
-        if (centers.contains(0)) return; //Fehler beim einscannen. Weiß ist vorhanden
+            centerColors.add(color);
+        }
+        if (doubleColorIndexes.size() == 0) return; // Keine Korrektur nötig
+        if (doubleColorIndexes.size() > 2) return; // Error. Zu viele Center doppelt. Cube neu einscannen
+        if (centerColors.contains(0)) return; // Error. Weiß ist vorhanden. Cube neu einscannen
 
-        // Ab hier ist klar das das Logo das Ergebnis abgefälscht hat
-        // TODO Farben
+        // Ab hier ist klar, dass das Logo das Ergebnis abgefälscht hat
+        // TODO Doppelte Farbwerte vergleichen. Farbe mit geringerer Sättigung ist Weiß
+        double sat0 = centerColorValues.get(doubleColorIndexes.get(0))[1];
+        double sat1 = centerColorValues.get(doubleColorIndexes.get(1))[1];
+
+        System.out.println("Doppelte Mittelstein Index " + doubleColorIndexes.get(0) + doubleColorIndexes.get(1));
+        System.out.println("Doppelte Mittelstein Farbwerte " + sat0 + ", " + sat1);
+
+        int whiteIndex;
+        if (sat0 < sat1) whiteIndex = doubleColorIndexes.get(0);
+        else whiteIndex = doubleColorIndexes.get(1);
+
+        int[][] singleCubeSide = scannedCubeSides.get(whiteIndex);
+        singleCubeSide[1][1] = 0;
+        scannedCubeSides.set(whiteIndex, singleCubeSide);
+
+        System.out.println("Der Mittelstein von der Seite " + whiteIndex + " wurde zu Weiß geändert :)");
     }
 
     /**
@@ -605,19 +628,23 @@ public class ImageProcessing implements Observer {
                         val += readColor[2];
                     }
                 }
-                // Get the mean of all unit vectors
+                // Get the mean of both unit vectors
                 unitVectorX /= Math.pow(model.getScanAreaSize(), 2);
                 unitVectorY /= Math.pow(model.getScanAreaSize(), 2);
                 // Convert the calculated unit vector to an angle that can be used as a hue value
                 hue = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
                 // Because the hue value is a circle, negative values should be added with 360°
                 if (hue < 0) hue += 360;
-                // Open Cv uses hue values between 0 - 179
+                // Normalise the hue to the Open Cv range uses hue values between 0 - 179
                 hue /= 2;
                 sat /= Math.pow(model.getScanAreaSize(), 2);
                 val /= Math.pow(model.getScanAreaSize(), 2);
 
-                // TODO Weiß wird bei schlechten Lichtverhältnissen nicht verlässlich erkannt-------------------------------------------------
+                if (x == 1 && y == 1) {
+                    centerColorValues.add(new double[] {hue, sat, val});
+                }
+
+                // TODO Weiß wird bei schlechten Lichtverhältnissen nicht verlässlich erkannt/ Relativ teuer-------------------------------------------------
                 if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) colors[x][y] = 0; // white
                 else if (hue < 5) colors[x][y] = 2; // red
                 else if (hue < 20) colors[x][y] = 3; // orange
