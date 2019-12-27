@@ -27,7 +27,7 @@ public class SortAlgorithm {
                 int[] edge1 = colorScheme.getEdge(sideIndex, edgeIndex);
 
                 if (edgesCouldBeNeighbours(edge0, edge1))
-                    possibleFirstThings.add(new int[]{sideIndex, edgeIndex});
+                    possibleFirstThings.add(new int[] {sideIndex, edgeIndex});
             }
 
         // Seiten, die an den Partner von weiß oben und rechts an die weiße Seite passen
@@ -117,7 +117,7 @@ public class SortAlgorithm {
             if (side != sameComb[0] || edge != sameComb[1]) counter++;
             sameComb[0] = side;
             sameComb[1] = edge;
-            
+
         }
         System.out.println("Fourth round: " + counter);
 
