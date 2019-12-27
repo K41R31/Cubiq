@@ -21,7 +21,7 @@ public class Cubelet {
     }
 
     /** Edge and Corner Cubelet
-     * Creates a new instance of a Cubelet, which is located on an edge position.
+     * Creates a new instance of a Cubelet, which is located on an edge or corner position.
      * @param colors depends on the type of Cubelet. Two int values for the Edge and three for the Corner Cubelets which
      * contain informations about the color of the specific sides of the Cubelet.
      * @param location the location which contains information about the X, Y, Z coordinates.
@@ -33,7 +33,6 @@ public class Cubelet {
         setLocation(location);
         setRotation(rotation);
     }
-
 
     public int getColor() {
         return color;
@@ -66,7 +65,5 @@ public class Cubelet {
     public void setRotation(int rotation) {
         this.rotation = rotation;
     }
-
-
 
 }
