@@ -16,7 +16,7 @@ public class ImageProcessing implements Observer {
     private CubeScanFramelessModel model;
     private VideoCapture videoCapture;
     private List<int[][]> scannedCubeSides = new ArrayList<>();
-    private List<double[]> centerColorValues = new ArrayList<>();
+    private List<Double> centerColorSaturations = new ArrayList<>();
     private ScheduledExecutorService timer;
 
     private void startWebcamStream() {
@@ -68,14 +68,16 @@ public class ImageProcessing implements Observer {
         // Get a 3x3 grid (scanpoints) based on the bounding rectangle
         Point[][] scanpoints = gridBasedOnRect(boundingRect);
 
-        // Get the colors at the scanpoints
-        int[][] colorMatrix = colorsAtScanpoints(scanpoints, frame);
+        // Get the mean HSV color at the scanpoints
+        Scalar[][] meanHSVColorMatrix = meanHSVAtScanpoints(scanpoints, frame);
 
-        // TODO Logo kann Farbe von weißem Mittelstein abfälschen
+        // Get the colors at the scanpoints
+        int[][] colorMatrix = normalizedColors(meanHSVColorMatrix);
 
         // Check if the scanned color matrix is already stored. If not, store it in the list differentColorMatrices
         if (isNewCubeSide(colorMatrix)) {
             scannedCubeSides.add(colorMatrix);
+            centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
             // Save the found colors as .txt, and the frame as .jpg
             if (model.isDebug()) {
                 Output output = new Output();
@@ -251,6 +253,10 @@ public class ImageProcessing implements Observer {
         return true;
     }
 
+    /* TODO
+        Symmetrische Seiten verursachen sehr viele Kombinationsmöglichkeiten
+        Ein gelößter Würfel resultiert in unzähligen Möglichkeiten (8192)
+     */
     private void buildCube(ColorScheme colorScheme) {
         List<int[]> possibleFirstThings = new ArrayList<>();
         List<int[]> possibleSecondThings = new ArrayList<>();
@@ -270,7 +276,7 @@ public class ImageProcessing implements Observer {
                 int[] edge1 = colorScheme.getEdge(sideIndex, edgeIndex);
 
                 if (edgesCouldBeNeighbours(edge0, edge1))
-                    possibleFirstThings.add(new int[]{sideIndex, edgeIndex});
+                    possibleFirstThings.add(new int[] {sideIndex, edgeIndex});
             }
 
         // Seiten, die an den Partner von weiß oben und rechts an die weiße Seite passen
@@ -337,6 +343,7 @@ public class ImageProcessing implements Observer {
         }
 
         // Last side
+        int counter0 = 0;
         for (int[] possibleFourthThing : possibleFourthThings) {
             for (int j = 0; j < 4; j++) {
                 for (int i = 0; i < 4; i++) {
@@ -346,10 +353,11 @@ public class ImageProcessing implements Observer {
                         edge1EdgeIndex = nextEdgeClockWise(edge1EdgeIndex);
                     int[] edge1 = colorScheme.getEdge(5, edge1EdgeIndex);
                     if (!edgesCouldBeNeighbours(edge0, edge1)) continue;
-                    if (i == 3) System.out.println("COMBINATION FOUND");
+                    if (i == 3) counter0++;
                 }
             }
         }
+        System.out.println("Possibilities found: " + counter0);
 
         System.out.println("First round: " + possibleFirstThings.size());
         int counter = 0;
@@ -360,13 +368,8 @@ public class ImageProcessing implements Observer {
             if (side != sameComb[0] || edge != sameComb[1]) counter++;
             sameComb[0] = side;
             sameComb[1] = edge;
-
         }
         System.out.println("Fourth round: " + counter);
-
-        for (int[] possibleFourthThing : possibleFourthThings) {
-            System.out.println(Arrays.toString(possibleFourthThing));
-        }
     }
 
     /**
@@ -451,40 +454,35 @@ public class ImageProcessing implements Observer {
     }
 
     private void logoCorrection() {
-        // TODO Wenn zwei Mitten gleich sind -> nur weitermachen wenn Weiß fehlt > Farbe identifizieren > Mitte mit weniger Sättigung als Weiß deklarieren
-        List<Integer> doubleColorIndexes = new ArrayList<>();
+        int doubleColorIndex0 = -1;
+        int doubleColorIndex1 = -1;
         List<Integer> centerColors = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             int color = scannedCubeSides.get(i)[1][1];
             for (int j = 0; j < centerColors.size(); j++) {
-                if (centerColors.get(j) == color) {
-                    doubleColorIndexes.add(i);
-                    doubleColorIndexes.add(j);
+                if (centerColors.get(j) == color && doubleColorIndex0 == -1) {
+                    doubleColorIndex0 = i;
+                    doubleColorIndex1 = j;
                 }
         }
             centerColors.add(color);
         }
-        if (doubleColorIndexes.size() == 0) return; // Keine Korrektur nötig
-        if (doubleColorIndexes.size() > 2) return; // Error. Zu viele Center doppelt. Cube neu einscannen
-        if (centerColors.contains(0)) return; // Error. Weiß ist vorhanden. Cube neu einscannen
+        if (doubleColorIndex0 == -1) return; // Kein Center doppelt. Keine Korrektur nötig
+        if (centerColors.contains(0)) return; // Error. Weiß ist vorhanden. Eine andere Farbe ist doppelt. Cube neu einscannen
 
         // Ab hier ist klar, dass das Logo das Ergebnis abgefälscht hat
-        // TODO Doppelte Farbwerte vergleichen. Farbe mit geringerer Sättigung ist Weiß
-        double sat0 = centerColorValues.get(doubleColorIndexes.get(0))[1];
-        double sat1 = centerColorValues.get(doubleColorIndexes.get(1))[1];
-
-        System.out.println("Doppelte Mittelstein Index " + doubleColorIndexes.get(0) + doubleColorIndexes.get(1));
-        System.out.println("Doppelte Mittelstein Farbwerte " + sat0 + ", " + sat1);
+        double sat0 = centerColorSaturations.get(doubleColorIndex0);
+        double sat1 = centerColorSaturations.get(doubleColorIndex1);
 
         int whiteIndex;
-        if (sat0 < sat1) whiteIndex = doubleColorIndexes.get(0);
-        else whiteIndex = doubleColorIndexes.get(1);
+        if (sat0 < sat1) whiteIndex = doubleColorIndex0;
+        else whiteIndex = doubleColorIndex1;
 
         int[][] singleCubeSide = scannedCubeSides.get(whiteIndex);
         singleCubeSide[1][1] = 0;
         scannedCubeSides.set(whiteIndex, singleCubeSide);
 
-        System.out.println("Der Mittelstein von der Seite " + whiteIndex + " wurde zu Weiß geändert :)");
+        new Output().printSchemes(scannedCubeSides);
     }
 
     /**
@@ -598,15 +596,17 @@ public class ImageProcessing implements Observer {
      * 4 = blue,
      * 5 = yellow
      */
-    private int[][] colorsAtScanpoints(Point[][] scanpoints, Mat frame) {
+    private Scalar[][] meanHSVAtScanpoints(Point[][] scanpoints, Mat frame) {
         double scanAreaHalf = model.getScanAreaSize() / 2;
-        int[][] colors = new int[3][3];
-        double hue, sat = 0, val = 0;
+        Scalar[][] colors = new Scalar[3][3];
+        double hue, sat, val;
         double[] readColor;
         double unitVectorX, unitVectorY;
 
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
+                sat = 0;
+                val = 0;
                 unitVectorX = 0;
                 unitVectorY = 0;
 
@@ -640,21 +640,30 @@ public class ImageProcessing implements Observer {
                 sat /= Math.pow(model.getScanAreaSize(), 2);
                 val /= Math.pow(model.getScanAreaSize(), 2);
 
-                if (x == 1 && y == 1) {
-                    centerColorValues.add(new double[] {hue, sat, val});
-                }
-
-                // TODO Weiß wird bei schlechten Lichtverhältnissen nicht verlässlich erkannt/ Relativ teuer-------------------------------------------------
-                if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) colors[x][y] = 0; // white
-                else if (hue < 5) colors[x][y] = 2; // red
-                else if (hue < 20) colors[x][y] = 3; // orange
-                else if (hue < 45 || hue < 60 && sat < 155) colors[x][y] = 5; // yellow
-                else if (hue < 90) colors[x][y] = 1; // green
-                else if (hue < 140) colors[x][y] = 4; // blue
-                else if (hue <= 180) colors[x][y] = 2; // red
+                colors[x][y] = new Scalar(hue, sat, val);
             }
         }
         return colors;
+    }
+
+    private int[][] normalizedColors(Scalar[][] scalars) {
+        int[][] normalizedColors = new int[3][3];
+        for (int y  = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                double hue = scalars[x][y].val[0];
+                double sat = scalars[x][y].val[1];
+                double val = scalars[x][y].val[2];
+
+                if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) normalizedColors[x][y] = 0; // white
+                else if (hue < 5) normalizedColors[x][y] = 2; // red
+                else if (hue < 20) normalizedColors[x][y] = 3; // orange
+                else if (hue < 45 || hue < 60 && sat < 155) normalizedColors[x][y] = 5; // yellow
+                else if (hue < 90) normalizedColors[x][y] = 1; // green
+                else if (hue < 140) normalizedColors[x][y] = 4; // blue
+                else if (hue <= 180) normalizedColors[x][y] = 2; // red
+            }
+        }
+        return normalizedColors;
     }
 
     private boolean isNewCubeSide(int[][] matrix) {
