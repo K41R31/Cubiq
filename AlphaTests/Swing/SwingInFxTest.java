@@ -5,31 +5,32 @@ import javafx.embed.swing.SwingNode;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-public class Start extends Application {
+public class SwingInFxTest extends Application {
 
     @Override
-    public void start (Stage stage) {
+    public void start(Stage stage) {
         final SwingNode swingNode = new SwingNode();
-
-        createSwingContent(swingNode);
+        createAndSetSwingContent(swingNode);
 
         StackPane pane = new StackPane();
         pane.getChildren().add(swingNode);
 
-        stage.setTitle("Swing in JavaFX");
-        stage.setScene(new Scene(pane, 250, 150));
+        stage.setScene(new Scene(pane, 100, 50));
         stage.show();
     }
 
-    private void createSwingContent(final SwingNode swingNode) {
+    private void createAndSetSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 swingNode.setContent(new JButton("Click me!"));
             }
         });
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
