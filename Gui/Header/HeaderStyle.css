@@ -1,0 +1,18 @@
+.closeButton {
+    -fx-image: url("../../Resources/Assets/closeButton.png");
+}
+.closeButton:hover {
+    -fx-image: url("../../Resources/Assets/closeButtonHover.png");
+}
+.minmaxButton {
+    -fx-image: url("../../Resources/Assets/minmaxButton.png");
+}
+.minmaxButton:hover {
+    -fx-image: url("../../Resources/Assets/minmaxButtonHover.png");
+}
+.minimizeButton {
+    -fx-image: url("../../Resources/Assets/minimizeButton.png");
+}
+.minimizeButton:hover {
+    -fx-image: url("../../Resources/Assets/minimizeButtonHover.png");
+}

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Polygon?>
+
+
+<AnchorPane fx:id="root" prefHeight="1017.0" prefWidth="1920.0" style="-fx-background-color: #3f464f;" stylesheets="@MainViewStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Gui.MainView.MainViewController">
+   <children>
+      <ImageView fitHeight="1080.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <ImageView fitHeight="1080.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../../Resources/Assets/camOverlay.png" />
+         </image>
+      </ImageView>
+      <StackPane layoutX="285.0" layoutY="299.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="635.0" fitWidth="130.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../Resources/Assets/sideLeft.png" />
+               </image>
+            </ImageView>
+         </children>
+      </StackPane>
+      <StackPane layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="635.0" fitWidth="130.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../Resources/Assets/sideRight.png" />
+               </image>
+            </ImageView>
+         </children>
+      </StackPane>
+      <ImageView fitHeight="125.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <image>
+            <Image url="@../../Resources/Assets/footer.png" />
+         </image>
+      </ImageView>
+      <HBox alignment="BOTTOM_LEFT" nodeOrientation="RIGHT_TO_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <StackPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="31.0">
+               <children>
+                  <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="31.0">
+                     <children>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="31.0" prefWidth="480.0">
+                           <children>
+                              <Polygon fill="#3f464f" points="0.0, 0.0, 30.0, 31.0, 480.0, 31.0, 480.0, 0.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0">
+                                 <effect>
+                                    <DropShadow height="50.0" offsetY="2.0" radius="24.5" width="50.0" />
+                                 </effect>
+                              </Polygon>
+                              <ImageView fitHeight="31.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../Resources/Assets/combOverlay.png" />
+                                 </image>
+                                 <viewport>
+                                    <Rectangle2D height="31.0" width="480.0" />
+                                 </viewport>
+                              </ImageView>
+                           </children>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </StackPane>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="31.0" prefWidth="510.0">
+                           <children>
+                              <Polygon fill="#3f464f" nodeOrientation="LEFT_TO_RIGHT" points="0.0, 0.0, 30.0, 31.0, 511.0, 31.0, 480.0, 0.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0">
+                                 <effect>
+                                    <DropShadow blurType="GAUSSIAN" height="50.0" offsetY="2.0" radius="24.5" width="50.0" />
+                                 </effect>
+                              </Polygon>
+                              <ImageView fx:id="iv_footerOverlay2" fitHeight="31.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../Resources/Assets/combOverlay.png" />
+                                 </image>
+                                 <viewport>
+                                    <Rectangle2D height="31.0" width="480.0" />
+                                 </viewport>
+                              </ImageView>
+                           </children>
+                           <HBox.margin>
+                              <Insets left="-31.0" />
+                           </HBox.margin>
+                        </StackPane>
+                     </children>
+                  </HBox>
+                  <ImageView fitHeight="31.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../../Resources/Assets/combOverlay.png" />
+                     </image>
+                     <viewport>
+                        <Rectangle2D height="31.0" width="1440.0" />
+                     </viewport>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <Polygon fill="#3d444d" nodeOrientation="LEFT_TO_RIGHT" points="0.0, 33.0, 53.25, 33.0, 105.75, 85.25, 480.0, 85.25, 510.0, 116.0, 0.0, 116.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0">
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" height="50.0" offsetY="2.0" radius="24.5" width="50.0" />
+               </effect>
+               <HBox.margin>
+                  <Insets left="-30.0" />
+               </HBox.margin>
+            </Polygon>
+         </children>
+      </HBox>
+      <StackPane layoutX="493.0" layoutY="447.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="31.0" prefWidth="510.0">
+         <children>
+            <Polygon fx:id="pg_footer1" fill="#3f464f" nodeOrientation="LEFT_TO_RIGHT" points="0.0, 0.0, 30.0, 31.0, 511.0, 31.0, 480.0, 0.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false">
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" height="50.0" offsetY="2.0" radius="24.5" width="50.0" />
+               </effect>
+            </Polygon>
+            <ImageView fx:id="iv_footerOverlay1" cache="true" fitHeight="500.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../Resources/Assets/combOverlay.png" />
+               </image>
+               <viewport>
+                  <Rectangle2D height="500.0" width="500.0" />
+               </viewport>
+            </ImageView>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>
