@@ -1,4 +1,4 @@
-package AlphaTests.VirtualCube;
+package AlphaTests.GuiTest.Renderer;
 
 /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
@@ -67,7 +67,7 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
     // Defining shader source code file paths and names
-    final String shaderPath = "src/AlphaTests/VirtualCube/Resources/";
+    final String shaderPath = "src/AlphaTests/GuiTest/Resources/";
     final String vertexShaderFileName = "Basic.vert";
     final String fragmentShaderFileName = "Basic.frag";
 //    final String vertexShaderFileName = "BasicMacOS.vert";
@@ -153,21 +153,21 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
         // Interleaved data layout: position, color
 
         float[] verticies = {
-                -0.5f,  -0.5f,  0.5f,  // 0
+                -0.5f, -0.5f,  0.5f,   // 0
                 0.0f,  0.68f,  0.85f,  // 0
                 0.5f,  -0.5f,  0.5f,   // 1
                 0.0f,  0.68f,  0.85f,  // 1
-                -0.5f,  0.5f,  0.5f,   // 2
+                -0.5f, 0.5f,   0.5f,   // 2
                 0.0f,  0.68f,  0.85f,  // 2
-                0.5f,  0.5f,  0.5f,    // 3
+                0.5f,  0.5f,   0.5f,   // 3
                 0.0f,  0.68f,  0.85f,  // 3
-                -0.5f,  -0.5f,  -0.5f, // 4
+                -0.5f, -0.5f,  -0.5f,  // 4
                 0.0f,  0.68f,  0.85f,  // 4
-                -0.5f,  0.5f,  -0.5f,  // 5
+                -0.5f, 0.5f,   -0.5f,  // 5
                 0.0f,  0.68f,  0.85f,  // 5
                 0.5f,  -0.5f,  -0.5f,  // 6
                 0.0f,  0.68f,  0.85f,  // 6
-                0.5f,  0.5f,  -0.5f,   // 7
+                0.5f,  0.5f,   -0.5f,  // 7
                 0.0f,  0.68f,  0.85f,  // 7
         };
 
@@ -246,6 +246,7 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
      */
     @Override
     public void display(GLAutoDrawable drawable) {
+
         // Retrieve the OpenGL graphics context
         GL3 gl = drawable.getGL().getGL3();
         // Clear color and depth buffer

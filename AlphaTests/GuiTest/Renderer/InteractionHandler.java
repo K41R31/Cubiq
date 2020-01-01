@@ -1,4 +1,4 @@
-package AlphaTests.VirtualCube;
+package AlphaTests.GuiTest.Renderer;
 
 import java.awt.*;
 import java.awt.event.*;

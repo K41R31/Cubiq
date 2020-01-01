@@ -21,7 +21,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
 
-        primaryStage.getIcons().add(new Image("Resources/Assets/taskbarIcon.png"));
+        primaryStage.getIcons().add(new Image("AlphaTests/GuiTest/taskbarIcon.png"));
         primaryStage.getIcons().size();
     }
 

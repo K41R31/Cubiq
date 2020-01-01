@@ -1,4 +1,4 @@
-package AlphaTests.VirtualCube;
+package AlphaTests.GuiTest.Renderer;
 
 /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
@@ -33,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.jogamp.opengl.GL2ES2;
 import com.jogamp.opengl.GL2ES2;
 
 /**
