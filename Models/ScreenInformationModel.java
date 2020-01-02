@@ -10,6 +10,7 @@ public class ScreenInformationModel extends Observable {
     private double screenWidth, screenHeight, savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
     private int headerHeight = 23;
     private int taskbarHeight = 40;
+    private int[] minWindowSize = new int[] {1100, 612};
 
     //toggleFullScreen--------------------------------------------------------------------------------------------------
     public void toggleFullScreen() {
@@ -107,5 +108,15 @@ public class ScreenInformationModel extends Observable {
 
     public void setTaskbarHeight(int taskbarHeight) {
         this.taskbarHeight = taskbarHeight;
+    }
+
+    //minWindowSize-----------------------------------------------------------------------------------------------------
+
+    public int[] getMinWindowSize() {
+        return minWindowSize;
+    }
+
+    public void setMinWindowSize(int[] minWindowSize) {
+        this.minWindowSize = minWindowSize;
     }
 }

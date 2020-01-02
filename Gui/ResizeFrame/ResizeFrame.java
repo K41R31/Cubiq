@@ -58,8 +58,10 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        Start.primaryStage.setY(scenePosY + offsetY);
-                        Start.primaryStage.setHeight(sceneHeight - offsetY);
+                        if (sceneHeight - offsetY > screenInformationModel.getMinWindowSize()[1]) {
+                            Start.primaryStage.setY(scenePosY + offsetY);
+                            Start.primaryStage.setHeight(sceneHeight - offsetY);
+                        }
                     });
                     continue;
                 case 1:
@@ -75,9 +77,12 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        Start.primaryStage.setY(scenePosY + offsetY);
-                        Start.primaryStage.setWidth(sceneWidth + offsetX);
-                        Start.primaryStage.setHeight(sceneHeight - offsetY);
+                        if (sceneWidth + offsetX > screenInformationModel.getMinWindowSize()[0])
+                            Start.primaryStage.setWidth(sceneWidth + offsetX);
+                        if (sceneHeight - offsetY > screenInformationModel.getMinWindowSize()[1]) {
+                            Start.primaryStage.setHeight(sceneHeight - offsetY);
+                            Start.primaryStage.setY(scenePosY + offsetY);
+                        }
                     });
                     continue;
                 case 3:
@@ -88,7 +93,8 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
-                        Start.primaryStage.setWidth(sceneWidth + offsetX);
+                        if (sceneWidth + offsetX > screenInformationModel.getMinWindowSize()[0])
+                            Start.primaryStage.setWidth(sceneWidth + offsetX);
                     });
                     continue;
                 case 4:
@@ -103,8 +109,10 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        Start.primaryStage.setWidth(sceneWidth + offsetX);
-                        Start.primaryStage.setHeight(sceneHeight + offsetY);
+                        if (sceneWidth + offsetX > screenInformationModel.getMinWindowSize()[0])
+                            Start.primaryStage.setWidth(sceneWidth + offsetX);
+                        if (sceneHeight + offsetY > screenInformationModel.getMinWindowSize()[1])
+                            Start.primaryStage.setHeight(sceneHeight + offsetY);
                     });
                     continue;
                 case 6:
@@ -115,7 +123,8 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        Start.primaryStage.setHeight(sceneHeight + offsetY);
+                        if (sceneHeight + offsetY > screenInformationModel.getMinWindowSize()[1])
+                            Start.primaryStage.setHeight(sceneHeight + offsetY);
                     });
                     continue;
                 case 7:
@@ -131,9 +140,12 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        Start.primaryStage.setX(scenePosX + offsetX);
-                        Start.primaryStage.setWidth(sceneWidth - offsetX);
-                        Start.primaryStage.setHeight(sceneHeight + offsetY);
+                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
+                            Start.primaryStage.setX(scenePosX + offsetX);
+                            Start.primaryStage.setWidth(sceneWidth - offsetX);
+                        }
+                        if (sceneHeight + offsetY > screenInformationModel.getMinWindowSize()[1])
+                            Start.primaryStage.setHeight(sceneHeight + offsetY);
                     });
                     continue;
                 case 9:
@@ -145,8 +157,10 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
-                        Start.primaryStage.setX(scenePosX + offsetX);
-                        Start.primaryStage.setWidth(sceneWidth - offsetX);
+                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
+                            Start.primaryStage.setX(scenePosX + offsetX);
+                            Start.primaryStage.setWidth(sceneWidth - offsetX);
+                        }
                     });
                     continue;
                 case 10:
@@ -163,10 +177,12 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (!(Start.primaryStage.getHeight() < 31 && offsetY > 0)) {
+                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
                             Start.primaryStage.setX(scenePosX + offsetX);
-                            Start.primaryStage.setY(scenePosY + offsetY);
                             Start.primaryStage.setWidth(sceneWidth - offsetX);
+                        }
+                        if (sceneHeight - offsetY > screenInformationModel.getMinWindowSize()[1]) {
+                            Start.primaryStage.setY(scenePosY + offsetY);
                             Start.primaryStage.setHeight(sceneHeight - offsetY);
                         }
                     });

@@ -64,6 +64,7 @@ public class Start extends Application {
         // Footer
         Footer footer = new Footer();
         generalRoot.getChildren().add(footer);
+        footer.getStylesheets().add("Gui/Footer/FooterStyle.css");
         AnchorPane.setBottomAnchor(footer, 0d);
         AnchorPane.setLeftAnchor(footer, 0d);
         AnchorPane.setRightAnchor(footer, 0d);
@@ -109,8 +110,8 @@ public class Start extends Application {
         primaryStage.show();
 
         // Load Fonts
-        final Font kiona = Font.loadFont(getClass().getResource("../Resources/Fonts/Kiona-Regular.ttf").toExternalForm(), 20);
-        settingsModel.setKiona(kiona);
+        Font bender = Font.loadFont(getClass().getResource("../Resources/Fonts/Bender-Light.ttf").toExternalForm().replace("%20", " "), 20);
+        settingsModel.setBender(bender);
 
         screenInformationModel.toggleFullScreen();
         screenInformationModel.alignResizeLines();
