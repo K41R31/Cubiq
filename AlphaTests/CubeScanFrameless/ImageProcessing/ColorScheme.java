@@ -55,6 +55,20 @@ public class ColorScheme {
         return sorted;
     }
 
+    private List<int[][]> mirrorYellowSide(List<int[][]> scheme) {
+        int[][] yellowSide = scheme.get(5);
+        int[][] mirroredSide = new int[3][3];
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                if (x == 0) mirroredSide[x][y] = yellowSide[2][y];
+                else if (x == 1) mirroredSide[x][y] = yellowSide[x][y];
+                else mirroredSide[x][y] = yellowSide[0][y];
+            }
+        }
+        scheme.set(5, mirroredSide);
+        return scheme;
+    }
+
     public int[][] get(int index) {
         return sortedScheme.get(index);
     }

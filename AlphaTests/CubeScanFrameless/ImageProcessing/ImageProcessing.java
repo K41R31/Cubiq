@@ -75,7 +75,7 @@ public class ImageProcessing implements Observer {
         int[][] colorMatrix = normalizedColors(meanHSVColorMatrix);
 
         // Check if the scanned color matrix is already stored. If not, store it in the list differentColorMatrices
-        if (isNewCubeSide(colorMatrix)) {
+        if (isNewCubeSide(colorMatrix)) { // TODO Delay (Unscharfe Bilder) entweder mit Zeit oder mit 10 mal das gleiche erkannt
             scannedCubeSides.add(colorMatrix);
             centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
             // Save the found colors as .txt, and the frame as .jpg
@@ -258,10 +258,10 @@ public class ImageProcessing implements Observer {
         Ein gelößter Würfel resultiert in unzähligen Möglichkeiten (8192)
      */
     private void buildCube(ColorScheme colorScheme) {
-        List<int[]> possibleFirstThings = new ArrayList<>();
-        List<int[]> possibleSecondThings = new ArrayList<>();
-        List<int[]> possibleThirdThings = new ArrayList<>();
-        List<int[]> possibleFourthThings = new ArrayList<>();
+        List<int[]> possibleFirstCombinations = new ArrayList<>();
+        List<int[]> possibleSecondCombinations = new ArrayList<>();
+        List<int[]> possibleThirdCombinations = new ArrayList<>();
+        List<int[]> possibleFourthCombinations = new ArrayList<>();
 
         if (!colorsExistsNineTimes(colorScheme)) {
             System.err.println("WRONG COLOR SCHEME");
@@ -276,59 +276,59 @@ public class ImageProcessing implements Observer {
                 int[] edge1 = colorScheme.getEdge(sideIndex, edgeIndex);
 
                 if (edgesCouldBeNeighbours(edge0, edge1))
-                    possibleFirstThings.add(new int[] {sideIndex, edgeIndex});
+                    possibleFirstCombinations.add(new int[] {sideIndex, edgeIndex});
             }
 
         // Seiten, die an den Partner von weiß oben und rechts an die weiße Seite passen
-        for (int i = 0; i < possibleFirstThings.size(); i++) {
+        for (int i = 0; i < possibleFirstCombinations.size(); i++) {
 
-            int[] edge0 = colorScheme.getEdge(possibleFirstThings.get(i)[0], nextEdgeCounterClockWise(possibleFirstThings.get(i)[1]));
+            int[] edge0 = colorScheme.getEdge(possibleFirstCombinations.get(i)[0], nextEdgeCounterClockWise(possibleFirstCombinations.get(i)[1]));
             int[] edge1 = colorScheme.getEdge(0, 1);
 
             for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleFirstThings.get(i)[0]) continue;
+                if (sideIndex == possibleFirstCombinations.get(i)[0]) continue;
 
                 for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
                     int[] edge2 = colorScheme.getEdge(sideIndex, edgeIndex);
                     int[] edge3 = colorScheme.getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
 
                     if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
-                        possibleSecondThings.add(new int[] {possibleFirstThings.get(i)[0], possibleFirstThings.get(i)[1], sideIndex, edgeIndex});
+                        possibleSecondCombinations.add(new int[] {possibleFirstCombinations.get(i)[0], possibleFirstCombinations.get(i)[1], sideIndex, edgeIndex});
                     }
                 }
             }
         }
 
-        for (int i = 0; i < possibleSecondThings.size(); i++) {
+        for (int i = 0; i < possibleSecondCombinations.size(); i++) {
 
-            int[] edge0 = colorScheme.getEdge(possibleSecondThings.get(i)[2], nextEdgeCounterClockWise(possibleSecondThings.get(i)[3]));
+            int[] edge0 = colorScheme.getEdge(possibleSecondCombinations.get(i)[2], nextEdgeCounterClockWise(possibleSecondCombinations.get(i)[3]));
             int[] edge1 = colorScheme.getEdge(0, 2);
 
             // Alle Seiten bis auf Weiß, Gelb, die erste und die zweite Seite
             for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleSecondThings.get(i)[0] || sideIndex == possibleSecondThings.get(i)[2]) continue;
+                if (sideIndex == possibleSecondCombinations.get(i)[0] || sideIndex == possibleSecondCombinations.get(i)[2]) continue;
 
                 for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
                     int[] edge2 = colorScheme.getEdge(sideIndex, edgeIndex);
                     int[] edge3 = colorScheme.getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
 
                     if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
-                        possibleThirdThings.add(new int[] {possibleSecondThings.get(i)[0], possibleSecondThings.get(i)[1], possibleSecondThings.get(i)[2], possibleSecondThings.get(i)[3], sideIndex, edgeIndex});
+                        possibleThirdCombinations.add(new int[] {possibleSecondCombinations.get(i)[0], possibleSecondCombinations.get(i)[1], possibleSecondCombinations.get(i)[2], possibleSecondCombinations.get(i)[3], sideIndex, edgeIndex});
                     }
                 }
             }
         }
 
         // Fourth
-        for (int i = 0; i < possibleThirdThings.size(); i++) {
+        for (int i = 0; i < possibleThirdCombinations.size(); i++) {
 
-            int[] edge0 = colorScheme.getEdge(possibleThirdThings.get(i)[4], nextEdgeCounterClockWise(possibleThirdThings.get(i)[5]));
+            int[] edge0 = colorScheme.getEdge(possibleThirdCombinations.get(i)[4], nextEdgeCounterClockWise(possibleThirdCombinations.get(i)[5]));
             int[] edge1 = colorScheme.getEdge(0, 3);
-            int[] edge5 = colorScheme.getEdge(possibleThirdThings.get(i)[0], nextEdgeClockWise(possibleThirdThings.get(i)[1]));
+            int[] edge5 = colorScheme.getEdge(possibleThirdCombinations.get(i)[0], nextEdgeClockWise(possibleThirdCombinations.get(i)[1]));
 
             // Alle Seiten bis auf Weiß, Gelb, die erste, die zweite und die dritte Seite
             for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleThirdThings.get(i)[0] || sideIndex == possibleThirdThings.get(i)[2]|| sideIndex == possibleThirdThings.get(i)[4]) continue;
+                if (sideIndex == possibleThirdCombinations.get(i)[0] || sideIndex == possibleThirdCombinations.get(i)[2]|| sideIndex == possibleThirdCombinations.get(i)[4]) continue;
 
                 for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
                     int[] edge2 = colorScheme.getEdge(sideIndex, edgeIndex);
@@ -336,40 +336,39 @@ public class ImageProcessing implements Observer {
                     int[] edge4 = colorScheme.getEdge(sideIndex, nextEdgeCounterClockWise(edgeIndex));
 
                     if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2) && edgesCouldBeNeighbours(edge5, edge4)) {
-                        possibleFourthThings.add(new int[] {possibleThirdThings.get(i)[0], possibleThirdThings.get(i)[1], possibleThirdThings.get(i)[2], possibleThirdThings.get(i)[3], possibleThirdThings.get(i)[4], possibleThirdThings.get(i)[5], sideIndex, edgeIndex});
+                        possibleFourthCombinations.add(new int[] {possibleThirdCombinations.get(i)[0], possibleThirdCombinations.get(i)[1], possibleThirdCombinations.get(i)[2], possibleThirdCombinations.get(i)[3], possibleThirdCombinations.get(i)[4], possibleThirdCombinations.get(i)[5], sideIndex, edgeIndex});
                     }
                 }
             }
         }
 
         // Last side
-        int counter0 = 0;
-        for (int[] possibleFourthThing : possibleFourthThings) {
+
+        System.out.println("Possible fourth combinations: " + possibleFourthCombinations.size());
+        System.out.println(Arrays.toString(possibleFourthCombinations.get(0)));
+
+
+        int counter = 0;
+        for (int i = 0; i < possibleFourthCombinations.size(); i++) {
+            int[] edge0;
+            int[] edge1;
+
             for (int j = 0; j < 4; j++) {
-                for (int i = 0; i < 4; i++) {
-                    int[] edge0 = colorScheme.getEdge(possibleFourthThing[i * 2], nextOppositeEdge(possibleFourthThing[i * 2 + 1]));
-                    int edge1EdgeIndex = i;
-                    for (int r = j; r > 0; r--)
-                        edge1EdgeIndex = nextEdgeClockWise(edge1EdgeIndex);
-                    int[] edge1 = colorScheme.getEdge(5, edge1EdgeIndex);
-                    if (!edgesCouldBeNeighbours(edge0, edge1)) continue;
-                    if (i == 3) counter0++;
+                for (int ei = 3 - j, l = 3; l >= 0; l--) {
+                    edge0 = colorScheme.getEdge(5, ei);
+                    edge1 = colorScheme.getEdge(possibleFourthCombinations.get(i)[0], nextOppositeEdge(possibleFourthCombinations.get(i)[1]));
+                    if (!edgesCouldBeNeighbours(edge0, edge1)) break;
+                    if (l == 3) counter++;
+                    if (ei == 0) ei = 3;
                 }
             }
-        }
-        System.out.println("Possibilities found: " + counter0);
+            // TODO Überprüfung ob jeder Stein ein mal vorhanden ist
+            // Kantensteine
+            for (int j = 0; j < 4; j++) {
 
-        System.out.println("First round: " + possibleFirstThings.size());
-        int counter = 0;
-        int[] sameComb = new int[] {0, 0};
-        for (int[] possibleFourthThing : possibleFourthThings) {
-            int side = possibleFourthThing[0];
-            int edge = possibleFourthThing[1];
-            if (side != sameComb[0] || edge != sameComb[1]) counter++;
-            sameComb[0] = side;
-            sameComb[1] = edge;
+            }
         }
-        System.out.println("Fourth round: " + counter);
+        System.out.println("Possibilities found: " + counter);
     }
 
     /**

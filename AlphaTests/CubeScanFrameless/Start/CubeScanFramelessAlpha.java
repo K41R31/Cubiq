@@ -49,7 +49,7 @@ public class CubeScanFramelessAlpha extends Application {
         stage.setScene(new Scene(rootPane, 1280, 720));
         stage.show();
 
-        stage.getIcons().add(new Image("Resources/Assets/taskbarIcon.png"));
+        stage.getIcons().add(new Image("AlphaTests/GuiTest/taskbarIcon.png"));
         stage.getIcons().size();
     }
 
