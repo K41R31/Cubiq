@@ -22,12 +22,12 @@ public class Cube {
          *  korrekt auf die Cubelets gemapped.
          *
          *  Ausrichtung der Mittelsteine zu Beginn des Mappings:
-         *      - Weiß = -Y (unten)
-         *      - Gelb = Y
-         *      - Blau = -X
-         *      - Grün = X (links)
-         *      - Rot = -Z
-         *      - Orange Z (vorne)
+         *      - 0 Weiß = -Y (unten)
+         *      - 5 Gelb = Y
+         *      - 4 Blau = -X
+         *      - 1 Grün = X (links)
+         *      - 2 Rot = -Z
+         *      - 3 Orange Z (vorne)
          *
          *  Belegung der Ecksteine, in Z-Reihenfolge von o.L. nach u.R., anschließend hintere Reihe genauso.
          *  Ebenfalls werde auch hier schon die Farbkoordinaten (FK) betrachtet.
@@ -60,6 +60,24 @@ public class Cube {
          *  Alle Steine einer Seite x auswählen, um diese dann um eine Achse a rotieren zu lassen.
          *  Z.b. alle Steine mit X=0 um 90° CW.
          *  Richtungsangabe erfolgt durch CW/CCW (Clockwise oder Counterclockwise)
+         *
+         *
+         *  Ecksteine:
+         *  90° Rotation um y-Achse: {x, y, z} => {z, y, x}
+         *  90° Rotation um x-Achse: {x, y, z} => {x, z, y}
+         *  90° Rotation um z-Achse: {x, y, z} => {y, x, z}
+         *
+         *  Beispiel:
+         *  E00 = (X=-1, Y=1, Z=1), FK= (X=-1, BLAU) (Y=1, ROT) (Z=1, WEIß)
+         *  TODO: 90° Rotation y-Achse CW
+         *  E00 = (X=-1, Y=1, Z=-1), FK= (Z=-1, BLAU) (Y=1, ROT) (X=-1, WEIß)
+         *  TODO: 90° Rotation y-Achse CW
+         *  E00 = (X=1, Y=1, Z=-1), FK = (X=1, BLAU) (Y=1, ROT) (Z=-1, WEIß)
+         *  TODO: 90° Rotation y-Achse CW
+         *  E00 = (X=1, Y=1, Z=1), FK= (Z=1, BLAU) (Y=1, ROT) (X=1, WEIß)
+         *  TODO: 90° Rotation y-Achse CW
+         *  E00 = (X=-1, Y=1, Z=1), FK= (X=-1, BLAU) (Y=1, ROT) (Z=1, WEIß)
+         *
          */
 
     }
