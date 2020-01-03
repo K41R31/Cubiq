@@ -1,4 +1,4 @@
-package Gui.Footer;
+package GUI.Footer;
 
 import Models.GuiModel;
 import javafx.beans.value.ChangeListener;

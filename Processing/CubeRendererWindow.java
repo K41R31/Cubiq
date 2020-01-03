@@ -73,8 +73,7 @@ public class CubeRendererWindow extends JFrame {
         GLProfile profile = GLProfile.get(GLProfile.GL3);
         GLCapabilities capabilities = new GLCapabilities(profile);
         // Create the OpenGL rendering canvas
-        CubeRenderer cubeRenderer = new CubeRenderer(capabilities);
-        cubeRenderer.initModel(model);
+        CubeRenderer cubeRenderer = new CubeRenderer(capabilities, model.getColorScheme());
         cubeRenderer.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
 
         // Create an animator that drives the canvas display() at the specified

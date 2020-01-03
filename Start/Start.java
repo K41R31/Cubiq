@@ -1,11 +1,11 @@
 package Start;
 
-import Gui.Footer.Footer;
-import Gui.Header.HeaderController;
-import Gui.MainView.MainViewController;
-import Gui.ResizeFrame.ResizeFrame;
-import Gui.ScreenInformation;
-import Gui.Settings.SettingsController;
+import GUI.Footer.Footer;
+import GUI.Header.HeaderController;
+import GUI.MainView.MainViewController;
+import GUI.ResizeFrame.ResizeFrame;
+import GUI.ScreenInformation;
+import GUI.Settings.SettingsController;
 import Models.ScreenInformationModel;
 import Models.GuiModel;
 import Processing.CubeRendererWindow;
@@ -41,9 +41,9 @@ public class Start extends Application {
         AnchorPane generalRoot = new AnchorPane();
 
         // Settings
-        FXMLLoader settingsLoader = new FXMLLoader(getClass().getResource("../Gui/Settings/SettingsView.fxml"));
+        FXMLLoader settingsLoader = new FXMLLoader(getClass().getResource("../GUI/Settings/SettingsView.fxml"));
         AnchorPane settingsPane = settingsLoader.load();
-        settingsPane.getStylesheets().add("Gui/Settings/SettingsStyle.css");
+        settingsPane.getStylesheets().add("GUI/Settings/SettingsStyle.css");
         generalRoot.getChildren().add(settingsPane);
         AnchorPane.setTopAnchor(settingsPane, 23d);
         AnchorPane.setLeftAnchor(settingsPane, 0d);
@@ -51,9 +51,9 @@ public class Start extends Application {
         AnchorPane.setBottomAnchor(settingsPane, 0d);
 
         // MainView
-        FXMLLoader mainViewLoader = new FXMLLoader(getClass().getResource("../Gui/MainView/MainViewView.fxml"));
+        FXMLLoader mainViewLoader = new FXMLLoader(getClass().getResource("../GUI/MainView/MainViewView.fxml"));
         AnchorPane mainViewPane = mainViewLoader.load();
-        mainViewPane.getStylesheets().add("Gui/MainView/MainViewStyle.css");
+        mainViewPane.getStylesheets().add("GUI/MainView/MainViewStyle.css");
         generalRoot.getChildren().add(mainViewPane);
         AnchorPane.setTopAnchor(mainViewPane, 23d);
         AnchorPane.setLeftAnchor(mainViewPane, 0d);
@@ -61,9 +61,9 @@ public class Start extends Application {
         AnchorPane.setBottomAnchor(mainViewPane, 0d);
 
         // Header
-        FXMLLoader headerLoader = new FXMLLoader(getClass().getResource("../Gui/Header/HeaderView.fxml"));
+        FXMLLoader headerLoader = new FXMLLoader(getClass().getResource("../GUI/Header/HeaderView.fxml"));
         AnchorPane headerPane = headerLoader.load();
-        headerPane.getStylesheets().add("Gui/Header/HeaderStyle.css");
+        headerPane.getStylesheets().add("GUI/Header/HeaderStyle.css");
         generalRoot.getChildren().add(headerPane);
         AnchorPane.setTopAnchor(headerPane, 0d);
         AnchorPane.setLeftAnchor(headerPane, 0d);

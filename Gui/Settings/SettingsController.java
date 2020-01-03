@@ -1,4 +1,4 @@
-package Gui.Settings;
+package GUI.Settings;
 
 import Models.GuiModel;
 

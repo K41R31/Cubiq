@@ -1,4 +1,4 @@
-package Gui;
+package GUI;
 
 import Models.ScreenInformationModel;
 import Start.Start;

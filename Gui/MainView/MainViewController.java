@@ -1,4 +1,4 @@
-package Gui.MainView;
+package GUI.MainView;
 
 import Models.GuiModel;
 import javafx.application.Platform;

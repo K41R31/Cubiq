@@ -26,13 +26,13 @@ package Processing; /**
  * or implied, of JogAmp Community.
  */
 
-import Models.GuiModel;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.PMVMatrix;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
 
 /**
  * Performs the OpenGL graphics processing using the Programmable Pipeline and the
@@ -61,7 +61,7 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
 
-    private GuiModel model;
+    private List<int[][]> colorScheme;
 
     // taking shader source code files from relative path
     private final String shaderPath = "src/Resources/Shader/";
@@ -102,9 +102,10 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
      * Create the canvas with the requested OpenGL capabilities
      * @param capabilities The capabilities of the canvas, including the OpenGL profile
      */
-    public CubeRenderer(GLCapabilities capabilities) {
+    public CubeRenderer(GLCapabilities capabilities, List<int[][]> colorScheme) {
         // Create the canvas with the requested OpenGL capabilities
         super(capabilities);
+        this.colorScheme = colorScheme;
         // Add this object as an OpenGL event listener
         this.addGLEventListener(this);
         createAndRegisterInteractionHandler();
@@ -168,7 +169,7 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
             System.err.println("Error allocating index buffer object.");
         // END: Allocating vertex array objects and buffers for each object
 
-        cubeFace = new CubeFace(model.getColorScheme());
+        cubeFace = new CubeFace(colorScheme);
 
         // Initialize objects to be drawn (see respective sub-methods)
         initCubeFace0(gl);
@@ -617,9 +618,5 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         gl.glDisable(GL.GL_DEPTH_TEST);
 
         System.exit(0);
-    }
-
-    public void initModel(GuiModel model) {
-        this.model = model;
     }
 }

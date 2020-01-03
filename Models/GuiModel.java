@@ -174,7 +174,7 @@ public class GuiModel extends Observable {
         return colorScheme;
     }
 
-    public void setColorScheme(List<int[][]> getColorScheme) {
+    public void setColorScheme(List<int[][]> colorScheme) {
         this.colorScheme = colorScheme;
     }
 }
