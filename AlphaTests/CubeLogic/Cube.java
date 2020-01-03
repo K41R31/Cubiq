@@ -18,11 +18,11 @@ public class Cube {
     }
 
     public int[][] addCubelets(int[][] cornerCubelets, int[][] edgeCubelets, int[][] middleCubelets, int[][] cubelet) {
-        for ()
-
+//        for (
+        return null;
     }
 
-    private rotateSide(int axis, int depth, int angle) {
+    private void rotateSide(int axis, int depth, int angle) {
         if (depth == -1) {
             angle = -angle;
         }
