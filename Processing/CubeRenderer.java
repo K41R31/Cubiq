@@ -214,6 +214,8 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         float[] cubeFace0Vertices = cubeFace.createColoredCubeFace(0);
         int[] cubeFace0Indices = cubeFace.getCubeFaceIndices(0);
 
+
+
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // floats use 4 bytes in Java
