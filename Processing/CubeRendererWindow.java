@@ -1,4 +1,4 @@
-package AlphaTests.JoglShapesPP; /**
+package Processing; /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
@@ -27,16 +27,16 @@ package AlphaTests.JoglShapesPP; /**
  */
 
 
-import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.JFrame;
-
+import Models.GuiModel;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Top-level class of the application displaying the OpenGL component.
@@ -55,31 +55,34 @@ import com.jogamp.opengl.util.FPSAnimator;
  * @version 22.10.2017
  *
  */
-public class ShapesMainWindowPP extends JFrame {
+public class CubeRendererWindow extends JFrame {
 
     private static final long serialVersionUID = 1L;
+
+    private GuiModel model;
     // Define constants for the top-level container
     private static String TITLE = "Shapes start Code Main Window - Programmable Pipeline";
     private static final int CANVAS_WIDTH = 800;  // width of the drawable
     private static final int CANVAS_HEIGHT = 600; // height of the drawable
     private static final int FPS = 60; // animator's target frames per second
 
-    public ShapesMainWindowPP() {
+    public CubeRendererWindow() {
         // Setup an OpenGL context for the Canvas
         // Setup OpenGL to use the programmable pipeline
         // Setting to OpenGL 3
         GLProfile profile = GLProfile.get(GLProfile.GL3);
         GLCapabilities capabilities = new GLCapabilities(profile);
         // Create the OpenGL rendering canvas
-        GLCanvas canvas = new ShapesRendererPP(capabilities);
-        canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
+        CubeRenderer cubeRenderer = new CubeRenderer(capabilities);
+        cubeRenderer.initModel(model);
+        cubeRenderer.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
 
         // Create an animator that drives the canvas display() at the specified
         // frame rate.
-        final FPSAnimator animator = new FPSAnimator(canvas, FPS, true);
+        final FPSAnimator animator = new FPSAnimator(cubeRenderer, FPS, true);
 
         // Create the top-level container frame
-        this.getContentPane().add(canvas);
+        this.getContentPane().add(cubeRenderer);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -101,15 +104,10 @@ public class ShapesMainWindowPP extends JFrame {
         animator.start(); // start the animation loop	// TODO Auto-generated constructor stub
 
         // OpenGL: request focus for canvas
-        canvas.requestFocusInWindow();
+        cubeRenderer.requestFocusInWindow();
     }
 
-    /**
-     * Creates the main window and starts the program
-     * @param args Arguments are not used
-     */
-    public static void main(String[] args) {
-        new ShapesMainWindowPP();
+    public void initModel(GuiModel model) {
+        this.model = model;
     }
-
 }

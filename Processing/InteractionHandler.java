@@ -1,13 +1,13 @@
-package AlphaTests.GuiTest.Renderer;
+package Processing;
 
 import java.awt.*;
 import java.awt.event.*;
 
 /**
  * Java class for handling the keyboard and mouse interaction.
- * Intented to be used for an OpenGL scene renderer.
+ * Intended to be used for an OpenGL scene renderer.
  * @author Karsten Lehn
- * @version 23.8.2017, 10.9.2017, 22.9.2018
+ * @version 23.8.2017, 10.9.2017
  */
 
 public class InteractionHandler implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{

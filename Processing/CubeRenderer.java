@@ -1,4 +1,4 @@
-package AlphaTests.JoglShapesPP; /**
+package Processing; /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
@@ -26,12 +26,13 @@ package AlphaTests.JoglShapesPP; /**
  * or implied, of JogAmp Community.
  */
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
+import Models.GuiModel;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.PMVMatrix;
+
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 /**
  * Performs the OpenGL graphics processing using the Programmable Pipeline and the
@@ -56,26 +57,17 @@ import com.jogamp.opengl.util.PMVMatrix;
  * @version 22.10.2017
  *
  */
-public class ShapesRendererPP extends GLCanvas implements GLEventListener {
+public class CubeRenderer extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
 
+    private GuiModel model;
+
     // taking shader source code files from relative path
-    private final String shaderPath = "src/AlphaTests/JoglShapesPP/resources/";
+    private final String shaderPath = "src/Resources/Shader/";
     // Shader for object 0
     private final String vertexShader0FileName = "O0_Basic.vert";
     private final String fragmentShader0FileName = "O0_Basic.frag";
-    // Shader for object 1
-    private final String vertexShader1FileName = "O1_Basic.vert";
-    private final String fragmentShader1FileName = "O1_Basic.frag";
-
-    // Shader for object 2
-    private final String vertexShader2FileName = "O2_Basic.vert";
-    private final String fragmentShader2FileName = "O2_Basic.frag";
-
-    // Shader for object 3
-    private final String vertexShader3FileName = "O3_Basic.vert";
-    private final String fragmentShader3FileName = "O3_Basic.frag";
 
     private ShaderProgram shaderProgram0;
     private ShaderProgram shaderProgram1;
@@ -88,9 +80,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
     private int[] iboName;	// Names of index buffer objects
 
     // Create objects for the scene
-    // The box and roof do not need objects because all methods of these classes are static
-    private Sphere sphere0;
-    private Cone cone0;
+    private CubeFace cubeFace;
 
     // Object for handling keyboard and mouse interaction
     private InteractionHandler interactionHandler;
@@ -100,7 +90,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
     /**
      * Standard constructor for object creation.
      */
-    public ShapesRendererPP() {
+    public CubeRenderer() {
         // Create the canvas with default capabilities
         super();
         // Add this object as OpenGL event listener
@@ -112,7 +102,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
      * Create the canvas with the requested OpenGL capabilities
      * @param capabilities The capabilities of the canvas, including the OpenGL profile
      */
-    public ShapesRendererPP(GLCapabilities capabilities) {
+    public CubeRenderer(GLCapabilities capabilities) {
         // Create the canvas with the requested OpenGL capabilities
         super(capabilities);
         // Add this object as an OpenGL event listener
@@ -158,7 +148,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
 
         // BEGIN: Preparing scene
         // BEGIN: Allocating vertex array objects and buffers for each object
-        int noOfObjects = 4;
+        int noOfObjects = 6;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -178,11 +168,15 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
             System.err.println("Error allocating index buffer object.");
         // END: Allocating vertex array objects and buffers for each object
 
+        cubeFace = new CubeFace(model.getColorScheme());
+
         // Initialize objects to be drawn (see respective sub-methods)
-        initObject0(gl);
-        initObject1(gl);
-        initObject2(gl);
-        initObject3(gl);
+        initCubeFace0(gl);
+        initCubeFace1(gl);
+        initCubeFace2(gl);
+        initCubeFace3(gl);
+        initCubeFace4(gl);
+        initCubeFace5(gl);
         // END: Preparing scene
 
         // Switch on back face culling
@@ -208,7 +202,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
      * Initializes the GPU for drawing object0
      * @param gl OpenGL context
      */
-    private void initObject0(GL3 gl) {
+    private void initCubeFace0(GL3 gl) {
         // BEGIN: Prepare a sphere for drawing (object 0)
         // create sphere data for rendering a sphere using an index array into a vertex array
         gl.glBindVertexArray(vaoName[0]);
@@ -217,22 +211,20 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         shaderProgram0.loadShaderAndCreateProgram(shaderPath,
                 vertexShader0FileName, fragmentShader0FileName);
 
-        float[] color0 = {0.8f, 0.1f, 0.1f};
-        sphere0 = new Sphere(64, 64);
-        float[] sphereVertices = sphere0.makeVertices(0.5f, color0);
-        int[] sphereIndices = sphere0.makeIndicesForTriangleStrip();
+        float[] cubeFace0Vertices = cubeFace.createColoredCubeFace(0);
+        int[] cubeFace0Indices = cubeFace.getCubeFaceIndices(0);
 
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, sphereVertices.length * 4,
-                FloatBuffer.wrap(sphereVertices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace0Vertices.length * 4,
+                FloatBuffer.wrap(cubeFace0Vertices), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, sphereIndices.length * 4,
-                IntBuffer.wrap(sphereIndices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace0Indices.length * 4,
+                IntBuffer.wrap(cubeFace0Indices), GL.GL_STATIC_DRAW);
 
         // Activate and order vertex buffer object data for the vertex shader
         // Defining input variables for vertex shader
@@ -252,28 +244,27 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
      * Initializes the GPU for drawing object1
      * @param gl OpenGL context
      */
-    private void initObject1(GL3 gl) {
+    private void initCubeFace1(GL3 gl) {
         // BEGIN: Prepare cube for drawing (object 1)
         gl.glBindVertexArray(vaoName[1]);
         shaderProgram1 = new ShaderProgram(gl);
         shaderProgram1.loadShaderAndCreateProgram(shaderPath,
-                vertexShader1FileName, fragmentShader1FileName);
+                vertexShader0FileName, fragmentShader0FileName);
 
-        float[] color1 = {0.1f, 0.1f, 0.8f};
-        float[] cubeVertices = Box.makeBoxVertices(0.8f, 0.5f, 0.4f, color1);
-        int[] cubeIndices = Box.makeBoxIndicesForTriangleStrip();
+        float[] cubeFace1Vertices = cubeFace.createColoredCubeFace(1);
+        int[] cubeFace1Indices = cubeFace.getCubeFaceIndices(1);
 
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[1]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeVertices.length * 4,
-                FloatBuffer.wrap(cubeVertices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace1Vertices.length * 4,
+                FloatBuffer.wrap(cubeFace1Vertices), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[1]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeIndices.length * 4,
-                IntBuffer.wrap(cubeIndices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace1Indices.length * 4,
+                IntBuffer.wrap(cubeFace1Indices), GL.GL_STATIC_DRAW);
 
         // Activate and order vertex buffer object data for the vertex shader
         // The vertex buffer contains: position (3), color (3), normals (3)
@@ -294,30 +285,28 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
      * Initializes the GPU for drawing object2
      * @param gl OpenGL context
      */
-    private void initObject2(GL3 gl) {
+    private void initCubeFace2(GL3 gl) {
         // BEGIN: Prepare cone (frustum) for drawing (object 2)
         // create cone (frustum) data for rendering a cone (frustum) using an index array into a vertex array
         gl.glBindVertexArray(vaoName[2]);
         shaderProgram2 = new ShaderProgram(gl);
         shaderProgram2.loadShaderAndCreateProgram(shaderPath,
-                vertexShader2FileName, fragmentShader2FileName);
+                fragmentShader0FileName, fragmentShader0FileName);
 
-        float[] color2 = {0.2f, 0.8f, 0.2f};
-        cone0 = new Cone(64);
-        float[] coneVertices = cone0.makeVertices(0.2f, 0.6f, 1f, color2);
-        int[] coneIndices = cone0.makeIndicesForTriangleStrip();
+        float[] cubeFace2Vertices = cubeFace.createColoredCubeFace(2);
+        int[] cubeFace2Indices = cubeFace.getCubeFaceIndices(2);
 
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[2]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, coneVertices.length * 4,
-                FloatBuffer.wrap(coneVertices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace2Vertices.length * 4,
+                FloatBuffer.wrap(cubeFace2Vertices), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[2]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, coneIndices.length * 4,
-                IntBuffer.wrap(coneIndices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace2Indices.length * 4,
+                IntBuffer.wrap(cubeFace2Indices), GL.GL_STATIC_DRAW);
 
         // Activate and arrange vertex buffer object data for the vertex shader
         // Defining input for vertex shader
@@ -337,29 +326,110 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
      * Initializes the GPU for drawing object3
      * @param gl OpenGL context
      */
-    private void initObject3(GL3 gl) {
+    private void initCubeFace3(GL3 gl) {
         // BEGIN: Prepare roof for drawing (object 3)
         // create data for rendering a roof using an index array into a vertex array
         gl.glBindVertexArray(vaoName[3]);
         shaderProgram3 = new ShaderProgram(gl);
         shaderProgram3.loadShaderAndCreateProgram(shaderPath,
-                vertexShader3FileName, fragmentShader3FileName);
+                fragmentShader0FileName, fragmentShader0FileName);
 
-        float[] color3 = {0.8f, 0.8f, 0.1f};
-        float[] roofVertices = Roof.makeVertices(0.8f, 1.1f, 0.5f, color3);
-        int[] roofIndices = Roof.makeIndicesForTriangleStrip();
+        float[] cubeFace3Vertices = cubeFace.createColoredCubeFace(3);
+        int[] cubeFace3Indices = cubeFace.getCubeFaceIndices(3);
 
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[3]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, roofVertices.length * 4,
-                FloatBuffer.wrap(roofVertices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace3Vertices.length * 4,
+                FloatBuffer.wrap(cubeFace3Vertices), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[3]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, roofIndices.length * 4,
-                IntBuffer.wrap(roofIndices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace3Indices.length * 4,
+                IntBuffer.wrap(cubeFace3Indices), GL.GL_STATIC_DRAW);
+
+        // Activate and arrange vertex buffer object data for the vertex shader
+        // Defining input for vertex shader
+        // Pointer for the vertex shader to the position information per vertex
+        gl.glEnableVertexAttribArray(0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
+        // Pointer for the vertex shader to the color information per vertex
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
+        // Pointer for the vertex shader to the normal information per vertex
+        gl.glEnableVertexAttribArray(2);
+        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
+        // END: Prepare roof for drawing
+    }
+
+    /**
+     * Initializes the GPU for drawing object3
+     * @param gl OpenGL context
+     */
+    private void initCubeFace4(GL3 gl) {
+        // BEGIN: Prepare roof for drawing (object 3)
+        // create data for rendering a roof using an index array into a vertex array
+        gl.glBindVertexArray(vaoName[3]);
+        shaderProgram3 = new ShaderProgram(gl);
+        shaderProgram3.loadShaderAndCreateProgram(shaderPath,
+                fragmentShader0FileName, fragmentShader0FileName);
+
+        float[] cubeFace4Vertices = cubeFace.createColoredCubeFace(4);
+        int[] cubeFace4Indices = cubeFace.getCubeFaceIndices(4);
+
+        // activate and initialize vertex buffer object (VBO)
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[3]);
+        // floats use 4 bytes in Java
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace4Vertices.length * 4,
+                FloatBuffer.wrap(cubeFace4Vertices), GL.GL_STATIC_DRAW);
+
+        // activate and initialize index buffer object (IBO)
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[3]);
+        // integers use 4 bytes in Java
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace4Indices.length * 4,
+                IntBuffer.wrap(cubeFace4Indices), GL.GL_STATIC_DRAW);
+
+        // Activate and arrange vertex buffer object data for the vertex shader
+        // Defining input for vertex shader
+        // Pointer for the vertex shader to the position information per vertex
+        gl.glEnableVertexAttribArray(0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
+        // Pointer for the vertex shader to the color information per vertex
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
+        // Pointer for the vertex shader to the normal information per vertex
+        gl.glEnableVertexAttribArray(2);
+        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
+        // END: Prepare roof for drawing
+    }
+
+    /**
+     * Initializes the GPU for drawing object3
+     * @param gl OpenGL context
+     */
+    private void initCubeFace5(GL3 gl) {
+        // BEGIN: Prepare roof for drawing (object 3)
+        // create data for rendering a roof using an index array into a vertex array
+        gl.glBindVertexArray(vaoName[3]);
+        shaderProgram3 = new ShaderProgram(gl);
+        shaderProgram3.loadShaderAndCreateProgram(shaderPath,
+                fragmentShader0FileName, fragmentShader0FileName);
+
+        float[] cubeFace5Vertices = cubeFace.createColoredCubeFace(5);
+        int[] cubeFace5Indices = cubeFace.getCubeFaceIndices(5);
+
+        // activate and initialize vertex buffer object (VBO)
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[3]);
+        // floats use 4 bytes in Java
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace5Vertices.length * 4,
+                FloatBuffer.wrap(cubeFace5Vertices), GL.GL_STATIC_DRAW);
+
+        // activate and initialize index buffer object (IBO)
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[3]);
+        // integers use 4 bytes in Java
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace5Indices.length * 4,
+                IntBuffer.wrap(cubeFace5Indices), GL.GL_STATIC_DRAW);
 
         // Activate and arrange vertex buffer object data for the vertex shader
         // Defining input for vertex shader
@@ -429,6 +499,17 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix.glTranslatef(1.5f, 0f, 0f);
         displayObject3(gl);
         pmvMatrix.glPopMatrix();
+
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0f, 1.5f, 0f);
+        pmvMatrix.glRotatef(45f, 0f, 1f, 0f);
+        displayObject4(gl);
+        pmvMatrix.glPopMatrix();
+
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0f, -1f, 0f);
+        displayObject5(gl);
+        pmvMatrix.glPopMatrix();
     }
 
     private void displayObject0(GL3 gl) {
@@ -439,7 +520,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glBindVertexArray(vaoName[0]);
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawArrays(GL.GL_TRIANGLES, sphere0.getNoOfIndices(), GL.GL_UNSIGNED_INT);
+        gl.glDrawArrays(GL.GL_TRIANGLES, cubeFace.getCubeFaceIndices(0).length, GL.GL_UNSIGNED_INT);
     }
 
     private void displayObject1(GL3 gl) {
@@ -449,7 +530,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glBindVertexArray(vaoName[1]);
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, Box.noOfIndicesForBox(), GL.GL_UNSIGNED_INT, 0);
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(1).length, GL.GL_UNSIGNED_INT, 0);
     }
 
     private void displayObject2(GL3 gl) {
@@ -459,7 +540,7 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glBindVertexArray(vaoName[2]);
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cone0.getNoOfIndices(), GL.GL_UNSIGNED_INT, 0);
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(2).length, GL.GL_UNSIGNED_INT, 0);
     }
 
     private void displayObject3(GL3 gl) {
@@ -469,7 +550,27 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glBindVertexArray(vaoName[3]);
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, Roof.getNoOfIndices(), GL.GL_UNSIGNED_INT, 0);
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(3).length, GL.GL_UNSIGNED_INT, 0);
+    }
+
+    private void displayObject4(GL3 gl) {
+        gl.glUseProgram(shaderProgram3.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+        gl.glBindVertexArray(vaoName[3]);
+        // Draws the elements in the order defined by the index buffer object (IBO)
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(4).length, GL.GL_UNSIGNED_INT, 0);
+    }
+
+    private void displayObject5(GL3 gl) {
+        gl.glUseProgram(shaderProgram3.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+        gl.glBindVertexArray(vaoName[3]);
+        // Draws the elements in the order defined by the index buffer object (IBO)
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(5).length, GL.GL_UNSIGNED_INT, 0);
     }
 
     /**
@@ -514,5 +615,9 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         gl.glDisable(GL.GL_DEPTH_TEST);
 
         System.exit(0);
+    }
+
+    public void initModel(GuiModel model) {
+        this.model = model;
     }
 }

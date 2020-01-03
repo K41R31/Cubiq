@@ -3,6 +3,7 @@ package Models;
 import javafx.scene.text.Font;
 import org.opencv.core.Mat;
 
+import java.util.List;
 import java.util.Observable;
 
 public class GuiModel extends Observable {
@@ -19,6 +20,7 @@ public class GuiModel extends Observable {
     private double blurThreshold = 3; //3
     private double dilateKernel = 1; //1
     private double scanAreaSize = 20;
+    private List<int[][]> colorScheme;
 
     // Shutdown
 
@@ -166,5 +168,13 @@ public class GuiModel extends Observable {
 
     public void setScanAreaSize(double scanAreaSize) {
         this.scanAreaSize = scanAreaSize;
+    }
+
+    public List<int[][]> getColorScheme() {
+        return colorScheme;
+    }
+
+    public void setColorScheme(List<int[][]> getColorScheme) {
+        this.colorScheme = colorScheme;
     }
 }
