@@ -36,9 +36,6 @@ import java.nio.file.Paths;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.PMVMatrix;
-import de.hshl.obj.loader.OBJLoader;
-import de.hshl.obj.loader.Resource;
-import de.hshl.obj.loader.objects.Mesh;
 
 /**
  * Performs the OpenGL rendering
@@ -159,16 +156,6 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
 
         //float[] whileCubelet = newCubelet(new float[] {1, 1, 1});
         float[] vertices = new float[0];
-        try {
-            OBJLoader loader = new OBJLoader();
-
-            Resource file = Resource.file((Paths.get("E:/IntelliJ Projekte/Cubiq/src/Resources/Assets/cube.obj")));
-            Mesh mesh = loader.loadMesh(file);
-
-            vertices = mesh.getVertices();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         /*
         int[] cubeIndices = {

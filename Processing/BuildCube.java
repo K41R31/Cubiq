@@ -10,7 +10,7 @@ public class BuildCube {
 
     /* TODO
         Symmetrische Seiten verursachen sehr viele Kombinationsmöglichkeiten
-        Ein gelößter Würfel resultiert in unzähligen Möglichkeiten (8192)
+        Ein gelöster Würfel resultiert in unzähligen Möglichkeiten (8192)
     */
     public BuildCube(List<int[][]> inputScheme) {
         sortedScheme = sortScheme(inputScheme);

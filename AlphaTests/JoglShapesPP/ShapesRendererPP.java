@@ -222,6 +222,8 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         float[] sphereVertices = sphere0.makeVertices(0.5f, color0);
         int[] sphereIndices = sphere0.makeIndicesForTriangleStrip();
 
+
+
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // floats use 4 bytes in Java

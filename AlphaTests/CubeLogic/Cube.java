@@ -7,9 +7,6 @@ public class Cube {
     private List<int[][]> cornerCubelets;
     private List<int[][]> edgeCubelets;
     private List<int[][]> middleCubelets;
-    private final int x_AXIS = 0;
-    private final int y_AXIS = 1;
-    private final int z_AXIS = 2;
 
     public Cube() {
         this.cornerCubelets = new ArrayList<>();
@@ -18,9 +15,11 @@ public class Cube {
     }
 
     public int[][] addCubelets(int[][] cornerCubelets, int[][] edgeCubelets, int[][] middleCubelets, int[][] cubelet) {
-//        for (
+//       for (
         return null;
     }
+
+
 
     private void rotateSide(int axis, int depth, int angle) {
         if (depth == -1) {
