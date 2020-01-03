@@ -188,13 +188,13 @@ public class ShapesRendererPP extends GLCanvas implements GLEventListener {
         // Switch on back face culling
         gl.glEnable(GL.GL_CULL_FACE);
         gl.glCullFace(GL.GL_BACK);
-//        gl.glCullFace(GL.GL_FRONT);
+        gl.glCullFace(GL.GL_FRONT);
         // Switch on depth test
         gl.glEnable(GL.GL_DEPTH_TEST);
 
         // defining polygon drawing mode
-//        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
-        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_LINE);
+        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
+//        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_LINE);
 
         // Create projection-model-view matrix
         pmvMatrix = new PMVMatrix();
