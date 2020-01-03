@@ -115,53 +115,40 @@ public class Start extends Application {
 
         List<int[][]> list = new ArrayList<>();
         list.add(new int[][] {
-                {
-                        0, 1, 0,
-                        4, 0, 3,
-                        3, 3, 5
-                }
+                {0, 1, 0},
+                {4, 0, 3},
+                {3, 3, 5}
         });
         list.add(new int[][] {
-                {
-                        3, 0, 1,
-                        4, 1, 4,
-                        0, 0, 1
-                }
+                {3, 0, 1},
+                {4, 1, 4},
+                {0, 0, 1}
         });
         list.add(new int[][] {
-                {
-                        3, 0, 1,
-                        2, 2, 0,
-                        5, 0, 0
-                }
+                {3, 0, 1},
+                {2, 2, 0},
+                {5, 0, 0}
         });
         list.add(new int[][] {
-                {
-                        4, 1, 2,
-                        2, 3, 5,
-                        0, 3, 4
-                }
+                {4, 1, 2},
+                {2, 3, 5},
+                {0, 3, 4}
         });
         list.add(new int[][] {
-                {
-                        5, 1, 2,
-                        4, 4, 5,
-                        1, 1, 1
-                }
+                {5, 1, 2},
+                {4, 4, 5},
+                {1, 1, 1}
         });
         list.add(new int[][] {
-                {
-                        5, 1, 4,
-                        2, 5, 5,
-                        4, 5, 3
-                }
+                {5, 1, 4},
+                {2, 5, 5},
+                {4, 5, 3}
         });
 
         guiModel.setColorScheme(list);
 
         // Init cube renderer
-        CubeRendererWindow cubeRendererWindow = new CubeRendererWindow();
-        cubeRendererWindow.initModel(guiModel);
+        CubeRendererWindow cubeRendererWindow = new CubeRendererWindow(guiModel);
 
         // Init Scene---------------------------------------------------------------------------------------------------
         Scene scene = new Scene(generalRoot, Color.TRANSPARENT);

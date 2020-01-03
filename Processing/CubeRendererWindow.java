@@ -66,7 +66,8 @@ public class CubeRendererWindow extends JFrame {
     private static final int CANVAS_HEIGHT = 600; // height of the drawable
     private static final int FPS = 60; // animator's target frames per second
 
-    public CubeRendererWindow() {
+    public CubeRendererWindow(GuiModel model) {
+        this.model = model;
         // Setup an OpenGL context for the Canvas
         // Setup OpenGL to use the programmable pipeline
         // Setting to OpenGL 3
@@ -104,9 +105,5 @@ public class CubeRendererWindow extends JFrame {
 
         // OpenGL: request focus for canvas
         cubeRenderer.requestFocusInWindow();
-    }
-
-    public void initModel(GuiModel model) {
-        this.model = model;
     }
 }

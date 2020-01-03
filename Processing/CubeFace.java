@@ -1,5 +1,7 @@
 package Processing;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,15 +12,20 @@ public class CubeFace {
 
     public CubeFace(List<int[][]> colorScheme) {
         this.colorScheme = colorScheme;
+        faceIndices = new ArrayList<>();
     }
 
     public float[] createColoredCubeFace(int index) {
+        System.out.println(colorScheme.size());
         float[] fullFace = new float[0];
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 float[] singleFace = newSingleFace(colorScheme.get(index)[x][y], x, y);
-                fullFace = Arrays.copyOf(fullFace, fullFace.length + singleFace.length);
-                System.arraycopy(singleFace, 0, fullFace, fullFace.length, singleFace.length);
+                float[] result = new float[fullFace.length + singleFace.length];
+
+                System.arraycopy(fullFace, 0, result, 0, fullFace.length);
+                System.arraycopy(singleFace, 0, result, fullFace.length, singleFace.length);
+                fullFace = result;
             }
         }
         return fullFace;
