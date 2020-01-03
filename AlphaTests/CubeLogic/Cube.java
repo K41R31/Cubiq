@@ -115,10 +115,13 @@ public class Cube {
                             eTemp[1][1] = color;
                             eTemp[0][1] = -eTemp[0][1];
                         } else if (eTemp[0][2] == 0) {
-                        int color = eTemp[1][2];
-                        eTemp[1][2] = eTemp[1][1];
-                        eTemp[1][1] =  color;
-                        eTemp[0][2] = -eTemp[0][2];
+                            int h = eTemp[0][1];
+                            eTemp[0][1] = eTemp[0][2];
+                            eTemp[0][2] = h;
+                            eTemp[0][2] = -eTemp[0][2];
+                            int color = eTemp[1][2];
+                            eTemp[1][2] = eTemp[1][1];
+                            eTemp[1][1] =  color;
                         }
                     }
                 } else if (axis == 1) {
@@ -129,10 +132,13 @@ public class Cube {
                             eTemp[1][0] = color;
                             eTemp[0][0] = -eTemp[0][0];
                         } else if (eTemp[0][0] == 0) {
-                            int color = eTemp[1][2];
-                            eTemp[1][2] = eTemp[1][1];
-                            eTemp[1][1] =  color;
+                            int h = eTemp[0][0];
+                            eTemp[0][0] = eTemp[0][2];
+                            eTemp[0][2] = h;
                             eTemp[0][0] = -eTemp[0][0];
+                            int color = eTemp[1][2];
+                            eTemp[1][2] = eTemp[1][0];
+                            eTemp[1][0] =  color;
                         }
                     }
                 } else if (axis == 2) {
@@ -143,16 +149,14 @@ public class Cube {
                             eTemp[1][1] =  color;
                             eTemp[0][1] = -eTemp[0][1];
                         } else if (eTemp[0][1] == 0) {
+                            int h = eTemp[0][0];
+                            eTemp[0][0] = eTemp[0][1];
+                            eTemp[0][1] = h;
+                            eTemp[0][1] = -eTemp[0][1];
                             int color = eTemp[1][1];
                             eTemp[1][1] = eTemp[1][0];
                             eTemp[1][0] = color;
-                            eTemp[][] = -eTemp[][];
                         }
-                    }
-                        int color = eTemp[1][0];
-
-
-
                     }
                 }
             }
@@ -169,106 +173,46 @@ public class Cube {
         for (int j = 0; j < angle; j++) {
             for (int i = 0; i < mTemp[0][i]; i++) {
 
-                if (axis == 0)  {
+                if (axis == 0) {
                     if (mTemp[0][2] == 0) {
                         int h = mTemp[0][1];
                         mTemp[0][1] = mTemp[0][2];
-                        mTemp[0][2] =  h;
+                        mTemp[0][2] = h;
                         mTemp[0][1] = -mTemp[0][1];
+                        int color = mTemp[1][1];
+                        mTemp[1][1] = mTemp[1][2];
+                        mTemp[1][2] = color;
                     }
                 } else if (axis == 1) {
                     if (mTemp[0][2] == 0) {
                         int h = mTemp[0][0];
                         mTemp[0][0] = mTemp[0][2];
-                        mTemp[0][2] =  h;
+                        mTemp[0][2] = h;
                         mTemp[0][0] = -mTemp[0][0];
+                        int color = mTemp[1][0];
+                        mTemp[1][0] = mTemp[1][2];
+                        mTemp[1][2] = color;
                     }
                 } else {
                     if (mTemp[0][1] == 0) {
                         int h = mTemp[0][0];
                         mTemp[0][0] = mTemp[0][1];
-                        mTemp[0][1] =  h;
+                        mTemp[0][1] = h;
                         mTemp[0][0] = -mTemp[0][0];
+                        int color = mTemp[1][0];
+                        mTemp[1][0] = mTemp[1][1];
+                        mTemp[1][1] = color;
                     }
                 }
             }
-            return mTemp;
         }
+        return mTemp;
+    }
         //TODO: Methode um Seiten des Cubes zu rotieren
 
 //         axis -> (0; 1; 2) > (x, y, z)
 //         depth -> (-1; 0; 1) > (hintere Ebene; mittlere Ebene; vordere Ebene)
 //         angle -> (-2; -1; 1; 2) > (-180°; -90°; 90°; 180°) (Clockwise +; Counter Clockwise -)
 
+}
 
-        /**
-         *  Alle Steine einer Seite x auswählen, um diese dann um eine Achse a rotieren zu lassen.
-         *  Z.b. alle Steine mit X=0 um 90° CW.
-         *  Richtungsangabe erfolgt durch CW/CCW (Clockwise oder Counterclockwise)
-         *
-         *
-         *  Ecksteine:
-         *  90° Rotation um y-Achse: {x, y, z} => {z, y, x}
-         *  90° Rotation um x-Achse: {x, y, z} => {x, z, y}
-         *  90° Rotation um z-Achse: {x, y, z} => {y, x, z}
-         *
-         *  Beispiel:
-         *  E00 = (X=-1, Y=1, Z=1), FK= (X=-1, BLAU) (Y=1, ROT) (Z=1, WEIß)
-         *  TODO: 90° Rotation y-Achse CW
-         *  E00 = (X=-1, Y=1, Z=-1), FK= (Z=-1, BLAU) (Y=1, ROT) (X=-1, WEIß)
-         *  TODO: 90° Rotation y-Achse CW
-         *  E00 = (X=1, Y=1, Z=-1), FK = (X=1, BLAU) (Y=1, ROT) (Z=-1, WEIß)
-         *  TODO: 90° Rotation y-Achse CW
-         *  E00 = (X=1, Y=1, Z=1), FK= (Z=1, BLAU) (Y=1, ROT) (X=1, WEIß)
-         *  TODO: 90° Rotation y-Achse CW
-         *  E00 = (X=-1, Y=1, Z=1), FK= (X=-1, BLAU) (Y=1, ROT) (Z=1, WEIß)
-         *
-         */
-
-        private void CubeStatus(){
-
-            //TODO: Methode zum Zwischenspeichern des Cube Zustandes beispielsweise in Form einer Arraylist
-
-            /**
-             *  Stand pro Veränderung speichern, also nach Veränderung speichern, damit auf dieser Basis weitere Änderungen
-             *  gemacht werden können. Eventuell auch Loggen, für Debug Zwecke.
-             */
-
-        }
-
-        private void CubeMapping(){
-
-            //TODO: Methode um vorher geladene Daten auf den 3D Würfel zu mappen
-
-            /**
-             *  Mithilfe dieser Methode werden die Daten aus der Computervision
-             *  korrekt auf die Cubelets gemapped.
-             *
-             *  Ausrichtung der Mittelsteine zu Beginn des Mappings:
-             *      - 0 Weiß = -Y (unten)
-             *      - 5 Gelb = Y
-             *      - 4 Blau = -X
-             *      - 1 Grün = X (links)
-             *      - 2 Rot = -Z
-             *      - 3 Orange Z (vorne)
-             *
-             *  Belegung der Ecksteine, in Z-Reihenfolge von o.L. nach u.R., anschließend hintere Reihe genauso.
-             *  Ebenfalls werde auch hier schon die Farbkoordinaten (FK) betrachtet.
-             *      E00 = (X=1, Y=1, Z=1), FK= (X=1, BLAU) (Y=1, ROT) (Z=1, WEIß)
-             *      E01 = (X=-1, Y=1, Z=1), FK= (X=-1, GRÜN) (Y= GELB) (Z=1, GELB)
-             *      ...
-             *      E07 = (X=1, Y=1, Z=-1), FK= (X=1, GRÜN) (Y=1, WEIß) (Z=-1, GRÜN)
-             *
-             *  TODO: Diese Belegung wird mittels CubeStatus gespeichert und nach Veränderung angepasst.
-             */
-
-        }
-
-        private void OutputToPP(){
-
-            //TODO: Methode um Zustand des Cubes an Renderer auszugeben
-
-        }
-
-
-    }
