@@ -1,23 +1,39 @@
 package Gui.MainView;
 
-import Models.SettingsModel;
+import Models.GuiModel;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
-import java.net.URL;
+import java.io.ByteArrayInputStream;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.ResourceBundle;
 
-public class MainViewController implements Observer, Initializable {
+public class MainViewController implements Observer {
 
-    private SettingsModel settingsModel;
+    private GuiModel model;
     @FXML
     private StackPane sp_solvePane, sp_learnPane, sp_timerPane;
+    @FXML
+    private ImageView iv_imageView;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+    private void updateImageView() {
+        Mat convertedMat = model.getWebcamframe().clone();
+        MatOfByte matOfByte = new MatOfByte();
+
+        Imgproc.cvtColor(convertedMat, convertedMat, Imgproc.COLOR_HSV2BGR);
+
+        //if (model.isMirrorWebcam()) Core.flip(convertedMat, convertedMat, 1);
+
+        Imgcodecs.imencode(".jpg", convertedMat, matOfByte);
+        Platform.runLater(() -> iv_imageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray()))));
     }
 
     @Override
@@ -38,10 +54,13 @@ public class MainViewController implements Observer, Initializable {
                 sp_learnPane.setVisible(false);
                 sp_timerPane.setVisible(true);
                 break;
+            case "updateImageView":
+                updateImageView();
+                break;
         }
     }
 
-    public void initModel(SettingsModel model) {
-        this.settingsModel = model;
+    public void initModel(GuiModel model) {
+        this.model = model;
     }
 }

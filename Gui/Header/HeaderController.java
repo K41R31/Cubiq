@@ -1,16 +1,15 @@
 package Gui.Header;
 
 import Models.ScreenInformationModel;
+import Models.GuiModel;
 import Start.Start;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.effect.Effect;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Polygon;
 
@@ -31,6 +30,7 @@ public class HeaderController implements Observer {
     private boolean mousePressedInHeader = false;
     private GraphicsDevice[] graphicsDevices;
     private ScreenInformationModel screenInformationModel;
+    private GuiModel guiModel;
 
     //TODO Multimonitor Unterstützung (MouseInfo.getPointerInfo().getDevice() abgleichen)
     //TODO Beim drag-fullscreen Windowposition nicht beim letzten draggen speichern (also y < 0), sondern beim mousePress
@@ -173,7 +173,7 @@ public class HeaderController implements Observer {
     }
     @FXML
     private void exit() {
-        System.exit(0);
+        guiModel.shutdown();
     }
 
     @Override
@@ -182,7 +182,8 @@ public class HeaderController implements Observer {
         }
     }
 
-    public void initModel(ScreenInformationModel model) {
-        this.screenInformationModel = model;
+    public void initModels(ScreenInformationModel screenInformationModel, GuiModel guiModel) {
+        this.screenInformationModel = screenInformationModel;
+        this.guiModel = guiModel;
     }
 }

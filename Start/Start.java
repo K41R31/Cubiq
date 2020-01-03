@@ -7,7 +7,8 @@ import Gui.ResizeFrame.ResizeFrame;
 import Gui.ScreenInformation;
 import Gui.Settings.SettingsController;
 import Models.ScreenInformationModel;
-import Models.SettingsModel;
+import Models.GuiModel;
+import Processing.ScanCube;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.opencv.core.Core;
 
 import java.awt.*;
 
@@ -27,6 +29,9 @@ public class Start extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Start.primaryStage = stage;
+
+        // Load library
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // Init Gui-----------------------------------------------------------------------------------------------------
         ScreenInformation screenInformation = new ScreenInformation();
@@ -64,7 +69,6 @@ public class Start extends Application {
         // Footer
         Footer footer = new Footer();
         generalRoot.getChildren().add(footer);
-        footer.getStylesheets().add("Gui/Footer/FooterStyle.css");
         AnchorPane.setBottomAnchor(footer, 0d);
         AnchorPane.setLeftAnchor(footer, 0d);
         AnchorPane.setRightAnchor(footer, 0d);
@@ -73,27 +77,31 @@ public class Start extends Application {
         ResizeFrame dragFrame = new ResizeFrame();
         generalRoot.getChildren().add(dragFrame.getDragFramePane());
 
+        // Init ScanCube
+        ScanCube scanCube = new ScanCube();
 
         // Init Models--------------------------------------------------------------------------------------------------
         ScreenInformationModel screenInformationModel = new ScreenInformationModel();
-        SettingsModel settingsModel = new SettingsModel();
+        GuiModel guiModel = new GuiModel();
 
         HeaderController headerController = headerLoader.getController();
         SettingsController settingsController = settingsLoader.getController();
         MainViewController mainViewController = mainViewLoader.getController();
 
         dragFrame.initModel(screenInformationModel);
-        headerController.initModel(screenInformationModel);
-        footer.initModel(settingsModel);
-        settingsController.initModel(settingsModel);
-        mainViewController.initModel(settingsModel);
+        headerController.initModels(screenInformationModel, guiModel);
+        footer.initModel(guiModel);
+        scanCube.initModel(guiModel);
+        settingsController.initModel(guiModel);
+        mainViewController.initModel(guiModel);
 
         screenInformationModel.addObserver(dragFrame);
         screenInformationModel.addObserver(headerController);
         screenInformationModel.addObserver(screenInformation);
-        settingsModel.addObserver(footer);
-        settingsModel.addObserver(settingsController);
-        settingsModel.addObserver(mainViewController);
+        guiModel.addObserver(scanCube);
+        guiModel.addObserver(footer);
+        guiModel.addObserver(settingsController);
+        guiModel.addObserver(mainViewController);
 
         screenInformation.initModel(screenInformationModel);
 
@@ -111,13 +119,14 @@ public class Start extends Application {
 
         // Load Fonts
         Font bender = Font.loadFont(getClass().getResource("../Resources/Fonts/Bender-Light.ttf").toExternalForm().replace("%20", " "), 20);
-        settingsModel.setBender(bender);
+        guiModel.setBender(bender);
 
         screenInformationModel.toggleFullScreen();
         screenInformationModel.alignResizeLines();
-        settingsModel.initFooter();
+        guiModel.initFooter();
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(("../Resources/Assets/taskbarIcon.png"))));
-        primaryStage.getIcons().size();
+
+        scanCube.startLoop();
     }
 
     public static void main(String[] args) {

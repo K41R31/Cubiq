@@ -26,7 +26,7 @@ public class SwingInFxTest extends Application {
 
     private static final int GLCANVAS_WIDTH = 1280;
     private static final int GLCANVAS_HEIGHT = 720;
-    private static final int FRAME_RATE = 30;
+    private static final int FRAME_RATE = 60;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -40,7 +40,7 @@ public class SwingInFxTest extends Application {
 
         rootPane.getChildren().add(swingNode);
 
-        stage.setScene(new Scene(rootPane, 1920, 1080));
+        stage.setScene(new Scene(rootPane, 200, 200));
         stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
 
@@ -60,7 +60,6 @@ public class SwingInFxTest extends Application {
         frame.add(canvas);
 
         final FPSAnimator animator = new FPSAnimator(canvas, FRAME_RATE, true);
-
 
         frame.addWindowListener(new WindowAdapter() {
             @Override

@@ -28,12 +28,17 @@ package AlphaTests.GuiTest.Renderer;
  * or implied, of JogAmp Community.
  */
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Paths;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.PMVMatrix;
+import de.hshl.obj.loader.OBJLoader;
+import de.hshl.obj.loader.Resource;
+import de.hshl.obj.loader.objects.Mesh;
 
 /**
  * Performs the OpenGL rendering
@@ -152,35 +157,31 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
         // To be transferred to a vertex buffer object on the GPU.
         // Interleaved data layout: position, color
 
-        float[] verticies = {
-                -0.5f, -0.5f,  0.5f,   // 0
-                0.0f,  0.68f,  0.85f,  // 0
-                0.5f,  -0.5f,  0.5f,   // 1
-                0.0f,  0.68f,  0.85f,  // 1
-                -0.5f, 0.5f,   0.5f,   // 2
-                0.0f,  0.68f,  0.85f,  // 2
-                0.5f,  0.5f,   0.5f,   // 3
-                0.0f,  0.68f,  0.85f,  // 3
-                -0.5f, -0.5f,  -0.5f,  // 4
-                0.0f,  0.68f,  0.85f,  // 4
-                -0.5f, 0.5f,   -0.5f,  // 5
-                0.0f,  0.68f,  0.85f,  // 5
-                0.5f,  -0.5f,  -0.5f,  // 6
-                0.0f,  0.68f,  0.85f,  // 6
-                0.5f,  0.5f,   -0.5f,  // 7
-                0.0f,  0.68f,  0.85f,  // 7
-        };
+        //float[] whileCubelet = newCubelet(new float[] {1, 1, 1});
+        float[] vertices = new float[0];
+        try {
+            OBJLoader loader = new OBJLoader();
 
+            Resource file = Resource.file((Paths.get("E:/IntelliJ Projekte/Cubiq/src/Resources/Assets/cube.obj")));
+            Mesh mesh = loader.loadMesh(file);
+
+            vertices = mesh.getVertices();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
         int[] cubeIndices = {
                 0, 2, 3, 0, 1, 3,
-                4, 5, 2, 4, 0, 2,
-                6, 7, 5, 6, 4, 5,
-                1, 3, 7, 1, 6, 7,
-                4, 0, 1, 4, 6, 1,
-                3, 7, 5, 3, 2, 5
+                4, 6, 2, 4, 0, 2,
+                5, 7, 6, 5, 4, 6,
+                1, 3, 7, 1, 5, 7,
+                4, 0, 1, 4, 5, 1,
+                3, 7, 6, 3, 2, 6
         };
+        */
 
-        totalInices = cubeIndices.length;
+        //totalInices = cubeIndices.length;
 
         // Create and activate a vertex array object (VAO)
         // Useful for switching between data sets for object rendering.
@@ -203,24 +204,14 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // Transferring the vertex data (see above) to the VBO on GPU.
         // (floats use 4 bytes in Java)
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, verticies.length * Float.BYTES,
-                FloatBuffer.wrap(verticies), GL.GL_STATIC_DRAW);
-
-        //Index buffer object initializing
-        int[] iboName = new int[1];
-        gl.glGenBuffers(1, iboName, 0);
-        if (iboName[0] < 1)
-            System.err.println("Error allocating index buffer object.");
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER,
-                cubeIndices.length * 4,
-                IntBuffer.wrap(cubeIndices), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, vertices.length * Float.BYTES,
+                FloatBuffer.wrap(vertices), GL.GL_STATIC_DRAW);
 
         // Activate and map input for the vertex shader from VBO,
         // taking care of interleaved layout of vertex data (position and color),
         // Enable layout position 0
 
-        for (int i = 0; i < verticies.length/6; i++) {
+        for (int i = 0; i < vertices.length/6; i++) {
             gl.glEnableVertexAttribArray(i);
             gl.glVertexAttribPointer(i, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * i * Float.BYTES);
         }
@@ -277,7 +268,7 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
 
     // Use all (6 Vertices per 6 sides) vertices in the VBO to draw a triangle.
 
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, totalInices, GL.GL_UNSIGNED_INT, 1);
+        gl.glDrawElements(GL.GL_TRIANGLES, 50, GL.GL_UNSIGNED_INT, 1);
 }
 
     /*
@@ -342,5 +333,32 @@ public class StartRendererPP extends GLCanvas implements GLEventListener {
         gl.glDeleteBuffers(1, vboName, 0);
 
         System.exit(0);
+    }
+
+    private float[] newCubelet(float[] color) {
+        float[] cubelet = {
+                -0.5f, -0.5f,  0.5f,   // 0
+                0.0f,  0.0f,   0.0f,   // 0
+                0.5f,  -0.5f,  0.5f,   // 1
+                0.0f,  0.0f,   0.0f,   // 1
+                -0.5f, 0.5f,   0.5f,   // 2
+                0.0f,  0.0f,   0.0f,   // 2
+                0.5f,  0.5f,   0.5f,   // 3
+                0.0f,  0.0f,   0.0f,   // 3
+                -0.5f, -0.5f,  -0.5f,  // 4
+                0.0f,  0.0f,   0.0f,   // 4
+                0.5f,  -0.5f,  -0.5f,  // 5
+                0.0f,  0.0f,   0.0f,   // 5
+                -0.5f, 0.5f,   -0.5f,  // 6
+                0.0f,  0.0f,   0.0f,   // 6
+                0.5f,  0.5f,   -0.5f,  // 7
+                0.0f,  0.0f,   0.0f,   // 7
+        };
+
+        for (int i = 3; i < cubelet.length; i = i + 6) {
+            for (int j = 0; j < 3; j++)
+                cubelet[j + i] = color[j];
+        }
+        return cubelet;
     }
 }

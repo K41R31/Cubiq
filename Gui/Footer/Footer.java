@@ -1,6 +1,6 @@
 package Gui.Footer;
 
-import Models.SettingsModel;
+import Models.GuiModel;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -18,7 +18,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.StrokeType;
-import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 
@@ -28,7 +27,7 @@ import java.util.Observer;
 
 public class Footer extends AnchorPane implements Observer {
 
-    private SettingsModel settingsModel;
+    private GuiModel guiModel;
 
     private void initFooter() {
         HBox menuItemContainer = new HBox();
@@ -44,9 +43,9 @@ public class Footer extends AnchorPane implements Observer {
         MenuItem menuItemLearn = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "learn");
         MenuItem menuItemTimer = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "timer");
 
-        menuItemSolve.setOnMouseClicked(event -> settingsModel.setMenuItemSolveActive());
-        menuItemLearn.setOnMouseClicked(event -> settingsModel.setMenuItemLearnActive());
-        menuItemTimer.setOnMouseClicked(event -> settingsModel.setMenuItemTimerActive());
+        menuItemSolve.setOnMouseClicked(event -> guiModel.setMenuItemSolveActive());
+        menuItemLearn.setOnMouseClicked(event -> guiModel.setMenuItemLearnActive());
+        menuItemTimer.setOnMouseClicked(event -> guiModel.setMenuItemTimerActive());
 
         menuItemContainer.getChildren().addAll(menuItemTimer, menuItemLearn, menuItemSolve, menuItemScan);
 
@@ -70,7 +69,6 @@ public class Footer extends AnchorPane implements Observer {
 
         MenuItem(Double[] points, String title) {
             this.points = points;
-            getStylesheets().add("Gui/Footer/FooterStyle.css");
             setPadding(new Insets(0, -33, 0, 0));
             setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             setMinWidth(USE_PREF_SIZE);
@@ -121,7 +119,7 @@ public class Footer extends AnchorPane implements Observer {
                 getChildren().add(captionText);
             } else {
                 Text captionText = createScanCaption();
-                
+
             }
         }
 
@@ -185,11 +183,10 @@ public class Footer extends AnchorPane implements Observer {
                     spacedTitle = spacedTitle.concat("   ");
             }
             Text text = new Text(spacedTitle.toUpperCase());
-            text.setFont(settingsModel.getBender());
+            text.setFont(guiModel.getBender());
             text.setStyle("-fx-font-size: 19");
             text.setFontSmoothingType(FontSmoothingType.LCD);
             text.setFill(Color.web("#2bccbd"));
-            text.setFontSmoothingType(FontSmoothingType.GRAY);
             StackPane.setAlignment(text, Pos.CENTER_LEFT);
             StackPane.setMargin(text, new Insets(3, 0, 0, 60));
 
@@ -200,7 +197,7 @@ public class Footer extends AnchorPane implements Observer {
 
         private Text createScanCaption() {
             Text text = new Text("S   C   A   N");
-            text.setFont(settingsModel.getBender());
+            text.setFont(guiModel.getBender());
             text.setStyle("-fx-font-size: 20pt");
             text.setFill(Color.web("#2bccbd"));
             text.setFontSmoothingType(FontSmoothingType.GRAY);
@@ -240,7 +237,7 @@ public class Footer extends AnchorPane implements Observer {
         }
     }
 
-    public void initModel(SettingsModel model) {
-        this.settingsModel = model;
+    public void initModel(GuiModel model) {
+        this.guiModel = model;
     }
 }

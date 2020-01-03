@@ -1,13 +1,13 @@
 package Gui.Settings;
 
-import Models.SettingsModel;
+import Models.GuiModel;
 
 import java.util.Observable;
 import java.util.Observer;
 
 public class SettingsController implements Observer {
 
-    private SettingsModel settingsModel;
+    private GuiModel guiModel;
 
     @Override
     public void update(Observable o, Object arg) {
@@ -15,7 +15,7 @@ public class SettingsController implements Observer {
         }
     }
 
-    public void initModel(SettingsModel model) {
-        this.settingsModel = model;
+    public void initModel(GuiModel model) {
+        this.guiModel = model;
     }
 }

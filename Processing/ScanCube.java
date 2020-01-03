@@ -1,51 +1,41 @@
-package AlphaTests.CubeScanFrameless.ImageProcessing;
+package Processing;
 
-import AlphaTests.CubeScanFrameless.Model.CubeScanFramelessModel;
+import IO.WebcamCapture;
+import Models.GuiModel;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
-import org.opencv.videoio.VideoCapture;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ImageProcessing implements Observer {
+public class ScanCube implements Observer {
 
-    private CubeScanFramelessModel model;
-    private VideoCapture videoCapture;
+    private GuiModel model;
+    private WebcamCapture webcamCapture;
+    private ScheduledExecutorService timer;
     private List<int[][]> scannedCubeSides = new ArrayList<>();
     private List<Double> centerColorSaturations = new ArrayList<>();
-    private ScheduledExecutorService timer;
 
-    private void startWebcamStream() {
-        videoCapture = new VideoCapture(0);
-        if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
-
-        // Track the framerate
-        int framerate = new FramerateTracker(videoCapture).getFramerate();
-
-        // Set width and height TODO width/ height von webcam auslesen
-        videoCapture.set(3, 1920);
-        videoCapture.set(4, 1080);
-        // Set the framerate
-        videoCapture.set(5, framerate);
-
-        // Create a loop, that repeats "process" at the same speed as the framerate of the webcam
-        timer = Executors.newSingleThreadScheduledExecutor();
-        timer.scheduleAtFixedRate(this::process, 0, 1000 / framerate, TimeUnit.MILLISECONDS);
+    public ScanCube() {
+        webcamCapture = new WebcamCapture(0);
     }
 
-    private void process() {
-        Mat frame = new Mat();
-        if (model.getLoadedMat() == null) {
-            videoCapture.read(frame);
-            Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
-        }
-        else frame = model.getLoadedMat().clone();
+    public void startLoop() {
+        // Create a loop, that repeats "process" at the same speed as the framerate of the webcam
+        timer = Executors.newSingleThreadScheduledExecutor();
+        timer.scheduleAtFixedRate(this::processFrames, 0, 1000 / webcamCapture.getFramerate(), TimeUnit.MILLISECONDS);
+    }
 
-        model.setProcessedMat(frame);
+    private void processFrames() {
+        Mat frame = new Mat();
+        webcamCapture.getVideoCapture().read(frame);
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
+        model.setWebcamframe(frame);
 
         // Get the position of the stickers
         List<Point> centers = cubeBoundarys(frame);
@@ -78,37 +68,27 @@ public class ImageProcessing implements Observer {
         if (isNewCubeSide(colorMatrix)) { // TODO Delay (Unscharfe Bilder) entweder mit Zeit oder mit 10 mal das gleiche erkannt
             scannedCubeSides.add(colorMatrix);
             centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
-            // Save the found colors as .txt, and the frame as .jpg
-            if (model.isDebug()) {
-                Output output = new Output();
-                output.printSchemes(scannedCubeSides);
-                output.printImage(frame.clone(), String.valueOf(scannedCubeSides.size()));
-                System.out.println(scannedCubeSides.size() + " SIDES SCANNED");
-            }
         }
 
         // If all 6 sides were scanned, stop the loop
-        if (scannedCubeSides.size() == 6) {
+        if (scannedCubeSides.size() == 6) { // TODO WÜRFEL FERTIG--------------------------------------------------------------------------------------------------------------------------------
+            System.out.println("FERTIG");
             logoCorrection();
-            timer.shutdown();
-            videoCapture.release();
 
             // Build the cube with the given color faces
-            ColorScheme colorScheme = new ColorScheme(scannedCubeSides);
-            buildCube(colorScheme);
+            BuildCube buildCube = new BuildCube(scannedCubeSides);
         }
 
         // Draw the found contours in the unprocessed image
         Mat contourMat = frame.clone();
-        if (model.isDebug()) {
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
-                }
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
             }
         }
+
         // Show processedMat
-        model.setProcessedMat(contourMat);
+        model.setWebcamframe(contourMat);
         model.updateImageView();
     }
 
@@ -139,7 +119,6 @@ public class ImageProcessing implements Observer {
             approximations.add(new MatOfPoint2f());
             Imgproc.approxPolyDP(new MatOfPoint2f(foundContours.get(i).toArray()), approximations.get(i), 0.1 * Imgproc.arcLength(new MatOfPoint2f(foundContours.get(i).toArray()), true), true);
         }
-
         // Find the cube squares and their centers
         List<Point> centers = new ArrayList<>();
         List<MatOfPoint2f> cubeSquares = new ArrayList<>();
@@ -203,10 +182,10 @@ public class ImageProcessing implements Observer {
                 return false;
             }
             // Check for sides that are shorter than 2% of the image width
-            if (distance < model.getProcessedMat().width() * 0.02)
+            if (distance < model.getWebcamframe().width() * 0.02)
                 return false;
             // Check for sides that are longer than 15% of the image width
-            if (distance > model.getProcessedMat().width() * 0.15)
+            if (distance > model.getWebcamframe().width() * 0.15)
                 return false;
         }
 
@@ -249,206 +228,6 @@ public class ImageProcessing implements Observer {
             if (angleLeft > model.getRotationThreshold())
                 return false;
         }
-
-        return true;
-    }
-
-    /* TODO
-        Symmetrische Seiten verursachen sehr viele Kombinationsmöglichkeiten
-        Ein gelößter Würfel resultiert in unzähligen Möglichkeiten (8192)
-     */
-    private void buildCube(ColorScheme colorScheme) {
-        List<int[]> possibleFirstCombinations = new ArrayList<>();
-        List<int[]> possibleSecondCombinations = new ArrayList<>();
-        List<int[]> possibleThirdCombinations = new ArrayList<>();
-        List<int[]> possibleFourthCombinations = new ArrayList<>();
-
-        if (!colorsExistsNineTimes(colorScheme)) {
-            System.err.println("WRONG COLOR SCHEME");
-            return;
-        }
-
-        // Seiten, die oben an die weiße Seite passen
-        for (int sideIndex = 1; sideIndex < 5; sideIndex++)
-            for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
-
-                int[] edge0 = colorScheme.getEdge(0, 0);
-                int[] edge1 = colorScheme.getEdge(sideIndex, edgeIndex);
-
-                if (edgesCouldBeNeighbours(edge0, edge1))
-                    possibleFirstCombinations.add(new int[] {sideIndex, edgeIndex});
-            }
-
-        // Seiten, die an den Partner von weiß oben und rechts an die weiße Seite passen
-        for (int i = 0; i < possibleFirstCombinations.size(); i++) {
-
-            int[] edge0 = colorScheme.getEdge(possibleFirstCombinations.get(i)[0], nextEdgeCounterClockWise(possibleFirstCombinations.get(i)[1]));
-            int[] edge1 = colorScheme.getEdge(0, 1);
-
-            for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleFirstCombinations.get(i)[0]) continue;
-
-                for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
-                    int[] edge2 = colorScheme.getEdge(sideIndex, edgeIndex);
-                    int[] edge3 = colorScheme.getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
-
-                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
-                        possibleSecondCombinations.add(new int[] {possibleFirstCombinations.get(i)[0], possibleFirstCombinations.get(i)[1], sideIndex, edgeIndex});
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < possibleSecondCombinations.size(); i++) {
-
-            int[] edge0 = colorScheme.getEdge(possibleSecondCombinations.get(i)[2], nextEdgeCounterClockWise(possibleSecondCombinations.get(i)[3]));
-            int[] edge1 = colorScheme.getEdge(0, 2);
-
-            // Alle Seiten bis auf Weiß, Gelb, die erste und die zweite Seite
-            for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleSecondCombinations.get(i)[0] || sideIndex == possibleSecondCombinations.get(i)[2]) continue;
-
-                for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
-                    int[] edge2 = colorScheme.getEdge(sideIndex, edgeIndex);
-                    int[] edge3 = colorScheme.getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
-
-                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
-                        possibleThirdCombinations.add(new int[] {possibleSecondCombinations.get(i)[0], possibleSecondCombinations.get(i)[1], possibleSecondCombinations.get(i)[2], possibleSecondCombinations.get(i)[3], sideIndex, edgeIndex});
-                    }
-                }
-            }
-        }
-
-        // Fourth
-        for (int i = 0; i < possibleThirdCombinations.size(); i++) {
-
-            int[] edge0 = colorScheme.getEdge(possibleThirdCombinations.get(i)[4], nextEdgeCounterClockWise(possibleThirdCombinations.get(i)[5]));
-            int[] edge1 = colorScheme.getEdge(0, 3);
-            int[] edge5 = colorScheme.getEdge(possibleThirdCombinations.get(i)[0], nextEdgeClockWise(possibleThirdCombinations.get(i)[1]));
-
-            // Alle Seiten bis auf Weiß, Gelb, die erste, die zweite und die dritte Seite
-            for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleThirdCombinations.get(i)[0] || sideIndex == possibleThirdCombinations.get(i)[2]|| sideIndex == possibleThirdCombinations.get(i)[4]) continue;
-
-                for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
-                    int[] edge2 = colorScheme.getEdge(sideIndex, edgeIndex);
-                    int[] edge3 = colorScheme.getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
-                    int[] edge4 = colorScheme.getEdge(sideIndex, nextEdgeCounterClockWise(edgeIndex));
-
-                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2) && edgesCouldBeNeighbours(edge5, edge4)) {
-                        possibleFourthCombinations.add(new int[] {possibleThirdCombinations.get(i)[0], possibleThirdCombinations.get(i)[1], possibleThirdCombinations.get(i)[2], possibleThirdCombinations.get(i)[3], possibleThirdCombinations.get(i)[4], possibleThirdCombinations.get(i)[5], sideIndex, edgeIndex});
-                    }
-                }
-            }
-        }
-
-        // Last side
-
-        System.out.println("Possible fourth combinations: " + possibleFourthCombinations.size());
-        System.out.println(Arrays.toString(possibleFourthCombinations.get(0)));
-
-
-        int counter = 0;
-        for (int i = 0; i < possibleFourthCombinations.size(); i++) {
-            int[] edge0;
-            int[] edge1;
-
-            for (int j = 0; j < 4; j++) {
-                for (int ei = 3 - j, l = 3; l >= 0; l--) {
-                    edge0 = colorScheme.getEdge(5, ei);
-                    edge1 = colorScheme.getEdge(possibleFourthCombinations.get(i)[0], nextOppositeEdge(possibleFourthCombinations.get(i)[1]));
-                    if (!edgesCouldBeNeighbours(edge0, edge1)) break;
-                    if (l == 3) counter++;
-                    if (ei == 0) ei = 3;
-                }
-            }
-            // TODO Überprüfung ob jeder Stein ein mal vorhanden ist
-            // Kantensteine
-            for (int j = 0; j < 4; j++) {
-
-            }
-        }
-        System.out.println("Possibilities found: " + counter);
-    }
-
-    /**
-     * Tests if the edges could be neighbours.
-     * The rules are:
-     *  - No single cube part can have the same color more than once
-     *  - No cube part can have colors tha are supposed to be on the
-     *    opposite side of the cube (white-yellow, blue-green, red-orange)
-     * @param edge0 The first edge, containing two corner and one edge pieces (3x1)
-     * @param edge1 The second edge, containing two corner and one edge pieces (3x1)
-     * @return True if the given 3x1 edges are possible neighbours
-     */
-    private boolean edgesCouldBeNeighbours(int[] edge0, int[] edge1) {
-        for (int i = 0; i < 3; i++)
-            if (edge0[i] == edge1[2 - i] || edge0[i] + edge1[2 - i] == 5)
-                return false;
-        return true;
-    }
-
-    /**
-     * Returns the edge that is located next to the given edge index
-     * @param input The index of the starting edge
-     * @return The index of the next edge counter clock wise
-     */
-    private int nextEdgeCounterClockWise(int input) {
-        if (input > 0) return input - 1;
-        else return 3;
-    }
-
-    /**
-     * Returns the edge that is located next to the given edge index
-     * @param input The index of the starting edge
-     * @return The index of the next edge clock wise
-     */
-    private int nextEdgeClockWise(int input) {
-        if (input < 3) return input + 1;
-        else return 0;
-    }
-
-    /**
-     * Returns the edge that is located at the opposite edge
-     * @param input The index of the starting edge
-     * @return The index of the edge at the opposite side
-     */
-    private int nextOppositeEdge(int input) {
-        if (input <= 1) return input + 2;
-        else return input - 2;
-    }
-
-    private boolean colorsExistsNineTimes(ColorScheme colorScheme) {
-        int[] colorCounter = new int[] {0, 0, 0, 0, 0, 0};
-        for (int i = 0; i < 6; i++) {
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    switch(colorScheme.get(i)[x][y]) {
-                        case 0:
-                            colorCounter[0]++;
-                            break;
-                        case 1:
-                            colorCounter[1]++;
-                            break;
-                        case 2:
-                            colorCounter[2]++;
-                            break;
-                        case 3:
-                            colorCounter[3]++;
-                            break;
-                        case 4:
-                            colorCounter[4]++;
-                            break;
-                        case 5:
-                            colorCounter[5]++;
-                            break;
-                    }
-                }
-            }
-        }
-        for (int i = 0; i < 6; i++) {
-            if (colorCounter[i] != 9) return false;
-        }
         return true;
     }
 
@@ -463,7 +242,7 @@ public class ImageProcessing implements Observer {
                     doubleColorIndex0 = i;
                     doubleColorIndex1 = j;
                 }
-        }
+            }
             centerColors.add(color);
         }
         if (doubleColorIndex0 == -1) return; // Kein Center doppelt. Keine Korrektur nötig
@@ -480,8 +259,6 @@ public class ImageProcessing implements Observer {
         int[][] singleCubeSide = scannedCubeSides.get(whiteIndex);
         singleCubeSide[1][1] = 0;
         scannedCubeSides.set(whiteIndex, singleCubeSide);
-
-        new Output().printSchemes(scannedCubeSides);
     }
 
     /**
@@ -756,16 +533,15 @@ public class ImageProcessing implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "processImage":
-                process();
-                break;
-            case "startWebcamStream":
-                startWebcamStream();
+            case "shutdown":
+                webcamCapture.getVideoCapture().release();
+                timer.shutdownNow();
+                System.exit(0);
                 break;
         }
     }
 
-    public void initModel(CubeScanFramelessModel model) {
+    public void initModel(GuiModel model) {
         this.model = model;
     }
 }

@@ -36,12 +36,13 @@
             </Text>
          </children>
       </StackPane>
+      <ImageView fx:id="iv_imageView" fitHeight="1080.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <ImageView fitHeight="1080.0" fitWidth="1920.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../Resources/Assets/camOverlay.png" />
          </image>
       </ImageView>
-      <StackPane layoutX="285.0" layoutY="299.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <StackPane maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ImageView fitHeight="635.0" fitWidth="130.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -52,7 +53,7 @@
       </StackPane>
       <StackPane layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ImageView fitHeight="635.0" fitWidth="130.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../Resources/Assets/sideRight.png" />
                </image>
