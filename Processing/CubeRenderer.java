@@ -70,9 +70,6 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
     private final String fragmentShader0FileName = "O0_Basic.frag";
 
     private ShaderProgram shaderProgram0;
-    private ShaderProgram shaderProgram1;
-    private ShaderProgram shaderProgram2;
-    private ShaderProgram shaderProgram3;
 
     // Pointers (names) for data transfer and handling on GPU
     private int[] vaoName;  // Names of vertex array objects
@@ -135,21 +132,9 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        System.err.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
-        System.err.println("INIT GL IS: " + gl.getClass().getName());
-        System.err.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
-        System.err.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
-        System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
-
-        // Verify if VBO-Support is available
-        if(!gl.isExtensionAvailable("GL_ARB_vertex_buffer_object"))
-            System.out.println("Error: VBO support is missing");
-        else
-            System.out.println("VBO support is available");
-
         // BEGIN: Preparing scene
         // BEGIN: Allocating vertex array objects and buffers for each object
-        int noOfObjects = 6;
+        int noOfObjects = 1;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -173,22 +158,13 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
 
         // Initialize objects to be drawn (see respective sub-methods)
         initCubeFace0(gl);
-        initCubeFace1(gl);
-        initCubeFace2(gl);
-        initCubeFace3(gl);
-        initCubeFace4(gl);
-        initCubeFace5(gl);
         // END: Preparing scene
 
-        // Switch on back face culling
-        gl.glEnable(GL.GL_CULL_FACE);
-        gl.glCullFace(GL.GL_BACK);
-        gl.glCullFace(GL.GL_FRONT);
         // Switch on depth test
         gl.glEnable(GL.GL_DEPTH_TEST);
 
         // defining polygon drawing mode
-        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
+        gl.glPolygonMode(GL.GL_FRONT, gl.GL_FILL);
 //        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_LINE);
 
         // Create projection-model-view matrix
@@ -215,237 +191,26 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         float[] cubeFace0Vertices = cubeFace.createColoredCubeFace(0);
         int[] cubeFace0Indices = cubeFace.getCubeFaceIndices(0);
 
-
-
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace0Vertices.length * 4,
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace0Vertices.length * Float.BYTES,
                 FloatBuffer.wrap(cubeFace0Vertices), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace0Indices.length * 4,
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace0Indices.length * Float.BYTES,
                 IntBuffer.wrap(cubeFace0Indices), GL.GL_STATIC_DRAW);
 
         // Activate and order vertex buffer object data for the vertex shader
         // Defining input variables for vertex shader
         // Pointer for the vertex shader to the position information per vertex
         gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
-        // Pointer for the vertex shader to the color information per vertex
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6*Float.BYTES, 0);
         gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
-        // Pointer for the vertex shader to the normal information per vertex
-        gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6*Float.BYTES, 3*Float.BYTES);
         // END: Prepare sphere for drawing
-    }
-
-    /**
-     * Initializes the GPU for drawing object1
-     * @param gl OpenGL context
-     */
-    private void initCubeFace1(GL3 gl) {
-        // BEGIN: Prepare cube for drawing (object 1)
-        gl.glBindVertexArray(vaoName[1]);
-        shaderProgram1 = new ShaderProgram(gl);
-        shaderProgram1.loadShaderAndCreateProgram(shaderPath,
-                vertexShader0FileName, fragmentShader0FileName);
-
-        float[] cubeFace1Vertices = cubeFace.createColoredCubeFace(1);
-        int[] cubeFace1Indices = cubeFace.getCubeFaceIndices(1);
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[1]);
-        // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace1Vertices.length * 4,
-                FloatBuffer.wrap(cubeFace1Vertices), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[1]);
-        // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace1Indices.length * 4,
-                IntBuffer.wrap(cubeFace1Indices), GL.GL_STATIC_DRAW);
-
-        // Activate and order vertex buffer object data for the vertex shader
-        // The vertex buffer contains: position (3), color (3), normals (3)
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
-        // Pointer for the vertex shader to the normal information per vertex
-        gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
-        // END: Prepare cube for drawing
-    }
-
-    /**
-     * Initializes the GPU for drawing object2
-     * @param gl OpenGL context
-     */
-    private void initCubeFace2(GL3 gl) {
-        // BEGIN: Prepare cone (frustum) for drawing (object 2)
-        // create cone (frustum) data for rendering a cone (frustum) using an index array into a vertex array
-        gl.glBindVertexArray(vaoName[2]);
-        shaderProgram2 = new ShaderProgram(gl);
-        shaderProgram2.loadShaderAndCreateProgram(shaderPath,
-                fragmentShader0FileName, fragmentShader0FileName);
-
-        float[] cubeFace2Vertices = cubeFace.createColoredCubeFace(2);
-        int[] cubeFace2Indices = cubeFace.getCubeFaceIndices(2);
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[2]);
-        // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace2Vertices.length * 4,
-                FloatBuffer.wrap(cubeFace2Vertices), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[2]);
-        // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace2Indices.length * 4,
-                IntBuffer.wrap(cubeFace2Indices), GL.GL_STATIC_DRAW);
-
-        // Activate and arrange vertex buffer object data for the vertex shader
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
-        // Pointer for the vertex shader to the normal information per vertex
-        gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
-        // END: Prepare cone (frustum) for drawing
-    }
-
-    /**
-     * Initializes the GPU for drawing object3
-     * @param gl OpenGL context
-     */
-    private void initCubeFace3(GL3 gl) {
-        // BEGIN: Prepare roof for drawing (object 3)
-        // create data for rendering a roof using an index array into a vertex array
-        gl.glBindVertexArray(vaoName[3]);
-        shaderProgram3 = new ShaderProgram(gl);
-        shaderProgram3.loadShaderAndCreateProgram(shaderPath,
-                fragmentShader0FileName, fragmentShader0FileName);
-
-        float[] cubeFace3Vertices = cubeFace.createColoredCubeFace(3);
-        int[] cubeFace3Indices = cubeFace.getCubeFaceIndices(3);
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[3]);
-        // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace3Vertices.length * 4,
-                FloatBuffer.wrap(cubeFace3Vertices), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[3]);
-        // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace3Indices.length * 4,
-                IntBuffer.wrap(cubeFace3Indices), GL.GL_STATIC_DRAW);
-
-        // Activate and arrange vertex buffer object data for the vertex shader
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
-        // Pointer for the vertex shader to the normal information per vertex
-        gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
-        // END: Prepare roof for drawing
-    }
-
-    /**
-     * Initializes the GPU for drawing object3
-     * @param gl OpenGL context
-     */
-    private void initCubeFace4(GL3 gl) {
-        // BEGIN: Prepare roof for drawing (object 3)
-        // create data for rendering a roof using an index array into a vertex array
-        gl.glBindVertexArray(vaoName[3]);
-        shaderProgram3 = new ShaderProgram(gl);
-        shaderProgram3.loadShaderAndCreateProgram(shaderPath,
-                fragmentShader0FileName, fragmentShader0FileName);
-
-        float[] cubeFace4Vertices = cubeFace.createColoredCubeFace(4);
-        int[] cubeFace4Indices = cubeFace.getCubeFaceIndices(4);
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[3]);
-        // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace4Vertices.length * 4,
-                FloatBuffer.wrap(cubeFace4Vertices), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[3]);
-        // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace4Indices.length * 4,
-                IntBuffer.wrap(cubeFace4Indices), GL.GL_STATIC_DRAW);
-
-        // Activate and arrange vertex buffer object data for the vertex shader
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
-        // Pointer for the vertex shader to the normal information per vertex
-        gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
-        // END: Prepare roof for drawing
-    }
-
-    /**
-     * Initializes the GPU for drawing object3
-     * @param gl OpenGL context
-     */
-    private void initCubeFace5(GL3 gl) {
-        // BEGIN: Prepare roof for drawing (object 3)
-        // create data for rendering a roof using an index array into a vertex array
-        gl.glBindVertexArray(vaoName[3]);
-        shaderProgram3 = new ShaderProgram(gl);
-        shaderProgram3.loadShaderAndCreateProgram(shaderPath,
-                fragmentShader0FileName, fragmentShader0FileName);
-
-        float[] cubeFace5Vertices = cubeFace.createColoredCubeFace(5);
-        int[] cubeFace5Indices = cubeFace.getCubeFaceIndices(5);
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[3]);
-        // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeFace5Vertices.length * 4,
-                FloatBuffer.wrap(cubeFace5Vertices), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[3]);
-        // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeFace5Indices.length * 4,
-                IntBuffer.wrap(cubeFace5Indices), GL.GL_STATIC_DRAW);
-
-        // Activate and arrange vertex buffer object data for the vertex shader
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 9*4, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 9*4, 3*4);
-        // Pointer for the vertex shader to the normal information per vertex
-        gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 9*4, 6*4);
-        // END: Prepare roof for drawing
     }
 
     /**
@@ -459,7 +224,7 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
         // Background color of the canvas
-        gl.glClearColor(0.97f, 0.97f, 0.97f, 1.0f);
+        gl.glClearColor(0.08f, 0.10f, 0.15f, 1.0f);
 
         // For monitoring the interaction settings
 /*        System.out.println("Camera: z = " + interactionHandler.getEyeZ() + ", " +
@@ -480,38 +245,11 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
         // Transform for the complete scene
-//        pmvMatrix.glTranslatef(1f, 0.2f, 0f);
+        pmvMatrix.glTranslatef(1f, 0.2f, 0f);
 
         pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(-1.5f, 0f, 0f);
+//        pmvMatrix.glTranslatef(-1.5f, 0f, 0f);
         displayObject0(gl);
-        pmvMatrix.glPopMatrix();
-
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(0f, 1.5f, 0f);
-        pmvMatrix.glRotatef(45f, 0f, 1f, 0f);
-        displayObject1(gl);
-        pmvMatrix.glPopMatrix();
-
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(0f, -1f, 0f);
-        displayObject2(gl);
-        pmvMatrix.glPopMatrix();
-
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(1.5f, 0f, 0f);
-        displayObject3(gl);
-        pmvMatrix.glPopMatrix();
-
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(0f, 1.5f, 0f);
-        pmvMatrix.glRotatef(45f, 0f, 1f, 0f);
-        displayObject4(gl);
-        pmvMatrix.glPopMatrix();
-
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(0f, -1f, 0f);
-        displayObject5(gl);
         pmvMatrix.glPopMatrix();
     }
 
@@ -523,57 +261,8 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glBindVertexArray(vaoName[0]);
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawArrays(GL.GL_TRIANGLES, cubeFace.getCubeFaceIndices(0).length, GL.GL_UNSIGNED_INT);
-    }
-
-    private void displayObject1(GL3 gl) {
-        gl.glUseProgram(shaderProgram1.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[1]);
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(1).length, GL.GL_UNSIGNED_INT, 0);
-    }
-
-    private void displayObject2(GL3 gl) {
-        gl.glUseProgram(shaderProgram2.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[2]);
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(2).length, GL.GL_UNSIGNED_INT, 0);
-    }
-
-    private void displayObject3(GL3 gl) {
-        gl.glUseProgram(shaderProgram3.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[3]);
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(3).length, GL.GL_UNSIGNED_INT, 0);
-    }
-
-    private void displayObject4(GL3 gl) {
-        gl.glUseProgram(shaderProgram3.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[3]);
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(4).length, GL.GL_UNSIGNED_INT, 0);
-    }
-
-    private void displayObject5(GL3 gl) {
-        gl.glUseProgram(shaderProgram3.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[3]);
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubeFace.getCubeFaceIndices(5).length, GL.GL_UNSIGNED_INT, 0);
+//        gl.glDrawArrays(GL.GL_TRIANGLES, cubeFace.getCubeFaceIndices(0).length, GL.GL_UNSIGNED_INT);
+        gl.glDrawElements(GL.GL_TRIANGLES, cubeFace.getCubeFaceIndices(0).length, GL.GL_UNSIGNED_INT, 0);
     }
 
     /**
@@ -607,7 +296,6 @@ public class CubeRenderer extends GLCanvas implements GLEventListener {
         // Detach and delete shader program
         gl.glUseProgram(0);
         shaderProgram0.deleteShaderProgram();
-        shaderProgram1.deleteShaderProgram();
 
         // deactivate VAO and VBO
         gl.glBindVertexArray(0);

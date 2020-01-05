@@ -1,6 +1,5 @@
 package Processing;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,45 +15,61 @@ public class CubeFace {
     }
 
     public float[] createColoredCubeFace(int index) {
-        System.out.println(colorScheme.size());
-        float[] fullFace = new float[0];
+        float[] fullFaceVertices = new float[0];
+        int[] fullFaceIndices = new int[0];
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                float[] singleFace = newSingleFace(colorScheme.get(index)[x][y], x, y);
-                float[] result = new float[fullFace.length + singleFace.length];
+                // vertices
+                float[] singleFaceVertices = newSingleFace(colorScheme.get(index)[x][y], x, y);
+                System.out.println(Arrays.toString(singleFaceVertices));
+                float[] mergedVertices = new float[fullFaceVertices.length + singleFaceVertices.length];
 
-                System.arraycopy(fullFace, 0, result, 0, fullFace.length);
-                System.arraycopy(singleFace, 0, result, fullFace.length, singleFace.length);
-                fullFace = result;
+                System.arraycopy(fullFaceVertices, 0, mergedVertices, 0, fullFaceVertices.length);
+                System.arraycopy(singleFaceVertices, 0, mergedVertices, fullFaceVertices.length, singleFaceVertices.length);
+                fullFaceVertices = mergedVertices;
+
+                // indices
+                int[] singleFaceIndices = newSingleFaceIndices(x, y);
+                int[] mergedIndices = new int[fullFaceIndices.length + singleFaceIndices.length];
+
+                System.arraycopy(fullFaceIndices, 0, mergedIndices, 0, fullFaceIndices.length);
+                System.arraycopy(singleFaceIndices, 0, mergedIndices, fullFaceIndices.length, singleFaceIndices.length);
+                fullFaceIndices = mergedIndices;
             }
         }
-        return fullFace;
+        faceIndices.add(fullFaceIndices);
+        return fullFaceVertices;
     }
 
     private float[] newSingleFace(int color, int x, int y) {
-        if (x == 0) x = -1;
-        else if (x == 1) x = 0;
-        else x = 1;
-        if (y == 0) y = -1;
-        else if (y == 1) y = 0;
-        else y = 1;
+        float offsetX, offsetY;
+        if (x == 0) offsetX = -1;
+        else if (x == 1) offsetX = 0;
+        else offsetX = 1;
+        if (y == 0) offsetY = 1;
+        else if (y == 1) offsetY = 0;
+        else offsetY = -1;
 
         float[] vertices = new float[] {
-                -0.5f + x,  -0.5f + y,   0,
-                0,            0,         0,
-                0.5f  + x,  -0.5f + y,   0,
-                0,            0,         0,
-                -0.5f + x,  0.5f  + y,   0,
-                0,            0,         0,
-                0.5f  + x,  0.5f  + y,   0
+                -0.5f + offsetX,  0.5f + offsetY,    0,
+                0,            0,                     0,
+                0.5f  + offsetX,  0.5f + offsetY,    0,
+                0,            0,                     0,
+                -0.5f + offsetX,  -0.5f  + offsetY,  0,
+                0,            0,                     0,
+                0.5f  + offsetX,  -0.5f  + offsetY,  0,
+                0,            0,                     0
         };
 
-        faceIndices.add(new int[] {
-                0, 1, 2,
-                1, 3, 2
-        });
-
         return addColor(vertices, color);
+    }
+
+    private int[] newSingleFaceIndices(int x, int y) {
+        int round = x + y * 3;
+        return new int[] {
+                0 + round, 1 + round, 2 + round,
+                1 + round, 3 + round, 2 + round
+        };
     }
 
     private float[] addColor(float[] vertices, int color) {
