@@ -125,12 +125,6 @@ public class BuildCube {
 
             }
         }
-        for (int i = 0; i < inputScheme.size(); i++) {
-            System.out.println(Arrays.toString(inputScheme.get(i)));
-        }
-        for (int[] possibleFourthCombination : possibleFourthCombinations) {
-            System.out.println(Arrays.toString(possibleFourthCombination));
-        }
         System.out.println("Possibilities found: " + counter);
     }
 

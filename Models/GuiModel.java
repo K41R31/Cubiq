@@ -12,7 +12,7 @@ public class GuiModel extends Observable {
     private Font bender;
     private Mat webcamframe;
     private boolean debug = true;
-    private boolean mirrorWebcam = false;
+    private boolean mirrorWebcam = true;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
     private double sideLengthThreshold = 0.8; //0.8
     private double angleThreshold = 50; //50
@@ -21,6 +21,7 @@ public class GuiModel extends Observable {
     private double dilateKernel = 1; //1
     private double scanAreaSize = 20;
     private List<int[][]> colorScheme;
+    private int totalCubeSideFound = 0;
 
     // Shutdown
 
@@ -29,14 +30,21 @@ public class GuiModel extends Observable {
         notifyObservers("shutdown");
     }
 
-    // Update image view------------------------------------------------------------------------------------------------
+    // Start cube scan
+
+    public void startCubeScan() {
+        setChanged();
+        notifyObservers("startCubeScan");
+    }
+
+    // Update image view
 
     public void updateImageView() {
         setChanged();
         notifyObservers("updateImageView");
     }
 
-    // initFooter-------------------------------------------------------------------------------------------------------
+    // initFooter
 
     public void initFooter() {
         setChanged();
@@ -176,5 +184,15 @@ public class GuiModel extends Observable {
 
     public void setColorScheme(List<int[][]> colorScheme) {
         this.colorScheme = colorScheme;
+    }
+
+    public int getTotalCubeSideFound() {
+        return totalCubeSideFound;
+    }
+
+    public void setTotalCubeSideFound(int totalCubeSideFound) {
+        this.totalCubeSideFound = totalCubeSideFound;
+        setChanged();
+        notifyObservers("newCubeSideFound");
     }
 }

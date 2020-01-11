@@ -1,4 +1,4 @@
-package GUI.Footer;
+package Gui.Footer;
 
 import Models.GuiModel;
 import javafx.beans.value.ChangeListener;
@@ -28,6 +28,7 @@ import java.util.Observer;
 public class Footer extends AnchorPane implements Observer {
 
     private GuiModel guiModel;
+    private MenuItem menuItemLeft;
 
     private void initFooter() {
         HBox menuItemContainer = new HBox();
@@ -38,7 +39,7 @@ public class Footer extends AnchorPane implements Observer {
         AnchorPane.setRightAnchor(menuItemContainer, 0d);
         AnchorPane.setBottomAnchor(menuItemContainer, 0d);
 
-        MenuItem menuItemScan = new MenuItem(new Double[] {0d, 0d, 53d, 0d, 105d, 50d, 480d, 50d, 510d, 81d, 0d, 81d}, "test");
+        menuItemLeft = new MenuItem(new Double[] {0d, 0d, 53d, 0d, 105d, 50d, 480d, 50d, 510d, 81d, 0d, 81d}, "leftItem");
         MenuItem menuItemSolve = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "solve");
         MenuItem menuItemLearn = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "learn");
         MenuItem menuItemTimer = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "timer");
@@ -47,11 +48,11 @@ public class Footer extends AnchorPane implements Observer {
         menuItemLearn.setOnMouseClicked(event -> guiModel.setMenuItemLearnActive());
         menuItemTimer.setOnMouseClicked(event -> guiModel.setMenuItemTimerActive());
 
-        menuItemContainer.getChildren().addAll(menuItemTimer, menuItemLearn, menuItemSolve, menuItemScan);
+        menuItemContainer.getChildren().addAll(menuItemTimer, menuItemLearn, menuItemSolve, menuItemLeft);
 
         ChangeListener sizeChangeListener = (ChangeListener<Double>) (observable, oldValue, newValue) -> {
             double width = menuItemContainer.getWidth() / 4;
-            menuItemScan.updateWidth(width);
+            menuItemLeft.updateWidth(width);
             menuItemSolve.updateWidth(width);
             menuItemLearn.updateWidth(width);
             menuItemTimer.updateWidth(width);
@@ -66,9 +67,12 @@ public class Footer extends AnchorPane implements Observer {
         ImageView overlay;
         Polyline glowLine, blurredLine;
         Double[] points;
+        String title;
+        Text leftItemText;
 
         MenuItem(Double[] points, String title) {
             this.points = points;
+            this.title = title;
             setPadding(new Insets(0, -33, 0, 0));
             setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             setMinWidth(USE_PREF_SIZE);
@@ -88,23 +92,25 @@ public class Footer extends AnchorPane implements Observer {
             glowLine = createGlowLine();
             blurredLine = createBlurredLine();
 
-            if (mainShape.getPoints().size() == 8) {
-                setMinHeight(USE_PREF_SIZE);
-                setPrefHeight(31);
-                setMaxHeight(USE_PREF_SIZE);
-            }
-            else {
-                setMinHeight(USE_PREF_SIZE);
-                setPrefHeight(81);
-                setMaxHeight(USE_PREF_SIZE);
-            }
-
             getChildren().add(mainShape);
             getChildren().add(overlay);
             getChildren().add(glowLine);
             getChildren().add(blurredLine);
 
-            if (mainShape.getPoints().size() == 8) {
+            if (title.equals("leftItem")) {
+                setMinHeight(USE_PREF_SIZE);
+                setPrefHeight(81);
+                setMaxHeight(USE_PREF_SIZE);
+
+                StackPane leftItem = createLeftItemCaption();
+                getChildren().add(leftItem);
+                leftItem.setViewOrder(20);
+            }
+            else {
+                setMinHeight(USE_PREF_SIZE);
+                setPrefHeight(31);
+                setMaxHeight(USE_PREF_SIZE);
+
                 Text captionText = createCaption(title);
 
                 mainShape.setOnMouseEntered(event -> {
@@ -116,17 +122,14 @@ public class Footer extends AnchorPane implements Observer {
                     mainShape.setFill(Color.web("#3d444d"));
                     captionText.setFill(Color.web("#2bccbd"));
                 });
-                getChildren().add(captionText);
-            } else {
-                Text captionText = createScanCaption();
 
+                getChildren().add(captionText);
             }
         }
 
         private ImageView createOverlay() {
-            int height;
-            if (mainShape.getPoints().size() == 8) height = 31;
-            else height = 81;
+            int height = 31;
+            if (title.equals("leftItem")) height = 81;
 
             ImageView overlay = new ImageView();
             overlay.setImage(new Image(getClass().getResourceAsStream(("../../Resources/Assets/combOverlay.png"))));
@@ -160,8 +163,11 @@ public class Footer extends AnchorPane implements Observer {
         private Polyline newGlowLine() {
             Polyline polyLine = new Polyline();
             Double[] linePoints;
-            if (mainShape.getPoints().size() == 8) linePoints = Arrays.copyOfRange(points, 0, 6);
-            else linePoints = Arrays.copyOfRange(points, 0, 10);
+            if (title.equals("leftItem")) {
+                linePoints = Arrays.copyOfRange(points, 0, 10);
+
+            }
+            else linePoints = Arrays.copyOfRange(points, 0, 6);
             polyLine.getPoints().addAll(linePoints);
 
             polyLine.setFill(Color.TRANSPARENT);
@@ -195,20 +201,34 @@ public class Footer extends AnchorPane implements Observer {
             return text;
         }
 
-        private Text createScanCaption() {
-            Text text = new Text("S   C   A   N");
-            text.setFont(guiModel.getBender());
-            text.setStyle("-fx-font-size: 20pt");
-            text.setFill(Color.web("#2bccbd"));
-            text.setFontSmoothingType(FontSmoothingType.GRAY);
+        private StackPane createLeftItemCaption() {
+            StackPane stackPane = new StackPane();
+            stackPane.setPrefWidth(USE_COMPUTED_SIZE);
+            stackPane.setPrefHeight(USE_COMPUTED_SIZE);
+            stackPane.setAlignment(Pos.CENTER_LEFT);
+            stackPane.setPadding(new Insets(0, 0, 20, 60));
 
-            return text;
+            Polygon background = new Polygon();
+            background.getPoints().addAll(53d, 0d, 408d, 0d, 460d, 50d, 105d, 50d);
+            background.setFill(Color.web("#2bccbd"));
+            background.setOpacity(0.7);
+
+            leftItemText = new Text("\\\\   0   S  I  D  E  S");
+            leftItemText.setFont(guiModel.getBender());
+            leftItemText.setStyle("-fx-font-size: 18pt");
+            leftItemText.setFill(Color.web("#393f47"));
+            leftItemText.setFontSmoothingType(FontSmoothingType.LCD);
+            StackPane.setMargin(leftItemText, new Insets(0, 0, 3, 70));
+
+            stackPane.getChildren().addAll(background, leftItemText);
+
+            return stackPane;
         }
 
         private void updateWidth(double width) {
             // vals -> [0] + [1] the indexes of the outer right points of the polygon; [2] the height
             int[] vals = new int[] {2, 4, 31};
-            if (mainShape.getPoints().size() != 8) vals = new int[] {6, 8, 81};
+            if (title.equals("leftItem")) vals = new int[] {6, 8, 81};
             // rootPane
             setPrefWidth(width + 1);
             // mainShape
@@ -226,6 +246,12 @@ public class Footer extends AnchorPane implements Observer {
             blurredLine.getPoints().set(vals[0], width);
             blurredLine.getPoints().set(vals[1], width + 30d);
         }
+
+        private void updateSidesFound(int count) {
+            String addition = "  S";
+            if (count == 1) addition = "";
+            leftItemText.setText("\\\\   " + count + "   S  I  D  E" + addition);
+        }
     }
 
     @Override
@@ -233,6 +259,9 @@ public class Footer extends AnchorPane implements Observer {
         switch ((String) arg) {
             case "initFooter":
                 initFooter();
+                break;
+            case "newCubeSideFound":
+                menuItemLeft.updateSidesFound(guiModel.getTotalCubeSideFound());
                 break;
         }
     }

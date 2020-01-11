@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane style="-fx-background-color: TRANSPARENT; -fx-border-color: TRANSPARENT; -fx-border-insets: -1; -fx-padding: 0 0 0 0;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Header.HeaderController">
+<AnchorPane style="-fx-background-color: TRANSPARENT; -fx-border-color: TRANSPARENT; -fx-border-insets: -1; -fx-padding: 0 0 0 0;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Gui.Header.HeaderController">
    <children>
       <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" style="-fx-background-color: #3f464f; -fx-border-insets: -1; -fx-padding: 0 0 0 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <HBox alignment="TOP_CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" style="-fx-background-color: TRANSPARENT; -fx-border-width: 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

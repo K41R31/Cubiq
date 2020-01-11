@@ -2,9 +2,15 @@ package Processing;
 
 import IO.WebcamCapture;
 import Models.GuiModel;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import org.opencv.core.*;
+import org.opencv.core.Point;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -12,6 +18,8 @@ import java.util.Observer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static org.opencv.core.CvType.CV_8UC3;
 
 public class ScanCube implements Observer {
 
@@ -25,13 +33,14 @@ public class ScanCube implements Observer {
         webcamCapture = new WebcamCapture(0);
     }
 
-    public void startLoop() {
+    private void startLoop() {
         // Create a loop, that repeats "process" at the same speed as the framerate of the webcam
         timer = Executors.newSingleThreadScheduledExecutor();
         timer.scheduleAtFixedRate(this::processFrames, 0, 1000 / webcamCapture.getFramerate(), TimeUnit.MILLISECONDS);
     }
 
     private void processFrames() {
+        //Mat frame = new Mat(new Size(1920, 1080), CV_8UC3, new Scalar(255, 255, 255)); TODO Webcamless mode
         Mat frame = new Mat();
         webcamCapture.getVideoCapture().read(frame);
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
@@ -68,6 +77,7 @@ public class ScanCube implements Observer {
         if (isNewCubeSide(colorMatrix)) { // TODO Delay (Unscharfe Bilder) entweder mit Zeit oder mit 10 mal das gleiche erkannt
             scannedCubeSides.add(colorMatrix);
             centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
+            model.setTotalCubeSideFound(scannedCubeSides.size());
         }
 
         // If all 6 sides were scanned, stop the loop
@@ -75,21 +85,49 @@ public class ScanCube implements Observer {
             System.out.println("FERTIG");
             logoCorrection();
 
-            // Build the cube with the given color faces
+            // Build the cube with the given color faces // TODO--------------------------------------------------------
             BuildCube buildCube = new BuildCube(scannedCubeSides);
         }
 
         // Draw the found contours in the unprocessed image
         Mat contourMat = frame.clone();
+        Mat scanpointOverlay = Imgcodecs.imread("C://scanPointOverlay.png", Imgcodecs.IMREAD_UNCHANGED);
+
+        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR);
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
+                //Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
+                //Rect roi = new Rect((int)Math.round(scanpoints[x][y].x), (int)Math.round(scanpoints[x][y].y), scanpointOverlay.width(),scanpointOverlay.height());
             }
         }
+
+        List<Mat> splitted = new ArrayList<>();
+        Core.split(scanpointOverlay, splitted);
+        alphaBlend(scanpointOverlay, contourMat, splitted.get());
+
+        //Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_BGR2HSV);
 
         // Show processedMat
         model.setWebcamframe(contourMat);
         model.updateImageView();
+    }
+
+    private Mat alphaBlend(Mat foreground, Mat background, Mat alpha, Mat outImage) {
+        // Find number of pixels.
+        int numberOfPixels = foreground.rows() * foreground.cols() * foreground.channels();
+
+        // Get floating point pointers to the data matrices
+        /*
+        float fptr = reinterpret_cast<float>(foreground.dataAddr());
+        float bptr = reinterpret_cast<float>(background.data);
+        float aptr = reinterpret_cast<float>(alpha.data);
+        float outImagePtr = reinterpret_cast<float>(outImage.data);
+
+        // Loop over all pixesl ONCE
+        for(int i = 0; i < numberOfPixels; i++, outImagePtr++, fptr++, aptr++, bptr++) {
+            *outImagePtr = (*fptr)*(*aptr) + (*bptr)*(1 - *aptr);
+        }
+        */
     }
 
     private List<Point> cubeBoundarys(Mat frame) {
@@ -533,6 +571,9 @@ public class ScanCube implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
+            case "startCubeScan":
+                startLoop();
+                break;
             case "shutdown":
                 webcamCapture.getVideoCapture().release();
                 timer.shutdownNow();

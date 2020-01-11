@@ -1,4 +1,4 @@
-package GUI.Header;
+package Gui.Header;
 
 import Models.ScreenInformationModel;
 import Models.GuiModel;

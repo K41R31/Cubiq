@@ -1,4 +1,4 @@
-package GUI.ResizeFrame;
+package Gui.ResizeFrame;
 
 import Models.ScreenInformationModel;
 import Start.Start;
