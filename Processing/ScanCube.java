@@ -103,7 +103,7 @@ public class ScanCube implements Observer {
 
         List<Mat> splitted = new ArrayList<>();
         Core.split(scanpointOverlay, splitted);
-        alphaBlend(scanpointOverlay, contourMat, splitted.get());
+        //alphaBlend(scanpointOverlay, contourMat, splitted.get());
 
         //Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_BGR2HSV);
 
@@ -128,6 +128,7 @@ public class ScanCube implements Observer {
             *outImagePtr = (*fptr)*(*aptr) + (*bptr)*(1 - *aptr);
         }
         */
+        return new Mat();
     }
 
     private List<Point> cubeBoundarys(Mat frame) {

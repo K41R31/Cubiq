@@ -63,7 +63,7 @@ public class Footer extends AnchorPane implements Observer {
     }
 
     private class MenuItem extends StackPane {
-        Polygon mainShape = new Polygon();
+        Polygon mainShape, leftItemCaptionBackground;
         ImageView overlay;
         Polyline glowLine, blurredLine;
         Double[] points;
@@ -79,6 +79,7 @@ public class Footer extends AnchorPane implements Observer {
             setPrefWidth(USE_COMPUTED_SIZE);
             setMaxWidth(USE_PREF_SIZE);
             setAlignment(Pos.BOTTOM_LEFT);
+            mainShape = new Polygon();
             mainShape.getPoints().addAll(points);
             mainShape.setFill(Color.web("#3d444d"));
             mainShape.setStrokeWidth(0);
@@ -208,10 +209,10 @@ public class Footer extends AnchorPane implements Observer {
             stackPane.setAlignment(Pos.CENTER_LEFT);
             stackPane.setPadding(new Insets(0, 0, 20, 60));
 
-            Polygon background = new Polygon();
-            background.getPoints().addAll(53d, 0d, 408d, 0d, 460d, 50d, 105d, 50d);
-            background.setFill(Color.web("#2bccbd"));
-            background.setOpacity(0.7);
+            leftItemCaptionBackground = new Polygon();
+            leftItemCaptionBackground.getPoints().addAll(53d, 0d, 408d, 0d, 460d, 50d, 105d, 50d);
+            leftItemCaptionBackground.setFill(Color.web("#2bccbd"));
+            leftItemCaptionBackground.setOpacity(0.7);
 
             leftItemText = new Text("\\\\   0   S  I  D  E  S");
             leftItemText.setFont(guiModel.getBender());
@@ -220,7 +221,7 @@ public class Footer extends AnchorPane implements Observer {
             leftItemText.setFontSmoothingType(FontSmoothingType.LCD);
             StackPane.setMargin(leftItemText, new Insets(0, 0, 3, 70));
 
-            stackPane.getChildren().addAll(background, leftItemText);
+            stackPane.getChildren().addAll(leftItemCaptionBackground, leftItemText);
 
             return stackPane;
         }
@@ -228,12 +229,21 @@ public class Footer extends AnchorPane implements Observer {
         private void updateWidth(double width) {
             // vals -> [0] + [1] the indexes of the outer right points of the polygon; [2] the height
             int[] vals = new int[] {2, 4, 31};
-            if (title.equals("leftItem")) vals = new int[] {6, 8, 81};
+            if (title.equals("leftItem")) {
+                if (width < 410) return;
+                vals = new int[] {6, 8, 81};
+            }
+            if (width < 410) width = (width * 4 - 410) / 3;
             // rootPane
             setPrefWidth(width + 1);
             // mainShape
             mainShape.getPoints().set(vals[0], width);
             mainShape.getPoints().set(vals[1], width + 30d);
+            //LeftItemCaptionBackground
+            if (leftItemCaptionBackground != null) {
+                leftItemCaptionBackground.getPoints().set(2, width - 72);
+                leftItemCaptionBackground.getPoints().set(4, width - 20);
+            }
             // overlay
             overlay.setFitWidth(width + 30d);
             overlay.setViewport(new Rectangle2D(0, 0, width + 30d, vals[2]));
