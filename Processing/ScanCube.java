@@ -87,23 +87,24 @@ public class ScanCube implements Observer {
 
             // Build the cube with the given color faces // TODO--------------------------------------------------------
             BuildCube buildCube = new BuildCube(scannedCubeSides);
+            model.shutdown();
         }
 
         // Draw the found contours in the unprocessed image
         Mat contourMat = frame.clone();
-        Mat scanpointOverlay = Imgcodecs.imread("C://scanPointOverlay.png", Imgcodecs.IMREAD_UNCHANGED);
+//        Mat scanpointOverlay = Imgcodecs.imread("C://scanPointOverlay.png", Imgcodecs.IMREAD_UNCHANGED);
 
-        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR);
+//        Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_HSV2BGR);
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                //Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
+                Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
                 //Rect roi = new Rect((int)Math.round(scanpoints[x][y].x), (int)Math.round(scanpoints[x][y].y), scanpointOverlay.width(),scanpointOverlay.height());
             }
         }
 
-        List<Mat> splitted = new ArrayList<>();
-        Core.split(scanpointOverlay, splitted);
-        //alphaBlend(scanpointOverlay, contourMat, splitted.get());
+//        List<Mat> splitted = new ArrayList<>();
+//        Core.split(scanpointOverlay, splitted);
+//        alphaBlend(scanpointOverlay, contourMat, splitted.get());
 
         //Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_BGR2HSV);
 
@@ -128,7 +129,7 @@ public class ScanCube implements Observer {
             *outImagePtr = (*fptr)*(*aptr) + (*bptr)*(1 - *aptr);
         }
         */
-        return new Mat();
+        return null;
     }
 
     private List<Point> cubeBoundarys(Mat frame) {
