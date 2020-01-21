@@ -1,5 +1,6 @@
 package Processing;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,11 +8,9 @@ import java.util.List;
 public class BuildCube {
 
     private List<int[][]> sortedScheme;
+    private List<int[][]> finalizedSchme;
 
-    /* TODO
-        Symmetrische Seiten verursachen sehr viele Kombinationsmöglichkeiten
-        Ein gelöster Würfel resultiert in unzähligen Möglichkeiten (8192)
-    */
+
     public BuildCube(List<int[][]> inputScheme) {
         sortedScheme = sortScheme(inputScheme);
 
@@ -25,6 +24,8 @@ public class BuildCube {
             return;
         }
 
+        //TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
+
         // Seiten, die oben an die weiße Seite passen
         for (int sideIndex = 1; sideIndex < 5; sideIndex++)
             for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
@@ -37,55 +38,56 @@ public class BuildCube {
             }
 
         // Seiten, die an den Partner von weiß oben und rechts an die weiße Seite passen
-        for (int i = 0; i < possibleFirstCombinations.size(); i++) {
+        for (int[] possibleFirstCombination : possibleFirstCombinations) {
 
-            int[] edge0 = getEdge(possibleFirstCombinations.get(i)[0], nextEdgeCounterClockWise(possibleFirstCombinations.get(i)[1]));
+            int[] edge0 = getEdge(possibleFirstCombination[0], nextEdgeCounterClockWise(possibleFirstCombination[1]));
             int[] edge1 = getEdge(0, 1);
 
             for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleFirstCombinations.get(i)[0]) continue;
+                if (sideIndex == possibleFirstCombination[0]) continue;
 
                 for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
                     int[] edge2 = getEdge(sideIndex, edgeIndex);
                     int[] edge3 = getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
 
                     if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
-                        possibleSecondCombinations.add(new int[] {possibleFirstCombinations.get(i)[0], possibleFirstCombinations.get(i)[1], sideIndex, edgeIndex});
+                        possibleSecondCombinations.add(new int[]{possibleFirstCombination[0], possibleFirstCombination[1], sideIndex, edgeIndex});
                     }
                 }
             }
         }
 
-        for (int i = 0; i < possibleSecondCombinations.size(); i++) {
+        for (int[] possibleSecondCombination : possibleSecondCombinations) {
 
-            int[] edge0 = getEdge(possibleSecondCombinations.get(i)[2], nextEdgeCounterClockWise(possibleSecondCombinations.get(i)[3]));
+            int[] edge0 = getEdge(possibleSecondCombination[2], nextEdgeCounterClockWise(possibleSecondCombination[3]));
             int[] edge1 = getEdge(0, 2);
 
             // Alle Seiten bis auf Weiß, Gelb, die erste und die zweite Seite
             for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleSecondCombinations.get(i)[0] || sideIndex == possibleSecondCombinations.get(i)[2]) continue;
+                if (sideIndex == possibleSecondCombination[0] || sideIndex == possibleSecondCombination[2]) continue;
 
                 for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
                     int[] edge2 = getEdge(sideIndex, edgeIndex);
                     int[] edge3 = getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
 
                     if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
-                        possibleThirdCombinations.add(new int[] {possibleSecondCombinations.get(i)[0], possibleSecondCombinations.get(i)[1], possibleSecondCombinations.get(i)[2], possibleSecondCombinations.get(i)[3], sideIndex, edgeIndex});
+                        possibleThirdCombinations.add(new int[]{possibleSecondCombination[0], possibleSecondCombination[1], possibleSecondCombination[2], possibleSecondCombination[3], sideIndex, edgeIndex});
                     }
                 }
             }
         }
 
         // Fourth
-        for (int i = 0; i < possibleThirdCombinations.size(); i++) {
+        for (int[] possibleThirdCombination : possibleThirdCombinations) {
 
-            int[] edge0 = getEdge(possibleThirdCombinations.get(i)[4], nextEdgeCounterClockWise(possibleThirdCombinations.get(i)[5]));
+            int[] edge0 = getEdge(possibleThirdCombination[4], nextEdgeCounterClockWise(possibleThirdCombination[5]));
             int[] edge1 = getEdge(0, 3);
-            int[] edge5 = getEdge(possibleThirdCombinations.get(i)[0], nextEdgeClockWise(possibleThirdCombinations.get(i)[1]));
+            int[] edge5 = getEdge(possibleThirdCombination[0], nextEdgeClockWise(possibleThirdCombination[1]));
 
             // Alle Seiten bis auf Weiß, Gelb, die erste, die zweite und die dritte Seite
             for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
-                if (sideIndex == possibleThirdCombinations.get(i)[0] || sideIndex == possibleThirdCombinations.get(i)[2]|| sideIndex == possibleThirdCombinations.get(i)[4]) continue;
+                if (sideIndex == possibleThirdCombination[0] || sideIndex == possibleThirdCombination[2] || sideIndex == possibleThirdCombination[4])
+                    continue;
 
                 for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
                     int[] edge2 = getEdge(sideIndex, edgeIndex);
@@ -93,7 +95,7 @@ public class BuildCube {
                     int[] edge4 = getEdge(sideIndex, nextEdgeCounterClockWise(edgeIndex));
 
                     if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2) && edgesCouldBeNeighbours(edge5, edge4)) {
-                        possibleFourthCombinations.add(new int[] {possibleThirdCombinations.get(i)[0], possibleThirdCombinations.get(i)[1], possibleThirdCombinations.get(i)[2], possibleThirdCombinations.get(i)[3], possibleThirdCombinations.get(i)[4], possibleThirdCombinations.get(i)[5], sideIndex, edgeIndex});
+                        possibleFourthCombinations.add(new int[]{possibleThirdCombination[0], possibleThirdCombination[1], possibleThirdCombination[2], possibleThirdCombination[3], possibleThirdCombination[4], possibleThirdCombination[5], sideIndex, edgeIndex});
                     }
                 }
             }
@@ -101,33 +103,46 @@ public class BuildCube {
 
         // Last side
 
-        System.out.println("Possible fourth combinations: " + possibleFourthCombinations.size());
-        System.out.println(Arrays.toString(possibleFourthCombinations.get(0)));
-
-
         int counter = 0;
-        for (int i = 0; i < possibleFourthCombinations.size(); i++) {
-            int[] edge0;
-            int[] edge1;
+        for (int[] possibleCombination: possibleFourthCombinations) {
+            int[] edge0, edge1;
 
             for (int j = 0; j < 4; j++) {
-                for (int ei = 3 - j, l = 3; l >= 0; l--) {
+                for (int ei = j, l = 0; l <= 6; l = l + 2, ei++) {
+                    System.out.println("ei: " + ei + ", l: " + l);
                     edge0 = getEdge(5, ei);
-                    edge1 = getEdge(possibleFourthCombinations.get(i)[0], nextOppositeEdge(possibleFourthCombinations.get(i)[1]));
+                    edge1 = getEdge(possibleCombination[l], nextOppositeEdge(possibleCombination[l + 1]));
                     if (!edgesCouldBeNeighbours(edge0, edge1)) break;
-                    if (l == 3) counter++;
-                    if (ei == 0) ei = 3;
+                    if (l == 6) {
+                        if (finalizedSchme == null) finalizedSchme = finalizeScheme(possibleCombination, j);
+                        else System.err.println("Can not build the cube -> More than one combination was found!");
+                        break;
+                    }
+                    if (ei == 3) ei = -1;
                 }
             }
-            // TODO Überprüfung ob jeder Stein ein mal vorhanden ist
-            // Kantensteine
-            for (int j = 0; j < 4; j++) {
-
-            }
         }
-        System.out.println("Possibilities found: " + counter);
     }
 
+    private List<int[][]> finalizeScheme(int[] finalCombination, int lastLayerOrientation) {
+        List<int[][]> scheme = new ArrayList<>();
+        scheme.add(sortedScheme.get(0));
+        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[0]), finalCombination[1]));
+        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[2]), finalCombination[3]));
+        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[4]), finalCombination[5]));
+        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[6]), finalCombination[7]));
+        scheme.add(mirrorSide()) // TODO Rotation, mirror und so
+        return scheme;
+    }
+
+    private int[][] rotateClockwise(int[][] array, int steps) {
+        int[][] newArray = new int[3][3];
+        for (int i = 0; i < steps; steps++)
+            for (int y = 0; y < 3; ++y)
+                for (int x = 0; x < 3; ++x)
+                    newArray[y][x] = array[2 - x][y];
+        return newArray;
+    }
 
     /**
      * Tests if the edges could be neighbours.
@@ -249,18 +264,16 @@ public class BuildCube {
         return sorted;
     }
 
-    private List<int[][]> mirrorYellowSide(List<int[][]> scheme) {
-        int[][] yellowSide = scheme.get(5);
+    private int[][] mirrorSide(int[][] side) {
         int[][] mirroredSide = new int[3][3];
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                if (x == 0) mirroredSide[x][y] = yellowSide[2][y];
-                else if (x == 1) mirroredSide[x][y] = yellowSide[x][y];
-                else mirroredSide[x][y] = yellowSide[0][y];
+                if (x == 0) mirroredSide[x][y] = side[2][y];
+                else if (x == 1) mirroredSide[x][y] = side[x][y];
+                else mirroredSide[x][y] = side[0][y];
             }
         }
-        scheme.set(5, mirroredSide);
-        return scheme;
+        return mirroredSide;
     }
 
     public int[][] get(int index) {
