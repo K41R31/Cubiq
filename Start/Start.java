@@ -8,7 +8,7 @@ import Gui.ScreenInformation;
 import Gui.Settings.SettingsController;
 import Models.ScreenInformationModel;
 import Models.GuiModel;
-import Processing.BuildCube;
+import Processing.CubeRendererWindow;
 import Processing.ScanCube;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -113,6 +113,8 @@ public class Start extends Application {
         screenInformationModel.setScreenWidth(dimension.width);
         screenInformationModel.setScreenHeight(dimension.height);
 
+        /*
+
         //TODO
         // 0 white;
         // 1 green,
@@ -154,14 +156,16 @@ public class Start extends Application {
 
         BuildCube buildCube = new BuildCube(colorScheme);
 
-//        guiModel.setColorScheme(colorScheme);
+        guiModel.setColorScheme(colorScheme);
 
         // Init cube renderer
-//        CubeRendererWindow cubeRendererWindow = new CubeRendererWindow(guiModel);
+        CubeRendererWindow cubeRendererWindow = new CubeRendererWindow(guiModel);
+         */
 
         // Init Scene---------------------------------------------------------------------------------------------------
         Scene scene = new Scene(generalRoot, Color.TRANSPARENT);
-        ScreenInformation.setStageSize(1640, 860);
+        // Set the size of the window when toggling full screen
+        ScreenInformation.setStageSize(screenInformationModel.getScreenWidth() * 0.8, screenInformationModel.getScreenHeight() * 0.8);
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -175,7 +179,7 @@ public class Start extends Application {
         guiModel.initFooter();
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("../Resources/Assets/taskbarIcon.png")));
 
-//        guiModel.startCubeScan();
+        guiModel.startCubeScan();
     }
 
     public static void main(String[] args) {

@@ -3,136 +3,153 @@ package Processing;
 import IO.DebugOutput;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class BuildCube {
+public class BuildCubeOriginal {
 
     private List<int[][]> sortedScheme;
     private List<int[][]> finalizedSchme;
 
 
-    public BuildCube(List<int[][]> inputScheme) {
+    public BuildCubeOriginal(List<int[][]> inputScheme) {
         sortedScheme = sortScheme(inputScheme);
 
-        Combinations combinations = new Combinations();
+        List<int[]> possibleFirstCombinations = new ArrayList<>();
+        List<int[]> possibleSecondCombinations = new ArrayList<>();
+        List<int[]> possibleThirdCombinations = new ArrayList<>();
+        List<int[]> possibleFourthCombinations = new ArrayList<>();
 
         if (!colorsExistsNineTimes()) {
             System.err.println("WRONG COLOR SCHEME");
             return;
         }
 
-        // TODO Neue combinations dürfen alte aus vorherigen steps nicht erweitern, sondern müssen neu erstellt werden. Es kann zu einer combination im step 0 mehrere combinations im step 1 geben.
-
         new DebugOutput().printSchemes(sortedScheme);
 
         //TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
 
-        // Second side
         // Seiten, die oben an die weiße Seite passen
-        for (int side = 1; side < 5; side++) {
-            for (int edge = 0; edge < 4; edge++) {
+        for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
+            for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
 
                 int[] edge0 = getEdge(0, 0);
-                int[] edge1 = getEdge(side, edge);
+                int[] edge1 = getEdge(sideIndex, edgeIndex);
 
                 if (edgesCouldBeNeighbours(edge0, edge1))
-                    combinations.addNewCombination(side, edge);
+                    possibleFirstCombinations.add(new int[]{sideIndex, edgeIndex});
             }
         }
 
-        int step = 0;
+        System.out.println("first: " + possibleFirstCombinations.size());
 
-        // Third side
         // Seiten, die an den Partner von weiß oben und rechts an die weiße Seite passen
-        for (int i = 0; i < combinations.totalStepCombinations(step); i++) {
+        for (int[] possibleFirstCombination : possibleFirstCombinations) {
 
-            int[] edge0 = getEdge(combinations.getSide(step, i, 0), nextEdgeCounterClockWise(combinations.getEdge(step, i, 0)));
+            int[] edge0 = getEdge(possibleFirstCombination[0], nextEdgeCounterClockWise(possibleFirstCombination[1]));
             int[] edge1 = getEdge(0, 1);
 
-            for (int side = 1; side < 5; side++) {
-                if (side == combinations.getSide(step, i, 0)) continue;
+            for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
+                if (sideIndex == possibleFirstCombination[0]) continue;
 
-                for (int edge = 0; edge < 4; edge++) {
-                    int[] edge2 = getEdge(side, edge);
-                    int[] edge3 = getEdge(side, nextEdgeClockWise(edge));
+                for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
+                    int[] edge2 = getEdge(sideIndex, edgeIndex);
+                    int[] edge3 = getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
 
-                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2))
-                        combinations.extendCombination(step, i, side, edge);
+                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
+                        possibleSecondCombinations.add(new int[]{possibleFirstCombination[0], possibleFirstCombination[1], sideIndex, edgeIndex});
+                    }
                 }
             }
         }
 
-        step = 1;
+        System.out.println("second: " + possibleSecondCombinations.size());
 
-        // Fourth side
-        for (int i = 0; i < combinations.totalStepCombinations(step); i++) {
+        for (int[] possibleSecondCombination : possibleSecondCombinations) {
 
-            int[] edge0 = getEdge(combinations.getSide(step, i, 1), nextEdgeCounterClockWise(combinations.getEdge(step, i, 1)));
+            int[] edge0 = getEdge(possibleSecondCombination[2], nextEdgeCounterClockWise(possibleSecondCombination[3]));
             int[] edge1 = getEdge(0, 2);
 
             // Alle Seiten bis auf Weiß, Gelb, die erste und die zweite Seite
-            for (int side = 1; side < 5; side++) {
-                if (side == combinations.getSide(step, i, 0) || side == combinations.getSide(step, i, 1)) continue;
+            for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
+                if (sideIndex == possibleSecondCombination[0] || sideIndex == possibleSecondCombination[2]) continue;
 
-                for (int edge = 0; edge < 4; edge++) {
-                    int[] edge2 = getEdge(side, edge);
-                    int[] edge3 = getEdge(side, nextEdgeClockWise(edge));
+                for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
+                    int[] edge2 = getEdge(sideIndex, edgeIndex);
+                    int[] edge3 = getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
 
-                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2))
-                        combinations.extendCombination(step, i, side, edge);
+                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2)) {
+                        possibleThirdCombinations.add(new int[]{possibleSecondCombination[0], possibleSecondCombination[1], possibleSecondCombination[2], possibleSecondCombination[3], sideIndex, edgeIndex});
+                    }
                 }
             }
         }
 
-        step = 2;
+        System.out.println("third: " + possibleThirdCombinations.size());
 
-        // Fifth side
-        for (int i = 0; i < combinations.totalStepCombinations(step); i++) {
+        // Fourth
+        for (int[] possibleThirdCombination : possibleThirdCombinations) {
 
-            int[] edge0 = getEdge(combinations.getSide(step, i, 2), nextEdgeCounterClockWise(combinations.getEdge(step, i, 2)));
+            int[] edge0 = getEdge(possibleThirdCombination[4], nextEdgeCounterClockWise(possibleThirdCombination[5]));
             int[] edge1 = getEdge(0, 3);
-            int[] edge5 = getEdge(combinations.getSide(step, i, 0), nextEdgeClockWise(combinations.getEdge(step, i, 0)));
+            int[] edge5 = getEdge(possibleThirdCombination[0], nextEdgeClockWise(possibleThirdCombination[1]));
 
             // Alle Seiten bis auf Weiß, Gelb, die erste, die zweite und die dritte Seite
-            for (int side = 1; side < 5; side++) {
-                if (side == combinations.getSide(step, i, 0) || side == combinations.getSide(step, i, 1) || side == combinations.getSide(step, i, 2))
+            for (int sideIndex = 1; sideIndex < 5; sideIndex++) {
+                if (sideIndex == possibleThirdCombination[0] || sideIndex == possibleThirdCombination[2] || sideIndex == possibleThirdCombination[4])
                     continue;
 
-                for (int edge = 0; edge < 4; edge++) {
-                    int[] edge2 = getEdge(side, edge);
-                    int[] edge3 = getEdge(side, nextEdgeClockWise(edge));
-                    int[] edge4 = getEdge(side, nextEdgeCounterClockWise(edge));
+                for (int edgeIndex = 0; edgeIndex < 4; edgeIndex++) {
+                    int[] edge2 = getEdge(sideIndex, edgeIndex);
+                    int[] edge3 = getEdge(sideIndex, nextEdgeClockWise(edgeIndex));
+                    int[] edge4 = getEdge(sideIndex, nextEdgeCounterClockWise(edgeIndex));
 
-                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2) && edgesCouldBeNeighbours(edge5, edge4))
-                        combinations.extendCombination(step, i, side, edge);
+                    if (edgesCouldBeNeighbours(edge0, edge3) && edgesCouldBeNeighbours(edge1, edge2) && edgesCouldBeNeighbours(edge5, edge4)) {
+                        possibleFourthCombinations.add(new int[]{possibleThirdCombination[0], possibleThirdCombination[1], possibleThirdCombination[2], possibleThirdCombination[3], possibleThirdCombination[4], possibleThirdCombination[5], sideIndex, edgeIndex});
+                    }
                 }
             }
         }
 
-        step = 3;
+        System.out.println("fourth: " + possibleFourthCombinations.size());
 
         // Last side
-        for (int i = 0; i < combinations.totalStepCombinations(step); i++) {
-            for (int edgeOffset = 0; edgeOffset < 4; edgeOffset++) {
-                for (int layer = 3, edge = edgeOffset; layer >= 0; layer--, edge++) {
+        for (int[] possibleFourthCombination: possibleFourthCombinations) {
+            for (int i = 0, x = 0; i < 8; i = i + 2, x++) {
 
-                    if (edge == 4) edge = 0;
+                int[] edge0 = getEdge(possibleFourthCombination[i], nextOppositeEdge(possibleFourthCombination[i+1]));
+                int[] edge1 = getEdge(5, x);
 
-                    int[] edge0 = getEdge(combinations.getSide(step, i, layer), nextOppositeEdge(combinations.getEdge(step, i, layer)));
-                    int[] edge1 = getEdge(5, edge);
+                if (!edgesCouldBeNeighbours(edge0, edge1)) break;
+                if (i == 6) System.out.println("Possible Solution");
+                // Es können hier noch mehrere Möglichkeiten bestehen, da Achsensymetrische Seiten (nur die Werte müssen übereinstimmen zB Blau mittig gegenüber von grün)
+                // von dem Algorithmus nicht erkannt werden können
+                // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
+                // TODO Bei Farbwert achsensymetrischen Seiten nicht nur einzelne Seiten betrachten sondern Steine zusammenbauen und Möglichkeit bei Doppelten Steinen aussortieren
 
-                    if (!edgesCouldBeNeighbours(edge0, edge1)) break;
-                    if (layer == 0) System.out.println("Possible Solution");
-                    // Es können hier noch mehrere Möglichkeiten bestehen, da Achsensymetrische Seiten (nur die Werte müssen übereinstimmen zB Blau mittig gegenüber von grün)
-                    // von dem Algorithmus nicht erkannt werden können
-                    // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
-                    // TODO Bei Farbwert achsensymetrischen Seiten nicht nur einzelne Seiten betrachten sondern Steine zusammenbauen und Möglichkeit bei Doppelten Steinen aussortieren
+                if (x == 3) x = 0;
+            }
+
+            System.out.println("NEXT COMBINATION");
+            /*
+            for (int j = 0; j < 4; j++) {
+                for (int ei = j, l = 0; l <= 6; l = l + 2, ei++) {
+                    edge0 = getEdge(5, ei);
+                    //edge0 = mirrorEdge(edge0);
+                    edge1 = getEdge(possibleCombination[l], nextOppositeEdge(possibleCombination[l + 1]));
+                    if (!edgesCouldBeNeighbours(edge0, edge1)) {
+                        System.err.println("No solution found for side " + j);
+                        break;
+                    }
+                    if (l == 6) {
+                        System.out.println("Combination found");
+                        if (finalizedSchme == null) finalizedSchme = finalizeScheme(possibleCombination, j);
+                        else System.err.println("Can't build the cube -> More than one combination was found!");
+                    }
+                    if (ei == 3) ei = -1;
                 }
             }
+             */
         }
-        for (int i = 0; i < 4; i++)
-            System.out.println("step" + i + ": " + combinations.totalStepCombinations(i));
     }
 
     private List<int[][]> finalizeScheme(int[] finalCombination, int lastLayerOrientation) {
@@ -240,7 +257,7 @@ public class BuildCube {
     }
 
     /**
-     * Returns the 3x1 edge of the given side
+     * Returnes the 3x1 edge of the given side
      *
      * @param sideIndex side index between 0 and 5
      * @param edgeIndex edge index between 0 and 3
@@ -296,45 +313,6 @@ public class BuildCube {
             }
         }
         return mirroredSide;
-    }
-
-    /**
-     * Combination system class
-     */
-    private class Combinations extends ArrayList<ArrayList<ArrayList<int[]>>> {
-
-        Combinations() {
-            for (int i = 0; i < 5; i++)
-                this.add(new ArrayList<>());
-        }
-
-        private List<int[]> getCombination(int step, int index) {
-            return this.get(step).get(index);
-        }
-
-        private int getSide(int step, int index, int layer) {
-            return this.get(step).get(index).get(layer)[0];
-        }
-
-        private int getEdge(int step, int index, int layer) {
-            return this.get(step).get(index).get(layer)[1];
-        }
-
-        private void addNewCombination(int side, int edge) {
-            ArrayList<int[]> combination = new ArrayList<>();
-            combination.add(new int[]{side, edge});
-            this.get(0).add(combination);
-        }
-
-        private void extendCombination(int step, int index, int side, int edge) {
-            ArrayList<int[]> combination = new ArrayList<>(this.get(step).get(index));
-            combination.add(new int[]{side, edge});
-            this.get(step + 1).add(combination);
-        }
-
-        private int totalStepCombinations(int step) {
-            return this.get(step).size();
-        }
     }
 
     public int[][] get(int index) {

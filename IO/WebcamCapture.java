@@ -38,7 +38,7 @@ public class WebcamCapture {
         double secPerFrame = nanosPerFrame / 1e9d;
         int framerate = (int) Math.round(1 / secPerFrame);
 
-        // Normalize Framerate to typical framerates
+        // Eliminate small calculation errors by summarizing the results to typical values
         if (framerate < 10) return 0;
         if (framerate < 20) return 15;
         if (framerate < 27) return 25;

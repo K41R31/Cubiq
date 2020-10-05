@@ -1,5 +1,6 @@
 package Processing;
 
+import IO.DebugOutput;
 import IO.WebcamCapture;
 import Models.GuiModel;
 import javafx.scene.image.Image;
@@ -34,7 +35,7 @@ public class ScanCube implements Observer {
     }
 
     private void startLoop() {
-        // Create a loop, that repeats "process" at the same speed as the framerate of the webcam
+        // Create a loop, that repeats "processFrames" at the same speed as the framerate of the webcam
         timer = Executors.newSingleThreadScheduledExecutor();
         timer.scheduleAtFixedRate(this::processFrames, 0, 1000 / webcamCapture.getFramerate(), TimeUnit.MILLISECONDS);
     }
@@ -78,15 +79,15 @@ public class ScanCube implements Observer {
             scannedCubeSides.add(colorMatrix);
             centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
             model.setTotalCubeSideFound(scannedCubeSides.size());
+            new DebugOutput().printImage(frame.clone(), scannedCubeSides.size()); // TODO DEBUG IMAGE PRINT
         }
 
         // If all 6 sides were scanned, stop the loop
-        if (scannedCubeSides.size() == 6) { // TODO WÜRFEL FERTIG--------------------------------------------------------------------------------------------------------------------------------
-            System.out.println("FERTIG");
+        if (scannedCubeSides.size() == 6) {
             logoCorrection();
 
-            // Build the cube with the given color faces // TODO--------------------------------------------------------
-            BuildCube buildCube = new BuildCube(scannedCubeSides);
+            // Build the cube with the given color faces
+            new BuildCube(scannedCubeSides);
             model.shutdown();
         }
 
@@ -449,9 +450,9 @@ public class ScanCube implements Observer {
                 unitVectorY /= Math.pow(model.getScanAreaSize(), 2);
                 // Convert the calculated unit vector to an angle that can be used as a hue value
                 hue = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
-                // Because the hue value is a circle, negative values should be added with 360°
+                // Because the hue value is a circle, negative angles should be increased by 360°
                 if (hue < 0) hue += 360;
-                // Normalise the hue to the Open Cv range uses hue values between 0 - 179
+                // Normalise the hue to the Open Cv range, that uses hue values between 0 - 179
                 hue /= 2;
                 sat /= Math.pow(model.getScanAreaSize(), 2);
                 val /= Math.pow(model.getScanAreaSize(), 2);
@@ -497,8 +498,8 @@ public class ScanCube implements Observer {
                         }
                     }
                 }
-                // Sides are the same if 8 or more colors are at the same place
-                if (sameValuesCounter >= 8) return false;
+                // Sides are the same if 7 or more colors are at the same place
+                if (sameValuesCounter >= 7) return false;
                 if (rotation < 3) scannedCubeSide = rotateClockwise(scannedCubeSide);
             }
         }
