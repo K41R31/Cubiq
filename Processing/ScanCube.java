@@ -3,15 +3,11 @@ package Processing;
 import IO.DebugOutput;
 import IO.WebcamCapture;
 import Models.GuiModel;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import org.opencv.core.*;
 import org.opencv.core.Point;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -19,8 +15,6 @@ import java.util.Observer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static org.opencv.core.CvType.CV_8UC3;
 
 public class ScanCube implements Observer {
 
@@ -165,7 +159,7 @@ public class ScanCube implements Observer {
         List<MatOfPoint2f> cubeSquares = new ArrayList<>();
         for (MatOfPoint2f approximation : approximations) {
             // Proceed with the approximations that are squares
-            if (!isSquare(approximation)) continue;
+            if (!isCubeSquare(approximation)) continue;
             // Save the found squares
             cubeSquares.add(approximation);
             // Get the centers
@@ -173,12 +167,12 @@ public class ScanCube implements Observer {
             if (moments.m00 != 0) centers.add(new Point(moments.m10 / moments.m00, moments.m01 / moments.m00));
         }
 
-        //TODO Bedinung bei der alle squares ungefähr gleich groß sein müssen
+        //TODO Bedingung bei der alle squares ungefähr gleich groß sein müssen
 
         // If nothing was found
         if (cubeSquares.isEmpty()) return null;
 
-        // Remove overlapping squares TODO centerThreshold abhängig von der Quadratgröße machen -> immer das kleinere Quadrat nehmen
+        // Remove overlapping squares TODO centerThreshold abhängig von der Quadratgröße machen -> immer das kleinere Quadrat nehmen -> Rahmen um Sticker aussortieren
         int centerThreshold = 20;
         for (int i = 0; i < cubeSquares.size(); i++) {
             for (int c = 0; c < cubeSquares.size(); c++) {
@@ -198,7 +192,7 @@ public class ScanCube implements Observer {
      * @param cornerMat The matrix, with the found approximations
      * @return true if the approximation is a square
      */
-    private boolean isSquare(MatOfPoint2f cornerMat) {
+    private boolean isCubeSquare(MatOfPoint2f cornerMat) {
         // All approximations that don't have four corners get filtered out
         if (cornerMat.rows() != 4) return false;
 
@@ -533,7 +527,8 @@ public class ScanCube implements Observer {
         return scanpoints;
     }
 
-    /**Get both outer centers
+    /**
+     * Get both outer centers
      * Calculate the euclidean distance between two points
      * @param point0 The first point
      * @param point1 The second point

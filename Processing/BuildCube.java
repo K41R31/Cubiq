@@ -3,13 +3,12 @@ package Processing;
 import IO.DebugOutput;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BuildCube {
 
     private List<int[][]> sortedScheme;
-    private List<int[][]> finalizedSchme;
+    private List<int[][]> finalizedScheme;
 
 
     public BuildCube(List<int[][]> inputScheme) {
@@ -21,10 +20,6 @@ public class BuildCube {
             System.err.println("WRONG COLOR SCHEME");
             return;
         }
-
-        // TODO Neue combinations dürfen alte aus vorherigen steps nicht erweitern, sondern müssen neu erstellt werden. Es kann zu einer combination im step 0 mehrere combinations im step 1 geben.
-
-        new DebugOutput().printSchemes(sortedScheme);
 
         //TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
 
@@ -123,11 +118,15 @@ public class BuildCube {
                     int[] edge1 = getEdge(5, edge);
 
                     if (!edgesCouldBeNeighbours(edge0, edge1)) break;
-                    if (layer == 0) System.out.println("Possible Solution");
+                    if (layer == 0) {
+                        // TODO Test ob es nur eine mögliche Lösung ist
+                        finalizeScheme(combinations.getCombination(step, i), edgeOffset);
+                        new DebugOutput().printSchemes(sortedScheme); // TODO Als Farbenmuster ausgeben
+                    }
                     // Es können hier noch mehrere Möglichkeiten bestehen, da Achsensymetrische Seiten (nur die Werte müssen übereinstimmen zB Blau mittig gegenüber von grün)
                     // von dem Algorithmus nicht erkannt werden können
                     // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
-                    // TODO Bei Farbwert achsensymetrischen Seiten nicht nur einzelne Seiten betrachten sondern Steine zusammenbauen und Möglichkeit bei Doppelten Steinen aussortieren
+                    // TODO Bei Farbwert achsensymetrischen Seiten nicht nur einzelne Seiten betrachten sondern Steine zusammenbauen und Kombinationsmöglichkeit bei doppelten Steinen aussortieren
                 }
             }
         }
@@ -135,26 +134,28 @@ public class BuildCube {
             System.out.println("step" + i + ": " + combinations.totalStepCombinations(i));
     }
 
-    private List<int[][]> finalizeScheme(int[] finalCombination, int lastLayerOrientation) {
+    private void finalizeScheme(List<int[]> finalCombination, int lastLayerRotation) {
         List<int[][]> scheme = new ArrayList<>();
+
+        // Add the first side (always white)
         scheme.add(sortedScheme.get(0));
-        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[0]), finalCombination[1]));
-        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[2]), finalCombination[3]));
-        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[4]), finalCombination[5]));
-        scheme.add(rotateClockwise(sortedScheme.get(finalCombination[6]), finalCombination[7]));
-        //scheme.add(mirrorSide()) // TODO Rotation, mirror und so
-        return scheme;
+
+        // Add all sides between the white and yellow side
+        for (int i = 0; i < 4; i++)
+            scheme.add(rotateSideClockwise(sortedScheme.get(finalCombination.get(i)[0]), finalCombination.get(i)[1]));
+
+        // Add the last side (always yellow)
+        scheme.add(rotateSideClockwise(sortedScheme.get(5), lastLayerRotation));
+
+        sortedScheme = scheme;
     }
 
-    private int[][] rotateClockwise(int[][] array, int steps) {
+    private int[][] rotateSideClockwise(int[][] array, int steps) {
         int[][] newArray = new int[3][3];
-        for (int i = 0; i < steps; i++) {
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
+        for (int i = 0; i < steps; i++)
+            for (int y = 0; y < 3; y++)
+                for (int x = 0; x < 3; x++)
                     newArray[y][x] = array[2 - x][y];
-                }
-            }
-        }
         return newArray;
     }
 
