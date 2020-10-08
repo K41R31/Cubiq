@@ -24,8 +24,6 @@ public class BuildCubeOriginal {
             return;
         }
 
-        new DebugOutput().printSchemes(sortedScheme);
-
         //TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
 
         // Seiten, die oben an die weiße Seite passen

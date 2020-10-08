@@ -28,7 +28,7 @@ public class DebugOutput {
                     }
                     if (y < 2) bw.write("\n");
                 }
-                if (i < 5)bw.write("\n\n");
+                if (i < 5) bw.write("\n\n");
             }
             bw.close();
         } catch (IOException e) {
@@ -38,11 +38,12 @@ public class DebugOutput {
 
     public void printImage(Mat image, int index) {
         Imgproc.cvtColor(image, image, Imgproc.COLOR_HSV2BGR);
-        Imgcodecs.imwrite(fileLocation + index + ".jpg", image);
+        Imgcodecs.imwrite("src/Resources/Debug/" + index + ".jpg", image);
     }
 
     public void printFinalScheme(List<int[][]> colorScheme) {
         Mat mat = new Mat(1920, 1080, CvType.CV_8UC3);
+
     }
 
     private List<String[][]> convertSchemeToString(List<int[][]> colorSchemes) {

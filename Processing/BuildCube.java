@@ -3,6 +3,7 @@ package Processing;
 import IO.DebugOutput;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BuildCube {
@@ -119,9 +120,9 @@ public class BuildCube {
 
                     if (!edgesCouldBeNeighbours(edge0, edge1)) break;
                     if (layer == 0) {
+                        new DebugOutput().printSchemes(sortedScheme);
                         // TODO Test ob es nur eine mögliche Lösung ist
-                        finalizeScheme(combinations.getCombination(step, i), edgeOffset);
-                        new DebugOutput().printSchemes(sortedScheme); // TODO Als Farbenmuster ausgeben
+                        new DebugOutput().printSchemes(finalizeScheme(combinations.getCombination(step, i), edgeOffset));
                     }
                     // Es können hier noch mehrere Möglichkeiten bestehen, da Achsensymetrische Seiten (nur die Werte müssen übereinstimmen zB Blau mittig gegenüber von grün)
                     // von dem Algorithmus nicht erkannt werden können
@@ -134,7 +135,8 @@ public class BuildCube {
             System.out.println("step" + i + ": " + combinations.totalStepCombinations(i));
     }
 
-    private void finalizeScheme(List<int[]> finalCombination, int lastLayerRotation) {
+    // TODO Macht noch nicht das was ich will
+    private List<int[][]> finalizeScheme(List<int[]> finalCombination, int lastLayerRotation) {
         List<int[][]> scheme = new ArrayList<>();
 
         // Add the first side (always white)
@@ -147,16 +149,20 @@ public class BuildCube {
         // Add the last side (always yellow)
         scheme.add(rotateSideClockwise(sortedScheme.get(5), lastLayerRotation));
 
-        sortedScheme = scheme;
+        return scheme;
     }
 
-    private int[][] rotateSideClockwise(int[][] array, int steps) {
-        int[][] newArray = new int[3][3];
+    // TODO ccw rotation wäre besser, aber kp wie man das kurz macht
+    private int[][] rotateSideClockwise(int[][] input, int steps) {
+        if (steps == 1) steps = 3;
+        else if (steps == 3) steps = 1;
+
+        int[][] output = new int[3][3];
         for (int i = 0; i < steps; i++)
-            for (int y = 0; y < 3; y++)
-                for (int x = 0; x < 3; x++)
-                    newArray[y][x] = array[2 - x][y];
-        return newArray;
+            for (int x = 0; x < 3; x++)
+                for (int y = 0; y < 3; y++)
+                    output[y][2-x] = input[x][y];
+        return output;
     }
 
     /**
