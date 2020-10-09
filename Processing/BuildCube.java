@@ -131,8 +131,6 @@ public class BuildCube {
                 }
             }
         }
-        for (int i = 0; i < 4; i++)
-            System.out.println("step" + i + ": " + combinations.totalStepCombinations(i));
     }
 
     // TODO Macht noch nicht das was ich will
@@ -152,17 +150,36 @@ public class BuildCube {
         return scheme;
     }
 
-    // TODO ccw rotation wäre besser, aber kp wie man das kurz macht
+    private int[][] rotateSideCounterclockwise(int[][] input, int steps) {
+        int[][] output = new int[3][3];
+        for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++)
+                output[2-y][x] = input[x][y];
+        return output;
+    }
+
     private int[][] rotateSideClockwise(int[][] input, int steps) {
-        if (steps == 1) steps = 3;
-        else if (steps == 3) steps = 1;
+        int[][] output = new int[3][3];
+        for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++)
+                output[y][2-x] = input[x][y];
+        return output;
+    }
+
+    private int[][] rotateSide180(int[][] input, int steps) {
+        for (int row = 0; row < 3; row++) {
+            for (int x = 0, y = 2; x < y; x++, y--) {
+                // int temp = input[][];
+            }
+        }
 
         int[][] output = new int[3][3];
-        for (int i = 0; i < steps; i++)
-            for (int x = 0; x < 3; x++)
-                for (int y = 0; y < 3; y++)
-                    output[y][2-x] = input[x][y];
-        return output;
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                output[x][y] = input[x][y];
+            }
+        }
+        return null;
     }
 
     /**
