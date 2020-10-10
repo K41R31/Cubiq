@@ -1,81 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.Polygon?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #333333;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Gui.WebcamCooser.WebcamChooserController">
+<StackPane fx:id="rootPane" prefWidth="500.0" style="-fx-background-color: #0b1320;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.Gui.ViewPanel.WebcamChooserView">
    <children>
-      <HBox alignment="CENTER" layoutX="6.0" AnchorPane.bottomAnchor="550.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="choose a video input">
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Vers. 0.1" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0">
                <font>
-                  <Font name="Kiona Regular" size="43.0" />
+                  <Font name="Kiona Regular" size="18.0" />
                </font>
             </Text>
          </children>
-      </HBox>
-      <HBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
+      </AnchorPane>
+      <StackPane>
          <children>
-            <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0">
+            <VBox alignment="CENTER" spacing="50.0">
                <children>
-                  <Rectangle fill="#4a4a4a" height="300.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="300.0" />
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="klick to choose" textAlignment="CENTER" wrappingWidth="150.0">
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Cubiq alpha build" textAlignment="CENTER">
                      <font>
                         <Font name="Kiona Regular" size="30.0" />
                      </font>
                   </Text>
-               </children>
-            </StackPane>
-            <StackPane layoutX="360.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0">
-               <children>
-                  <Rectangle fill="#4a4a4a" height="300.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="300.0" />
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="klick to choose" textAlignment="CENTER" wrappingWidth="150.0">
-                     <font>
-                        <Font name="Kiona Regular" size="30.0" />
-                     </font>
-                  </Text>
-               </children>
-            </StackPane>
-            <StackPane layoutX="520.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0">
-               <children>
-                  <Rectangle fill="#4a4a4a" height="300.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="300.0" />
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="klick to choose" textAlignment="CENTER" wrappingWidth="150.0">
-                     <font>
-                        <Font name="Kiona Regular" size="30.0" />
-                     </font>
-                  </Text>
-               </children>
-            </StackPane>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="206.0" layoutY="393.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="450.0">
-         <children>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
-               <children>
-                  <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="400.0">
+                  <HBox alignment="CENTER">
                      <children>
-                        <Rectangle fill="TRANSPARENT" height="100.0" stroke="#1bc9b8" strokeType="INSIDE" strokeWidth="2.0" width="400.0" />
-                        <Text fill="#25bab9" strokeType="OUTSIDE" strokeWidth="0.0" text="Or continue without a webcam" textAlignment="CENTER" wrappingWidth="400.0">
-                           <font>
-                              <Font name="Kiona Regular" size="27.0" />
-                           </font>
-                        </Text>
+                        <StackPane onMouseEntered="#setGetStartedButton_entered" onMouseExited="#setGetStartedButton_exited" onMousePressed="#setGetStartedButton_pressed">
+                           <children>
+                              <Polygon fill="TRANSPARENT" points="0.0, 0.0, 100.0, 0.0, 110.0, -50.0, 10.0, -50.0" stroke="#6edac3" strokeType="INSIDE" strokeWidth="1.5" />
+                              <ImageView fitHeight="50.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane layoutX="160.0" layoutY="10.0" onMouseEntered="#setGetStartedButton_entered" onMouseExited="#setGetStartedButton_exited" onMousePressed="#setGetStartedButton_pressed">
+                           <children>
+                              <Polygon fill="TRANSPARENT" points="0.0, 0.0, 100.0, 0.0, 110.0, -50.0, 10.0, -50.0" stroke="#6edac3" strokeType="INSIDE" strokeWidth="1.5" />
+                              <ImageView fitHeight="50.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane layoutX="260.0" layoutY="10.0" onMouseEntered="#setGetStartedButton_entered" onMouseExited="#setGetStartedButton_exited" onMousePressed="#setGetStartedButton_pressed">
+                           <children>
+                              <Polygon fill="TRANSPARENT" points="0.0, 0.0, 100.0, 0.0, 110.0, -50.0, 10.0, -50.0" stroke="#6edac3" strokeType="INSIDE" strokeWidth="1.5" />
+                              <ImageView fitHeight="50.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
                      </children>
-                  </StackPane>
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="(you won't be able to use the scan function)" textAlignment="CENTER" wrappingWidth="400.0">
-                     <font>
-                        <Font name="Kiona Regular" size="12.0" />
-                     </font>
-                  </Text>
+                  </HBox>
                </children>
             </VBox>
          </children>
-      </HBox>
+      </StackPane>
    </children>
-</AnchorPane>
+</StackPane>

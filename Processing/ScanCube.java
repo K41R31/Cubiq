@@ -26,7 +26,7 @@ public class ScanCube implements Observer {
     private List<Double> centerColorSaturations = new ArrayList<>();
 
     public ScanCube() {
-        webcamCapture = new WebcamCapture(0);
+        webcamCapture = new WebcamCapture();
     }
 
     private void startLoop() {

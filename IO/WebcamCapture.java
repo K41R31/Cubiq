@@ -4,18 +4,22 @@ import org.opencv.core.CvException;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 public class WebcamCapture {
 
     private VideoCapture videoCapture;
     private int framerate;
 
-    public WebcamCapture(int webcamIndex) {
-        createWebcamCapture(webcamIndex);
+    public WebcamCapture() {
+        videoCapture = new VideoCapture();
+        System.out.println(listAvailableDevices());
     }
 
     public void createWebcamCapture(int webcamIndex) {
         videoCapture = new VideoCapture(webcamIndex);
-        if (!videoCapture.isOpened()) throw new CvException("Webcam could not be found");
 
         // Track the framerate
         framerate = calculateFramerate();
@@ -25,6 +29,15 @@ public class WebcamCapture {
         videoCapture.set(4, 1080);
         // Set the framerate
         videoCapture.set(5, framerate);
+    }
+
+    private List<Integer> listAvailableDevices() {
+        List<Integer> availableDevices = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            videoCapture.open(i);
+            if (videoCapture.isOpened()) availableDevices.add(i);
+        }
+        return (availableDevices);
     }
 
     private int calculateFramerate() {
