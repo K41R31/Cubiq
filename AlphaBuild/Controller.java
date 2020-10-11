@@ -29,6 +29,11 @@ public class Controller implements Observer {
         stage.setY((dimension.getHeight() - stage.getHeight()) / 2);
     }
 
+    @FXML
+    private void startRenderer() {
+        model.callObservers("startRenderer");
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
