@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #0b1320;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AlphaBuild.Gui.Controller">
+   <children>
+      <VBox alignment="CENTER" spacing="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Text fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="cubiq alpha build">
+               <font>
+                  <Font name="Kiona Regular" size="30.0" />
+               </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Text>
+            <HBox fx:id="menuItemsPane" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" />
+         </children>
+      </VBox>
+      <Button layoutY="474.0" mnemonicParsing="false" onAction="#startRenderer" opacity="0.0" text="test renderer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+      <Text fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="build 0.1" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <font>
+            <Font name="Kiona Regular" size="20.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>

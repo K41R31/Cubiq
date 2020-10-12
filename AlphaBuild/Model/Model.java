@@ -1,5 +1,6 @@
-package AlphaBuild;
+package AlphaBuild.Model;
 
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -9,6 +10,7 @@ public class Model extends Observable {
 
     private Stage stage;
     private Dimension dimension;
+    private Font kionaRegular, kionaItalic;
 
 
     public void callObservers(String arg) {
@@ -31,5 +33,21 @@ public class Model extends Observable {
 
     public void setDimension(Dimension dimension) {
         this.dimension = dimension;
+    }
+
+    public Font getKionaRegular() {
+        return this.kionaRegular;
+    }
+
+    public void setKionaRegular(Font kionaRegular) {
+        this.kionaRegular = kionaRegular;
+    }
+
+    public Font getKionaItalic() {
+        return this.kionaItalic;
+    }
+
+    public void setKionaItalic(Font kionaItalic) {
+        this.kionaItalic = kionaItalic;
     }
 }

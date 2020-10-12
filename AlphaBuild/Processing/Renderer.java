@@ -1,5 +1,6 @@
-package AlphaBuild;
+package AlphaBuild.Processing;
 
+import AlphaBuild.Model.Model;
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
@@ -53,6 +54,7 @@ public class Renderer implements Observer {
             }
 
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+                System.out.println(width + ", " + height);
                 GL2 gl = drawable.getGL().getGL2();
 
                 if (height == 0) height = 1;

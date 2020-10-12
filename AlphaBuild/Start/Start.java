@@ -1,26 +1,19 @@
-package AlphaBuild;
+package AlphaBuild.Start;
 
-import com.jogamp.newt.Display;
-import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.Screen;
-import com.jogamp.newt.javafx.NewtCanvasJFX;
-import com.jogamp.newt.opengl.GLWindow;
-import com.jogamp.opengl.*;
-import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.Animator;
-import com.jogamp.opengl.util.FPSAnimator;
+import AlphaBuild.Gui.Controller;
+import AlphaBuild.Processing.ImageProcessing;
+import AlphaBuild.Model.Model;
+import AlphaBuild.Processing.Renderer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.opencv.core.Core;
 
 public class Start extends Application {
-
-    private GLU glu;
 
 
     @Override
@@ -29,7 +22,7 @@ public class Start extends Application {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // Init View
-        FXMLLoader viewLoader = new FXMLLoader(getClass().getResource("View.fxml"));
+        FXMLLoader viewLoader = new FXMLLoader(getClass().getResource("../Gui/View.fxml"));
         AnchorPane viewPane = viewLoader.load();
 
         // Init Image Processing
@@ -58,6 +51,15 @@ public class Start extends Application {
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(scene);
         stage.show();
+
+        // Load Fonts
+        Font kionaRegular = Font.loadFont(getClass().getResource("../Resources/Fonts/Kiona-Regular.ttf").toExternalForm().replace("%20", " "), 30);
+        model.setKionaRegular(kionaRegular);
+
+        Font kionaItalic = Font.loadFont(getClass().getResource("../Resources/Fonts/Kiona-Italic.ttf").toExternalForm().replace("%20", " "), 17);
+        model.setKionaItalic(kionaItalic);
+
+        model.callObservers("guiInitialized");
     }
 
     public static void main(String[] args) {

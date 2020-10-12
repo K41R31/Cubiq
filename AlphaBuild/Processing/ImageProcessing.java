@@ -1,4 +1,6 @@
-package AlphaBuild;
+package AlphaBuild.Processing;
+
+import AlphaBuild.Model.Model;
 
 import java.util.Observable;
 import java.util.Observer;
