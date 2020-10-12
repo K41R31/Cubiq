@@ -78,85 +78,22 @@ public class Renderer implements Observer {
 
                 gl.glTranslatef(-2f, 2f, -12f);
 
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(0.0f, 0.8431f, 1.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
+                float[] rgbColor = new float[] {0.8431f, 1.0f, 0.0f};
 
-                gl.glTranslatef(DISTANCE, 0.0f, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
+                for (int i = 0; i < 9; i++) {
+                    gl.glBegin(GL2.GL_QUADS);
+                    gl.glColor4f(0.0f, rgbColor[0], rgbColor[1], rgbColor[2]);
+                    gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
+                    gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
+                    gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
+                    gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
+                    gl.glEnd();
 
-                gl.glTranslatef(DISTANCE, 0.0f, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
-
-                gl.glTranslatef(-(DISTANCE * 2), -DISTANCE, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
-
-                gl.glTranslatef(DISTANCE, 0f, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
-
-                gl.glTranslatef(DISTANCE, 0f, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
-
-                gl.glTranslatef(-(DISTANCE * 2), -DISTANCE, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
-
-                gl.glTranslatef(DISTANCE, 0f, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
-
-                gl.glTranslatef(DISTANCE, 0f, 0.0f);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glColor4f(1.0f, 0.8431f, 0.0f, 0.0f);
-                gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                gl.glEnd();
+                    if (i == 2 || i == 5)
+                        gl.glTranslatef(-(DISTANCE * 2), -DISTANCE, 0.0f);
+                    else
+                        gl.glTranslatef(DISTANCE, 0.0f, 0.0f);
+                }
             }
 
             public void dispose(final GLAutoDrawable drawable) {
