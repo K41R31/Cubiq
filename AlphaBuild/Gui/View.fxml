@@ -12,7 +12,7 @@
    <children>
       <VBox alignment="CENTER" spacing="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Text fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="cubiq alpha build">
+            <Text fx:id="titel" fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="cubiq alpha build">
                <font>
                   <Font name="Kiona Regular" size="30.0" />
                </font>

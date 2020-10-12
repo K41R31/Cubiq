@@ -2,6 +2,7 @@ package AlphaBuild.Model;
 
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.opencv.core.Mat;
 
 import java.awt.*;
 import java.util.Observable;
@@ -11,7 +12,7 @@ public class Model extends Observable {
     private Stage stage;
     private Dimension dimension;
     private Font kionaRegular, kionaItalic;
-
+    private Mat image;
 
     public void callObservers(String arg) {
         setChanged();
@@ -49,5 +50,13 @@ public class Model extends Observable {
 
     public void setKionaItalic(Font kionaItalic) {
         this.kionaItalic = kionaItalic;
+    }
+
+    public Mat getImage() {
+        return image;
+    }
+
+    public void setImage(Mat image) {
+        this.image = image;
     }
 }

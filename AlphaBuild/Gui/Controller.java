@@ -9,9 +9,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
 
 import java.awt.*;
+import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,12 +24,15 @@ public class Controller implements Observer {
     private Model model;
     @FXML
     private HBox menuItemsPane;
+    @FXML
+    private Text titel;
 
 
     private void generateMenu() {
         StackPane menuItem0 = new MenuItem("use webcam");
         StackPane menuItem1 = new MenuItem("load image");
         StackPane menuItem2 = new MenuItem("exit");
+        titel.setFont(model.getKionaRegular());
 
         menuItemsPane.getChildren().addAll(menuItem0, menuItem1, menuItem2);
     }
@@ -94,6 +101,28 @@ public class Controller implements Observer {
                 polyBorder.setFill(Color.TRANSPARENT);
                 title.setFill(Color.web("#64c4c0"));
             });
+
+            if(name == "use webcam"){
+                polyBorder.setOnMouseClicked(event ->{
+                    System.out.println("noch nicht verfügbar.");
+                });
+            }else if(name == "load image"){
+                polyBorder.setOnMouseClicked(event ->{
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle("Datei auswählen");
+                    fileChooser.setInitialDirectory(new File("src/AlphaBuild/Resources/Images"));
+                    File file = fileChooser.showOpenDialog(model.getStage());
+                    Mat mat = Imgcodecs.imread(file.toString());
+                    model.setImage(mat);
+                    model.callObservers("image loaded");
+                });
+            }else if(name == "exit"){
+                polyBorder.setOnMouseClicked(event ->{
+                    System.out.println("Programm wird nun beendet.");
+                    model.getStage().close();
+                    System.exit(0);
+                });
+            }
 
             return polyBorder;
         }
