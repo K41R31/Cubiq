@@ -14,7 +14,7 @@
          <children>
             <Text fx:id="titel" fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="cubiq alpha build">
                <font>
-                  <Font name="Kiona Regular" size="30.0" />
+                  <Font size="30.0" />
                </font>
                <VBox.margin>
                   <Insets />
@@ -24,9 +24,9 @@
          </children>
       </VBox>
       <Button layoutY="474.0" mnemonicParsing="false" onAction="#startRenderer" opacity="0.0" text="test renderer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-      <Text fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="build 0.1" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <Text fx:id="buildInfo" fill="#d5d5d5" strokeType="OUTSIDE" strokeWidth="0.0" text="build 0.1" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <font>
-            <Font name="Kiona Regular" size="20.0" />
+            <Font size="20.0" />
          </font>
       </Text>
    </children>

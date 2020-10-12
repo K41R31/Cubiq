@@ -1,12 +1,14 @@
 package AlphaBuild.Start;
 
 import AlphaBuild.Gui.Controller;
+import AlphaBuild.IO.FileChooser;
 import AlphaBuild.Processing.ImageProcessing;
 import AlphaBuild.Model.Model;
 import AlphaBuild.Processing.Renderer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -24,11 +26,10 @@ public class Start extends Application {
         FXMLLoader viewLoader = new FXMLLoader(getClass().getResource("../Gui/View.fxml"));
         AnchorPane viewPane = viewLoader.load();
 
-        // Init Image Processing
+        // Init Classes
         ImageProcessing imageProcessing = new ImageProcessing();
-
-        // Init Renderer
         Renderer renderer = new Renderer(viewPane);
+        FileChooser fileChooser = new FileChooser();
 
         // Init Model
         Model model = new Model();
@@ -38,10 +39,12 @@ public class Start extends Application {
         controller.initModel(model);
         imageProcessing.initModel(model);
         renderer.initModel(model);
+        fileChooser.initModel(model);
 
         model.addObserver(controller);
         model.addObserver(imageProcessing);
         model.addObserver(renderer);
+        model.addObserver(fileChooser);
 
         model.setStage(stage);
 
@@ -49,6 +52,7 @@ public class Start extends Application {
         Scene scene = new Scene(viewPane);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(scene);
+        stage.getIcons().add(new Image(getClass().getResource("../Resources/Assets/taskbarIcon.png").toExternalForm().replace("%20", " ")));
         stage.show();
 
         // Load Fonts
@@ -58,6 +62,7 @@ public class Start extends Application {
         Font kionaItalic = Font.loadFont(getClass().getResource("../Resources/Fonts/Kiona-Italic.ttf").toExternalForm().replace("%20", " "), 17);
         model.setKionaItalic(kionaItalic);
 
+        // Tell all observers, that the GUI has been initialized
         model.callObservers("guiInitialized");
     }
 

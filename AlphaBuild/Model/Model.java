@@ -3,37 +3,31 @@ package AlphaBuild.Model;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
-
-import java.awt.*;
 import java.util.Observable;
 
 public class Model extends Observable {
 
     private Stage stage;
-    private Dimension dimension;
     private Font kionaRegular, kionaItalic;
     private Mat image;
 
+
+    /**
+     * Calls the update function in every observer class
+     * @param arg A sting that will be submitted
+     */
     public void callObservers(String arg) {
         setChanged();
         notifyObservers(arg);
     }
 
-    // Getter and setter
+    // Getter and setter------------------------------------------------------------------------------------------------
     public Stage getStage() {
         return this.stage;
     }
 
     public void setStage(Stage stage) {
         this.stage = stage;
-    }
-
-    public Dimension getDimension() {
-        return this.dimension;
-    }
-
-    public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
     }
 
     public Font getKionaRegular() {
