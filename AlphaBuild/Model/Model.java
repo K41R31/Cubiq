@@ -13,7 +13,10 @@ public class Model extends Observable {
     private Font kionaRegular, kionaItalic;
     private Mat originalImage;
     private AnchorPane rendererPane;
-
+    private final double sideLengthThreshold = 0.8;
+    private final double angleThreshold = 50.0;
+    private final double rotationThreshold = 20.0;
+    private final double blurThreshold = 3.0;
 
     /**
      * Calls the update function in every observer class
@@ -63,5 +66,21 @@ public class Model extends Observable {
 
     public void setRendererPane(AnchorPane rendererPane) {
         this.rendererPane = rendererPane;
+    }
+
+    public double getSideLengthThreshold() {
+        return sideLengthThreshold;
+    }
+
+    public double getAngleThreshold() {
+        return angleThreshold;
+    }
+
+    public double getRotationThreshold() {
+        return rotationThreshold;
+    }
+
+    public double getBlurThreshold() {
+        return blurThreshold;
     }
 }
