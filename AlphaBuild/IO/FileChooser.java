@@ -5,7 +5,6 @@ import javafx.scene.control.Alert;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.util.Observable;
@@ -49,7 +48,7 @@ public class FileChooser implements Observer {
             return;
         }
         mat.convertTo(mat, CvType.CV_8UC3);
-        model.setImage(mat);
+        model.setOriginalImage(mat);
     }
 
     @Override

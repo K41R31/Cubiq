@@ -1,18 +1,25 @@
 package AlphaBuild.Gui;
 
 import AlphaBuild.Model.Model;
+import com.jogamp.newt.javafx.NewtCanvasJFX;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,12 +27,18 @@ public class Controller implements Observer {
 
     private Model model;
     @FXML
-    private HBox menuItemsPane;
+    private HBox menuItemsPane, resultsPane;
     @FXML
     private Text titel, buildInfo;
+    @FXML
+    private AnchorPane rootPane, launcherPane, rendererPane;
+    @FXML
+    private ImageView originalImageView;
 
 
     private void generateMenu() {
+        model.setRendererPane(rendererPane);
+
         StackPane menuItem0 = new MenuItem("use webcam");
         StackPane menuItem1 = new MenuItem("load image");
         StackPane menuItem2 = new MenuItem("exit");
@@ -39,7 +52,13 @@ public class Controller implements Observer {
     }
 
     @FXML
-    private void extendView() {
+    private void showResults() {
+        // Switch to the results pane
+        launcherPane.setDisable(true);
+        launcherPane.setVisible(false);
+        resultsPane.setDisable(false);
+        resultsPane.setVisible(true);
+
         // Get the screen size
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -47,18 +66,22 @@ public class Controller implements Observer {
         Stage stage = model.getStage();
 
         // Set the size of the application
-        stage.setWidth(1000);
-        stage.setHeight(800);
+        stage.setWidth(1200);
+        stage.setHeight(700);
+        rootPane.setPrefWidth(1200);
+        rootPane.setPrefHeight(700);
 
         // Center the application
         stage.setX((dimension.getWidth() - stage.getWidth()) / 2);
-        stage.setY((dimension.getHeight() - stage.getHeight()) / 2);
-    }
+        stage.setY((dimension.getHeight() - stage.getHeight()) / 2 - 60);
 
-    @FXML
-    private void startRenderer() {
-        model.callObservers("startRenderer");
-        // TODO Renderer mit Farwerten starten
+        // Set the viewport of the image view
+        originalImageView.setViewport(new Rectangle2D(700, 175, 600, 700)); // TODO minX und min Y (ersten Werte) abhängig von Würfelmitte machen
+
+        // Convert the Mat to a JavaFX image and load it into the image view
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", model.getOriginalImage(), matOfByte);
+        originalImageView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray())));
     }
 
     // Inner class, that generates custom styled buttons
@@ -145,6 +168,9 @@ public class Controller implements Observer {
         switch ((String)arg) {
             case "guiInitialized":
                 generateMenu();
+                break;
+            case "cubeFound":
+                showResults();
                 break;
         }
     }

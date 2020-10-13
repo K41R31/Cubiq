@@ -28,7 +28,7 @@ public class Start extends Application {
 
         // Init Classes
         ImageProcessing imageProcessing = new ImageProcessing();
-        Renderer renderer = new Renderer(viewPane);
+        Renderer renderer = new Renderer();
         FileChooser fileChooser = new FileChooser();
 
         // Init Model

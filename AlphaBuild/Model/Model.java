@@ -1,5 +1,7 @@
 package AlphaBuild.Model;
 
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
@@ -9,7 +11,8 @@ public class Model extends Observable {
 
     private Stage stage;
     private Font kionaRegular, kionaItalic;
-    private Mat image;
+    private Mat originalImage;
+    private AnchorPane rendererPane;
 
 
     /**
@@ -46,11 +49,19 @@ public class Model extends Observable {
         this.kionaItalic = kionaItalic;
     }
 
-    public Mat getImage() {
-        return image;
+    public Mat getOriginalImage() {
+        return originalImage;
     }
 
-    public void setImage(Mat image) {
-        this.image = image;
+    public void setOriginalImage(Mat originalImage) {
+        this.originalImage = originalImage;
+    }
+
+    public AnchorPane getRendererPane() {
+        return rendererPane;
+    }
+
+    public void setRendererPane(AnchorPane rendererPane) {
+        this.rendererPane = rendererPane;
     }
 }

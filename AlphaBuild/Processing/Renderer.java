@@ -9,7 +9,7 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.AnchorPane;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -19,11 +19,9 @@ public class Renderer implements Observer {
     private Model model;
     private GLU glu;
     private GLWindow glWindow;
-    private Pane pane;
     private float DISTANCE = 2.2f;
     
-    public Renderer(Pane pane) {
-        this.pane = pane;
+    public Renderer() {
         createGLWindow();
     }
     
@@ -32,16 +30,16 @@ public class Renderer implements Observer {
         Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
         glWindow = GLWindow.create(screen, caps);
-
-        FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
-        animator.start();
     }
     
     private void startRenderer() {
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
-        glCanvas.setWidth(900);
-        glCanvas.setHeight(500);
-        pane.getChildren().add(glCanvas);
+        glCanvas.setWidth(600);
+        glCanvas.setHeight(700);
+        model.getRendererPane().getChildren().add(glCanvas);
+
+        FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
+        animator.start();
 
         glWindow.addGLEventListener(new GLEventListener() {
 
@@ -50,18 +48,17 @@ public class Renderer implements Observer {
 
                 glu = new GLU();
 
-                gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                gl.glClearColor(0.04f, 0.07f, 0.12f, 1.0f);
             }
 
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                System.out.println(width + ", " + height);
                 GL2 gl = drawable.getGL().getGL2();
 
                 if (height == 0) height = 1;
                 gl.glViewport(0, 0, width, height);
                 gl.glMatrixMode(gl.GL_PROJECTION);
                 gl.glLoadIdentity();
-                float aspectRatio = (float) width / (float) height;
+                float aspectRatio = (float)width / (float)height;
                 glu.gluPerspective(50.0, aspectRatio, 0.1, 1000.0);
                 gl.glMatrixMode(gl.GL_MODELVIEW);
             }
@@ -78,11 +75,30 @@ public class Renderer implements Observer {
 
                 gl.glTranslatef(-2f, 2f, -12f);
 
-                float[] rgbColor = new float[] {0.8431f, 1.0f, 0.0f};
+                /**
+                 * white    = 0.95f, 0.95f, 0.91f
+                 * green    = 0.17f, 0.80f, 0.16f
+                 * red      = 0.87f, 0.14f, 0.14f
+                 * orange   = 0.84f, 0.50f, 0.12f
+                 * blue     = 0.15f, 0.68f, 0.82f
+                 * yellow   = 0.87f, 0.86f, 0.14f
+                 */
+                // red, green, blue, alpha
+                float[][] rgbColor = new float[][] {
+                        {0.95f, 0.95f, 0.91f},
+                        {0.17f, 0.80f, 0.16f},
+                        {0.95f, 0.95f, 0.91f},
+                        {0.15f, 0.68f, 0.82f},
+                        {0.87f, 0.86f, 0.14f},
+                        {0.84f, 0.50f, 0.12f},
+                        {0.84f, 0.50f, 0.12f},
+                        {0.15f, 0.68f, 0.82f},
+                        {0.95f, 0.95f, 0.91f},
+                };
 
                 for (int i = 0; i < 9; i++) {
                     gl.glBegin(GL2.GL_QUADS);
-                    gl.glColor4f(0.0f, rgbColor[0], rgbColor[1], rgbColor[2]);
+                    gl.glColor4f(rgbColor[i][0], rgbColor[i][1], rgbColor[i][2], 1f);
                     gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
                     gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
                     gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
@@ -104,7 +120,7 @@ public class Renderer implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "startRenderer":
+            case "cubeFound":
                 startRenderer();
                 break;
         }

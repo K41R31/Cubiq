@@ -21,8 +21,8 @@ public class ImageProcessing implements Observer {
      * Searches for a cube in a image
      */
     public void findCube() {
-        // Get a image form the model
-        Mat image = model.getImage();
+        // Get a image form the model and clone it
+        Mat image = model.getOriginalImage().clone();
 
         // Skips the processing if no image was selected
         if (image == null) return;
@@ -47,8 +47,11 @@ public class ImageProcessing implements Observer {
         Imgproc.Canny(greyImg, greyImg, 5.0, 17.0);
         debugOutput(greyImg, "3_canny");
 
+        model.callObservers("cubeFound");
+/*
         System.out.println("Images stored at \"AlphaBuild/Resources/Images/Processed\"");
         System.exit(0);
+*/
     }
 
     /**
