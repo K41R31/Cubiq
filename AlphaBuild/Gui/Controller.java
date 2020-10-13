@@ -27,11 +27,11 @@ public class Controller implements Observer {
 
     private Model model;
     @FXML
-    private HBox menuItemsPane, resultsPane;
+    private HBox menuItemsPane;
     @FXML
     private Text titel, buildInfo;
     @FXML
-    private AnchorPane rootPane, launcherPane, rendererPane;
+    private AnchorPane rootPane, launcherPane, rendererPane, resultsPane;
     @FXML
     private ImageView originalImageView;
 

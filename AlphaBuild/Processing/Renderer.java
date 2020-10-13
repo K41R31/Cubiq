@@ -75,26 +75,7 @@ public class Renderer implements Observer {
 
                 gl.glTranslatef(-2f, 2f, -12f);
 
-                /**
-                 * white    = 0.95f, 0.95f, 0.91f
-                 * green    = 0.17f, 0.80f, 0.16f
-                 * red      = 0.87f, 0.14f, 0.14f
-                 * orange   = 0.84f, 0.50f, 0.12f
-                 * blue     = 0.15f, 0.68f, 0.82f
-                 * yellow   = 0.87f, 0.86f, 0.14f
-                 */
-                // red, green, blue, alpha
-                float[][] rgbColor = new float[][] {
-                        {0.95f, 0.95f, 0.91f},
-                        {0.17f, 0.80f, 0.16f},
-                        {0.95f, 0.95f, 0.91f},
-                        {0.15f, 0.68f, 0.82f},
-                        {0.87f, 0.86f, 0.14f},
-                        {0.84f, 0.50f, 0.12f},
-                        {0.84f, 0.50f, 0.12f},
-                        {0.15f, 0.68f, 0.82f},
-                        {0.95f, 0.95f, 0.91f},
-                };
+                float[][] rgbColor = model.getCubeFaceColors();
 
                 for (int i = 0; i < 9; i++) {
                     gl.glBegin(GL2.GL_QUADS);

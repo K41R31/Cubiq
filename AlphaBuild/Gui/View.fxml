@@ -32,11 +32,11 @@
             </Text>
          </children>
       </AnchorPane>
-      <HBox fx:id="resultsPane" alignment="CENTER" disable="true" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane fx:id="resultsPane" disable="true" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ImageView fx:id="originalImageView" fitHeight="700.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" />
-            <AnchorPane fx:id="rendererPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="600.0" />
+            <ImageView fx:id="originalImageView" fitHeight="700.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <AnchorPane fx:id="rendererPane" maxHeight="700.0" maxWidth="600.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="-200.0" AnchorPane.topAnchor="0.0" />
          </children>
-      </HBox>
+      </AnchorPane>
    </children>
 </AnchorPane>

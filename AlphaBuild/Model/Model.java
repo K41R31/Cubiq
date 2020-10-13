@@ -13,6 +13,7 @@ public class Model extends Observable {
     private Font kionaRegular, kionaItalic;
     private Mat originalImage;
     private AnchorPane rendererPane;
+    private float[][] cubeFaceColors;
     private final double sideLengthThreshold = 0.8;
     private final double angleThreshold = 50.0;
     private final double rotationThreshold = 20.0;
@@ -68,19 +69,11 @@ public class Model extends Observable {
         this.rendererPane = rendererPane;
     }
 
-    public double getSideLengthThreshold() {
-        return sideLengthThreshold;
+    public float[][] getCubeFaceColors() {
+        return cubeFaceColors;
     }
 
-    public double getAngleThreshold() {
-        return angleThreshold;
-    }
-
-    public double getRotationThreshold() {
-        return rotationThreshold;
-    }
-
-    public double getBlurThreshold() {
-        return blurThreshold;
+    public void setCubeFaceColors(float[][] cubeFaceColors) {
+        this.cubeFaceColors = cubeFaceColors;
     }
 }
