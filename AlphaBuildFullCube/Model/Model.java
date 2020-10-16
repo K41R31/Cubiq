@@ -1,4 +1,4 @@
-package AlphaBuild.Model;
+package AlphaBuildFullCube.Model;
 
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
@@ -10,13 +10,10 @@ public class Model extends Observable {
 
     private Stage stage;
     private Font kionaRegular, kionaItalic;
-    private Mat originalImage;
+    private Mat processMat;
+    private Mat[] originalCubeImages;
     private AnchorPane rendererPane;
-    private float[][][] cubeColors;
-    private final double sideLengthThreshold = 0.8;
-    private final double angleThreshold = 50.0;
-    private final double rotationThreshold = 20.0;
-    private final double blurThreshold = 3.0;
+    private float[][][] cubeColors = new float[6][3][3];
 
     /**
      * Calls the update function in every observer class
@@ -52,12 +49,12 @@ public class Model extends Observable {
         this.kionaItalic = kionaItalic;
     }
 
-    public Mat getOriginalImage() {
-        return originalImage;
+    public Mat[] getOriginalCubeImages() {
+        return originalCubeImages;
     }
 
-    public void setOriginalImage(Mat originalImage) {
-        this.originalImage = originalImage;
+    public void setOriginalCubeImages(Mat[] originalCubeImages) {
+        this.originalCubeImages = originalCubeImages;
     }
 
     public AnchorPane getRendererPane() {
@@ -74,5 +71,13 @@ public class Model extends Observable {
 
     public void setCubeColors(float[][][] cubeColors) {
         this.cubeColors = cubeColors;
+    }
+
+    public Mat getProcessMat() {
+        return processMat;
+    }
+
+    public void setProcessMat(Mat processMat) {
+        this.processMat = processMat;
     }
 }

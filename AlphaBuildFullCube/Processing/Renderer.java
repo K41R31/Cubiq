@@ -1,6 +1,6 @@
-package AlphaBuild.Processing;
+package AlphaBuildFullCube.Processing;
 
-import AlphaBuild.Model.Model;
+import AlphaBuildFullCube.Model.Model;
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
@@ -19,6 +19,7 @@ public class Renderer implements Observer {
     private GLU glu;
     private GLWindow glWindow;
     private float DISTANCE = 2.2f;
+    private float rotateValue = 0.0f;
     
     public Renderer() {
         createGLWindow();
@@ -41,7 +42,6 @@ public class Renderer implements Observer {
         animator.start();
 
         glWindow.addGLEventListener(new GLEventListener() {
-
             public void init(GLAutoDrawable drawable) {
                 GL2 gl = glWindow.getGL().getGL2();
 
@@ -68,11 +68,10 @@ public class Renderer implements Observer {
 
                 gl.glLoadIdentity();
 
-                glu.gluLookAt(0f, 0f, 2f,
-                        0f, 0f, 0f,
-                        0f, 1.0f, 0f);
+                // Defines the position of the camera
+                glu.gluLookAt(0f, 0f, 15f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
-                gl.glTranslatef(-2f, 2f, -12f);
+                gl.glTranslatef(-DISTANCE, DISTANCE, DISTANCE + 1f);
 
                 float[][][] rgbColor = model.getCubeColors();
 
@@ -102,6 +101,8 @@ public class Renderer implements Observer {
         switch ((String)arg) {
             case "cubeFound":
                 startRenderer();
+                break;
+            case "newCubeSideFound":
                 break;
         }
     }

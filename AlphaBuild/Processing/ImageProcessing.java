@@ -5,7 +5,6 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class ImageProcessing implements Observer {
@@ -81,17 +80,19 @@ public class ImageProcessing implements Observer {
          * blue     = 0.15f, 0.68f, 0.82f
          * yellow   = 0.87f, 0.86f, 0.14f
          */
-        model.setCubeFaceColors(new float[][]
+        model.setCubeColors(new float[][][]
                 {
-                    {0.95f, 0.95f, 0.91f},
-                    {0.17f, 0.80f, 0.16f},
-                    {0.95f, 0.95f, 0.91f},
-                    {0.15f, 0.68f, 0.82f},
-                    {0.87f, 0.86f, 0.14f},
-                    {0.84f, 0.50f, 0.12f},
-                    {0.84f, 0.50f, 0.12f},
-                    {0.15f, 0.68f, 0.82f},
-                    {0.95f, 0.95f, 0.91f}
+                        {
+                                {0.95f, 0.95f, 0.91f},
+                                {0.17f, 0.80f, 0.16f},
+                                {0.95f, 0.95f, 0.91f},
+                                {0.15f, 0.68f, 0.82f},
+                                {0.87f, 0.86f, 0.14f},
+                                {0.84f, 0.50f, 0.12f},
+                                {0.84f, 0.50f, 0.12f},
+                                {0.15f, 0.68f, 0.82f},
+                                {0.95f, 0.95f, 0.91f}
+                        }
                 });
 
         model.callObservers("cubeFound");
@@ -124,7 +125,7 @@ public class ImageProcessing implements Observer {
 
     private Mat drawContoursOnMat(List<MatOfPoint> contours) {
         Mat mat = new Mat(1080, 1920, CvType.CV_8UC3);
-        for(int index = 0; index < contours.size(); index++)
+        for (int index = 0; index < contours.size(); index++)
             Imgproc.drawContours(mat, contours, index, new Scalar(255, 255, 255), 5);
         return mat;
     }
