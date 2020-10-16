@@ -87,14 +87,23 @@ public class ImageProcessing implements Observer {
         double offset = abstand / 2;
         double y_startwert = points[0].y + offset;
 
+        Mat circleMat = model.getOriginalImage().clone();
+
         for(int y = 0; y < 3; y++){
             double x_startwert = points[0].x + offset;
             for(int x = 0; x < 3;  x++){
                 inPoints[x][y] = new Point(x_startwert + x * abstand, y_startwert + y * abstand);
-                Imgproc.circle(image, inPoints[x][y], 1, new Scalar(255, 255, 255), 5);
+                Imgproc.circle(circleMat, inPoints[x][y], 1, new Scalar(255, 255, 255), 5);
             }
         }
-        debugOutput(image, "5_circles");
+        debugOutput(circleMat, "5_circles");
+
+        // 0 white;
+        // 1 green,
+        // 2 red;
+        // 3 orange;
+        // 4 blue;
+        // 5 yellow
 
         /**
          * white    = 0.95f, 0.95f, 0.91f
@@ -104,21 +113,47 @@ public class ImageProcessing implements Observer {
          * blue     = 0.15f, 0.68f, 0.82f
          * yellow   = 0.87f, 0.86f, 0.14f
          */
-        double[][][] colors = new double[6][9][3];
-        Mat convertToRgb = model.getOriginalImage().clone();
-        //Imgproc.cvtColor(convertToRgb, convertToRgb, Imgproc.COLOR_HSV2BGR);
+        Scalar[][] colors = new Scalar[3][3];
         for(int y = 0; y < 3; y++){
             for(int x = 0; x < 3; x++){
-                double[] temp = convertToRgb.get((int) inPoints[y][x].y, (int) inPoints[y][x].x);
-                for(int index = 0, index_2 = 2; index < 3; index++, index_2--){
-                    temp[index] /= 255.0;
-                    colors[0][x + y * x][index_2] = temp[index];
-                }
-
+                colors[x][y] = new Scalar(image.get((int) inPoints[x][y].y, (int) inPoints[x][y].x));
             }
         }
-        model.setCubeColors(colors);
+
+        int[][] normalizedColors = normalizeColors(colors);
+        float[] rendererColors = new float[9];
+
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                switch (normalizedColors[x][y]) {
+                    case 0:
+                        rendererColors[]
+                }
+            }
+        }
+
+        model.setCubeColors(new double[6][9][3]);
         model.callObservers("cubeFound");
+    }
+
+    private int[][] normalizeColors(Scalar[][] colors) {
+        int[][] normalizedColors = new int[3][3];
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                double hue = colors[x][y].val[0];
+                double sat = colors[x][y].val[1];
+                double val = colors[x][y].val[2];
+
+                if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) normalizedColors[x][y] = 0; // white
+                else if (hue < 5) normalizedColors[x][y] = 2; // red
+                else if (hue < 20) normalizedColors[x][y] = 3; // orange
+                else if (hue < 45 || hue < 60 && sat < 155) normalizedColors[x][y] = 5; // yellow
+                else if (hue < 90) normalizedColors[x][y] = 1; // green
+                else if (hue < 140) normalizedColors[x][y] = 4; // blue
+                else if (hue <= 180) normalizedColors[x][y] = 2; // red
+            }
+        }
+        return normalizedColors;
     }
 
     private MatOfPoint2f findCubeBoundingRect(List<MatOfPoint2f> approximations) {
