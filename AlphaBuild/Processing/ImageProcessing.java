@@ -1,10 +1,13 @@
 package AlphaBuild.Processing;
 
 import AlphaBuild.Model.Model;
+import javafx.scene.shape.Circle;
+import jdk.jshell.ImportSnippet;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.security.spec.RSAOtherPrimeInfo;
 import java.util.*;
 
 public class ImageProcessing implements Observer {
@@ -72,6 +75,27 @@ public class ImageProcessing implements Observer {
         Imgproc.rectangle(cubeBoundingRectImage, points[0], points[2], new Scalar(255, 255, 255), 5);
         debugOutput(cubeBoundingRectImage, "4_cubeBoundingRect");
 
+
+
+
+        Point[][] inPoints = new Point[3][3];
+        double kantenlänge = 0;
+        for(int index = 0; kantenlänge <= 50; index++){
+            kantenlänge = Math.abs(points[0].x - points[index].x);
+        }
+        double abstand = kantenlänge / 3.0;
+        double offset = abstand / 2;
+        double y_startwert = points[0].y + offset;
+
+        for(int y = 0; y < 3; y++){
+            double x_startwert = points[0].x + offset;
+            for(int x = 0; x < 3;  x++){
+                inPoints[x][y] = new Point(x_startwert + x * abstand, y_startwert + y * abstand);
+                Imgproc.circle(image, inPoints[x][y], 1, new Scalar(255, 255, 255), 5);
+            }
+        }
+        debugOutput(image, "5_circles");
+
         /**
          * white    = 0.95f, 0.95f, 0.91f
          * green    = 0.17f, 0.80f, 0.16f
@@ -80,21 +104,20 @@ public class ImageProcessing implements Observer {
          * blue     = 0.15f, 0.68f, 0.82f
          * yellow   = 0.87f, 0.86f, 0.14f
          */
-        model.setCubeColors(new float[][][]
-                {
-                        {
-                                {0.95f, 0.95f, 0.91f},
-                                {0.17f, 0.80f, 0.16f},
-                                {0.95f, 0.95f, 0.91f},
-                                {0.15f, 0.68f, 0.82f},
-                                {0.87f, 0.86f, 0.14f},
-                                {0.84f, 0.50f, 0.12f},
-                                {0.84f, 0.50f, 0.12f},
-                                {0.15f, 0.68f, 0.82f},
-                                {0.95f, 0.95f, 0.91f}
-                        }
-                });
+        double[][][] colors = new double[6][9][3];
+        Mat convertToRgb = model.getOriginalImage().clone();
+        //Imgproc.cvtColor(convertToRgb, convertToRgb, Imgproc.COLOR_HSV2BGR);
+        for(int y = 0; y < 3; y++){
+            for(int x = 0; x < 3; x++){
+                double[] temp = convertToRgb.get((int) inPoints[y][x].y, (int) inPoints[y][x].x);
+                for(int index = 0, index_2 = 2; index < 3; index++, index_2--){
+                    temp[index] /= 255.0;
+                    colors[0][x + y * x][index_2] = temp[index];
+                }
 
+            }
+        }
+        model.setCubeColors(colors);
         model.callObservers("cubeFound");
     }
 

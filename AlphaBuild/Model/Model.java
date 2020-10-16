@@ -12,7 +12,7 @@ public class Model extends Observable {
     private Font kionaRegular, kionaItalic;
     private Mat originalImage;
     private AnchorPane rendererPane;
-    private float[][][] cubeColors;
+    private double[][][] cubeColors;
     private final double sideLengthThreshold = 0.8;
     private final double angleThreshold = 50.0;
     private final double rotationThreshold = 20.0;
@@ -68,11 +68,11 @@ public class Model extends Observable {
         this.rendererPane = rendererPane;
     }
 
-    public float[][][] getCubeColors() {
+    public double[][][] getCubeColors() {
         return cubeColors;
     }
 
-    public void setCubeColors(float[][][] cubeColors) {
+    public void setCubeColors(double[][][] cubeColors) {
         this.cubeColors = cubeColors;
     }
 }
