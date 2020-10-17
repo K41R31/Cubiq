@@ -10,6 +10,8 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -74,11 +76,12 @@ public class Renderer implements Observer {
 
                 gl.glTranslatef(-2f, 2f, -12f);
 
-                double[][][] rgbColor = model.getCubeColors();
+                int[][] normColors = model.getNormalizedColors();
+                List<float[]> rgbColors = convert2Rgb(normColors);
 
                 for (int i = 0; i < 9; i++) {
                     gl.glBegin(GL2.GL_QUADS);
-                    gl.glColor4f((float) rgbColor[0][i][0], (float) rgbColor[0][i][1], (float) rgbColor[0][i][2], 1f);
+                    gl.glColor4f(rgbColors.get(i)[0], rgbColors.get(i)[1], rgbColors.get(i)[2], 1f);
                     gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
                     gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
                     gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
@@ -95,6 +98,34 @@ public class Renderer implements Observer {
             public void dispose(final GLAutoDrawable drawable) {
             }
         });
+    }
+
+    private List<float[]> convert2Rgb(int[][] normColors) {
+        List<float[]> rgbColors = new ArrayList<>();
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                switch (normColors[x][y]) {
+                    case 0:
+                        rgbColors.add(new float[]{0.95f, 0.95f, 0.91f});
+                        break;
+                    case 1:
+                        rgbColors.add(new float[]{0.17f, 0.80f, 0.16f});
+                        break;
+                    case 2:
+                        rgbColors.add(new float[]{0.87f, 0.14f, 0.14f});
+                        break;
+                    case 3:
+                        rgbColors.add(new float[]{0.84f, 0.50f, 0.12f});
+                        break;
+                    case 4:
+                        rgbColors.add(new float[]{0.15f, 0.68f, 0.82f});
+                        break;
+                    case 5:
+                        rgbColors.add(new float[]{0.87f, 0.86f, 0.14f});
+                }
+            }
+        }
+        return rgbColors;
     }
 
     @Override

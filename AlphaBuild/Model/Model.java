@@ -12,11 +12,7 @@ public class Model extends Observable {
     private Font kionaRegular, kionaItalic;
     private Mat originalImage;
     private AnchorPane rendererPane;
-    private double[][][] cubeColors;
-    private final double sideLengthThreshold = 0.8;
-    private final double angleThreshold = 50.0;
-    private final double rotationThreshold = 20.0;
-    private final double blurThreshold = 3.0;
+    private int[][] normalizedColors;
 
     /**
      * Calls the update function in every observer class
@@ -68,11 +64,11 @@ public class Model extends Observable {
         this.rendererPane = rendererPane;
     }
 
-    public double[][][] getCubeColors() {
-        return cubeColors;
+    public int[][] getNormalizedColors() {
+        return normalizedColors;
     }
 
-    public void setCubeColors(double[][][] cubeColors) {
-        this.cubeColors = cubeColors;
+    public void setNormalizedColors(int[][] rgbColors) {
+        this.normalizedColors = rgbColors;
     }
 }

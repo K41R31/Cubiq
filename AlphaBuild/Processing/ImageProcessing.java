@@ -1,13 +1,10 @@
 package AlphaBuild.Processing;
 
 import AlphaBuild.Model.Model;
-import javafx.scene.shape.Circle;
-import jdk.jshell.ImportSnippet;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.security.spec.RSAOtherPrimeInfo;
 import java.util.*;
 
 public class ImageProcessing implements Observer {
@@ -105,55 +102,37 @@ public class ImageProcessing implements Observer {
         // 4 blue;
         // 5 yellow
 
-        /**
-         * white    = 0.95f, 0.95f, 0.91f
-         * green    = 0.17f, 0.80f, 0.16f
-         * red      = 0.87f, 0.14f, 0.14f
-         * orange   = 0.84f, 0.50f, 0.12f
-         * blue     = 0.15f, 0.68f, 0.82f
-         * yellow   = 0.87f, 0.86f, 0.14f
-         */
-        Scalar[][] colors = new Scalar[3][3];
-        for(int y = 0; y < 3; y++){
-            for(int x = 0; x < 3; x++){
-                colors[x][y] = new Scalar(image.get((int) inPoints[x][y].y, (int) inPoints[x][y].x));
-            }
-        }
 
-        int[][] normalizedColors = normalizeColors(colors);
-        float[] rendererColors = new float[9];
+
+        int[][] normalizedColors = new int[3][3];
 
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                switch (normalizedColors[x][y]) {
-                    case 0:
-                        rendererColors[]
-                }
+                // Get the hsv color from a point in the cube grid
+                double[] hsvColor = image.get((int)inPoints[x][y].y, (int)inPoints[x][y].x);
+
+                // Normalize the color to an int value and store it in the array colors
+                normalizedColors[x][y] = normalizeColors(hsvColor);
             }
         }
 
-        model.setCubeColors(new double[6][9][3]);
+        model.setNormalizedColors(normalizedColors);
         model.callObservers("cubeFound");
     }
 
-    private int[][] normalizeColors(Scalar[][] colors) {
-        int[][] normalizedColors = new int[3][3];
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
-                double hue = colors[x][y].val[0];
-                double sat = colors[x][y].val[1];
-                double val = colors[x][y].val[2];
+    private int normalizeColors(double[] color) {
+        double hue = color[0];
+        double sat = color[1];
+        double val = color[2];
 
-                if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) normalizedColors[x][y] = 0; // white
-                else if (hue < 5) normalizedColors[x][y] = 2; // red
-                else if (hue < 20) normalizedColors[x][y] = 3; // orange
-                else if (hue < 45 || hue < 60 && sat < 155) normalizedColors[x][y] = 5; // yellow
-                else if (hue < 90) normalizedColors[x][y] = 1; // green
-                else if (hue < 140) normalizedColors[x][y] = 4; // blue
-                else if (hue <= 180) normalizedColors[x][y] = 2; // red
-            }
-        }
-        return normalizedColors;
+        if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) return 0; // white
+        if (hue < 5) return 2; // red
+        if (hue < 20) return 3; // orange
+        if (hue < 45 || hue < 60 && sat < 155) return 5; // yellow
+        if (hue < 90) return 1; // green
+        if (hue < 140) return 4; // blue
+        if (hue <= 180) return 2; // red
+        return -1;
     }
 
     private MatOfPoint2f findCubeBoundingRect(List<MatOfPoint2f> approximations) {
