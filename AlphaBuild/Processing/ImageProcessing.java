@@ -64,6 +64,7 @@ public class ImageProcessing implements Observer {
         Mat approximationMat = drawContoursOnMat(drawableApproximations);
         debugOutput(approximationMat, "3_approximations");
 
+        // Get a bounding rectangle of the cube
         MatOfPoint2f cubeBoundingRect = findCubeBoundingRect(approximations);
 
         // Draws the found rectangle
@@ -72,44 +73,24 @@ public class ImageProcessing implements Observer {
         Imgproc.rectangle(cubeBoundingRectImage, points[0], points[2], new Scalar(255, 255, 255), 5);
         debugOutput(cubeBoundingRectImage, "4_cubeBoundingRect");
 
+        // Get the cube grid
+        Point[][] cubeGrid = getCubeGrid(points);
 
-
-
-        Point[][] inPoints = new Point[3][3];
-        double kantenlänge = 0;
-        for(int index = 0; kantenlänge <= 50; index++){
-            kantenlänge = Math.abs(points[0].x - points[index].x);
-        }
-        double abstand = kantenlänge / 3.0;
-        double offset = abstand / 2;
-        double y_startwert = points[0].y + offset;
-
-        Mat circleMat = model.getOriginalImage().clone();
-
-        for(int y = 0; y < 3; y++){
-            double x_startwert = points[0].x + offset;
-            for(int x = 0; x < 3;  x++){
-                inPoints[x][y] = new Point(x_startwert + x * abstand, y_startwert + y * abstand);
-                Imgproc.circle(circleMat, inPoints[x][y], 1, new Scalar(255, 255, 255), 5);
+        // Debug output for the cube grid
+        Mat debugCircleMat = model.getOriginalImage().clone();
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                Imgproc.circle(debugCircleMat, cubeGrid[x][y], 2, new Scalar(255, 255, 255), 5);
             }
         }
-        debugOutput(circleMat, "5_circles");
-
-        // 0 white;
-        // 1 green,
-        // 2 red;
-        // 3 orange;
-        // 4 blue;
-        // 5 yellow
-
-
+        debugOutput(debugCircleMat, "5_circles");
 
         int[][] normalizedColors = new int[3][3];
 
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 // Get the hsv color from a point in the cube grid
-                double[] hsvColor = image.get((int)inPoints[x][y].y, (int)inPoints[x][y].x);
+                double[] hsvColor = image.get((int)cubeGrid[x][y].y, (int)cubeGrid[x][y].x);
 
                 // Normalize the color to an int value and store it in the array colors
                 normalizedColors[x][y] = normalizeColors(hsvColor);
@@ -120,6 +101,16 @@ public class ImageProcessing implements Observer {
         model.callObservers("cubeFound");
     }
 
+    /**
+     * 0 white
+     * 1 green
+     * 2 red
+     * 3 orange
+     * 4 blue
+     * 5 yellow
+     * @param color
+     * @return
+     */
     private int normalizeColors(double[] color) {
         double hue = color[0];
         double sat = color[1];
@@ -158,6 +149,72 @@ public class ImageProcessing implements Observer {
             }
         }
         return cubeBoundingRect;
+    }
+
+    /**
+     * Returns the location of all nine stickers, based on the corners of the cube
+     * @param corners Four bounding corners of a cueb
+     * @return 2D array of all nine stickers
+     */
+    private Point[][] getCubeGrid(Point[] corners) {
+        Point[][] cubeGrid = new Point[3][3];
+        Point[] sortedCorners = sortCorners(corners);
+
+        double cubieDistance = (sortedCorners[1].x - sortedCorners[0].x) / 3;
+        double cubieOffset = cubieDistance / 2;
+        double cubieMinY = sortedCorners[0].y + cubieOffset;
+
+        for (int y = 0; y < 3; y++) {
+            double cubieMinX = sortedCorners[0].x + cubieOffset;
+            for (int x = 0; x < 3; x++) {
+                cubeGrid[x][y] = new Point(cubieMinX + x * cubieDistance, cubieMinY + y * cubieDistance);
+            }
+        }
+        return cubeGrid;
+    }
+
+    /**
+     * Sorts the corners in the following order:
+     * -> topLeft: 0, topRight: 1, bottomLeft: 2, bottomRight: 3
+     * @param corners Unsorted corners
+     */
+    private Point[] sortCorners(Point[] corners) {
+        Point[] sortedCorners = new Point[corners.length];
+        Point center = getCenter(corners);
+
+        for (Point corner : corners) {
+            if (corner.x < center.x) {
+                if (corner.y < center.y) {
+                    sortedCorners[0] = corner;
+                } else {
+                    sortedCorners[2] = corner;
+                }
+            } else {
+                if (corner.y < center.y) {
+                    sortedCorners[1] = corner;
+                } else {
+                    sortedCorners[3] = corner;
+                }
+            }
+        }
+        return sortedCorners;
+    }
+
+    private Point getCenter(Point[] corners) {
+        // Get min and max values
+        double minX = corners[0].x;
+        double maxX = corners[0].x;
+        double minY = corners[0].y;
+        double maxY = corners[0].y;
+
+        for (int i = 1; i < corners.length; i++) {
+            if (corners[i].x < minX) minX = corners[i].x;
+            if (corners[i].x > maxX) maxX = corners[i].x;
+            if (corners[i].y < minY) minY = corners[i].y;
+            if (corners[i].y > maxY) maxY = corners[i].y;
+        }
+
+        return new Point((maxX - minX) / 2 + minX, (maxY - minY) / 2 + minY);
     }
 
     private Mat drawContoursOnMat(List<MatOfPoint> contours) {

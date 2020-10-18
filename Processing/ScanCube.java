@@ -329,7 +329,7 @@ public class ScanCube implements Observer {
     }
 
     /**
-     * Sorts the points so that they have the following order:
+     * Sorts the corners in the following order:
      * -> topLeft: 0, topRight: 1, bottomRight: 2, bottomLeft: 3
      * @param corners The points that are to be checked
      * @return The sorted points in an array
@@ -352,10 +352,10 @@ public class ScanCube implements Observer {
         // Top right
         results.add(getBoundingCorner(corners, results, new Point(maxX, minY)));
 
-        // Bootom Right
+        // Bottom Right
         results.add(getBoundingCorner(corners, results, new Point(maxX, maxY)));
 
-        // Bootom Left
+        // Bottom Left
         results.add(getBoundingCorner(corners, results, new Point(minX, maxY)));
 
         return results.toArray(new Point[4]);
