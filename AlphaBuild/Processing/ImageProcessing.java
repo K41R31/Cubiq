@@ -26,11 +26,11 @@ public class ImageProcessing implements Observer {
 
         // Split the hvs image into three individual channels (h, s and v) and store them into a array list
         // -> 0 = hue (color); 1 = saturation; 2 = value (brightness)
-        List<Mat> splittedMat = new ArrayList<>();
-        Core.split(image, splittedMat);
+        List<Mat> splitMat = new ArrayList<>();
+        Core.split(image, splitMat);
 
         // Keep the image with the value channel (brightness map = grayscale image)
-        Mat greyImg = splittedMat.get(2);
+        Mat greyImg = splitMat.get(2);
         debugOutput(greyImg, "1_greyscale");
 
         // Blur the image with the kernel size 15
