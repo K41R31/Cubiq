@@ -18,7 +18,8 @@ import javafx.stage.Stage;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.util.Observable;
 import java.util.Observer;

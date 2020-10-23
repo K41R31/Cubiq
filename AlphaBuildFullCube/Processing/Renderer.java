@@ -13,6 +13,9 @@ import com.jogamp.opengl.util.FPSAnimator;
 import java.util.Observable;
 import java.util.Observer;
 
+import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
+import static com.jogamp.opengl.GL.GL_LESS;
+
 public class Renderer implements Observer {
 
     private Model model;
@@ -20,6 +23,7 @@ public class Renderer implements Observer {
     private GLWindow glWindow;
     private float DISTANCE = 2.2f;
     private float rotateValue = 0.0f;
+    private float rotation = 0f;
     
     public Renderer() {
         createGLWindow();
@@ -47,6 +51,14 @@ public class Renderer implements Observer {
 
                 glu = new GLU();
 
+                // Switch on depth test
+                gl.glEnable(GL_DEPTH_TEST);
+                gl.glDepthFunc(GL_LESS);
+
+                // Switch on back face culling
+                gl.glEnable(GL.GL_CULL_FACE);
+                gl.glCullFace(GL.GL_BACK);
+
                 gl.glClearColor(0.04f, 0.07f, 0.12f, 1.0f);
             }
 
@@ -58,7 +70,7 @@ public class Renderer implements Observer {
                 gl.glMatrixMode(gl.GL_PROJECTION);
                 gl.glLoadIdentity();
                 float aspectRatio = (float)width / (float)height;
-                glu.gluPerspective(50.0, aspectRatio, 0.1, 1000.0);
+                glu.gluPerspective(45f, aspectRatio, 0.1, 1000f);
                 gl.glMatrixMode(gl.GL_MODELVIEW);
             }
 
@@ -69,25 +81,110 @@ public class Renderer implements Observer {
                 gl.glLoadIdentity();
 
                 // Defines the position of the camera
-                glu.gluLookAt(0f, 0f, 15f, 0f, 0f, 0f, 0f, 1.0f, 0f);
+                glu.gluLookAt(-5f, 5f, 5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
-                gl.glTranslatef(-DISTANCE, DISTANCE, DISTANCE + 1f);
+                gl.glRotatef(rotation, 0f, 1f, 0f);
+                rotation += 0.5f;
 
-                float[][][] rgbColor = model.getCubeColors();
+                gl.glTranslatef(0f, -2f, 0f);
+                // Offset to center the cube in the scene
+                gl.glTranslatef(-1f, 1f, -1f);
 
-                for (int i = 0; i < 9; i++) {
-                    gl.glBegin(GL2.GL_QUADS);
-                    gl.glColor4f(rgbColor[0][i][0], rgbColor[0][i][1], rgbColor[0][i][2], 1f);
-                    gl.glVertex3f(-1.0f, 1.0f, 0.0f);      // Top left
-                    gl.glVertex3f(1.0f, 1.0f, 0.0f);       // Top right
-                    gl.glVertex3f(1.0f, -1.0f, 0.0f);      // Bottom right
-                    gl.glVertex3f(-1.0f, -1.0f, 0.0f);     // Bottom left
-                    gl.glEnd();
 
-                    if (i == 2 || i == 5)
-                        gl.glTranslatef(-(DISTANCE * 2), -DISTANCE, 0.0f);
-                    else
-                        gl.glTranslatef(DISTANCE, 0.0f, 0.0f);
+                for (int z = 0; z < 3; z++) {
+                    for (int y = 0; y < 3; y++) {
+                        for (int x = 0; x < 3; x++) {
+
+                            float hCW = 0.5f; // Half the width of the cubies (half cubie width)
+                            float sCO = 0.51f; // The offset from the stickers to the cubie center (sticker center offset)
+                            float hSW = 0.45f; // Half the width of the stickers (half sticker width)
+
+                            gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                gl.glColor3f(0f, 0f, 0f);
+                                gl.glVertex3f(hCW, -hCW, hCW);
+                                gl.glVertex3f(-hCW, -hCW, hCW);
+                                gl.glVertex3f(hCW, -hCW, -hCW);
+                                gl.glVertex3f(-hCW, -hCW, -hCW);
+                                gl.glVertex3f(-hCW, hCW, -hCW);
+                                gl.glVertex3f(-hCW, -hCW, hCW);
+                                gl.glVertex3f(-hCW, hCW, hCW);
+                                gl.glVertex3f(hCW, -hCW, hCW);
+                                gl.glVertex3f(hCW, hCW, hCW);
+                                gl.glVertex3f(hCW, -hCW, -hCW);
+                                gl.glVertex3f(hCW, hCW, -hCW);
+                                gl.glVertex3f(-hCW, hCW, -hCW);
+                                gl.glVertex3f(hCW, hCW, hCW);
+                                gl.glVertex3f(-hCW, hCW, hCW);
+                            gl.glEnd();
+
+                            // X
+                            if (x == 0) {
+                                gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                    gl.glColor3f(0f, 0.62f, 0.33f);
+                                    gl.glVertex3f(-sCO, -hSW, -hSW);
+                                    gl.glVertex3f(-sCO, -hSW, hSW);
+                                    gl.glVertex3f(-sCO, hSW, -hSW);
+                                    gl.glVertex3f(-sCO, hSW, hSW);
+                                gl.glEnd();
+                            }
+
+                            if (x == 2) {
+                                gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                gl.glColor3f(0.24f, 0.51f, 0.96f);
+                                gl.glVertex3f(sCO, -hSW, hSW);
+                                gl.glVertex3f(sCO, -hSW, -hSW);
+                                gl.glVertex3f(sCO, hSW, hSW);
+                                gl.glVertex3f(sCO, hSW, -hSW);
+                                gl.glEnd();
+                            }
+
+                            // Y
+                            if (y == 0) {
+                                gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                gl.glColor3f(1f, 1f, 1f);
+                                gl.glVertex3f(hSW, -sCO, hSW);
+                                gl.glVertex3f(-hSW, -sCO, hSW);
+                                gl.glVertex3f(hSW, -sCO, -hSW);
+                                gl.glVertex3f(-hSW, -sCO, -hSW);
+                                gl.glEnd();
+                            }
+
+                            if (y == 2) {
+                                gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                gl.glColor3f(0.99f, 0.8f, 0.03f);
+                                gl.glVertex3f(-hSW, sCO, hSW);
+                                gl.glVertex3f(hSW, sCO, hSW);
+                                gl.glVertex3f(-hSW, sCO, -hSW);
+                                gl.glVertex3f(hSW, sCO, -hSW);
+                                gl.glEnd();
+                            }
+
+                            // Z
+                            if (z == 0) {
+                                gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                gl.glColor3f(0.86f, 0.26f, 0.18f);
+                                gl.glVertex3f(hSW, -hSW, -sCO);
+                                gl.glVertex3f(-hSW, -hSW, -sCO);
+                                gl.glVertex3f(hSW, hSW, -sCO);
+                                gl.glVertex3f(-hSW, hSW, -sCO);
+                                gl.glEnd();
+                            }
+
+                            if (z == 2) {
+                                gl.glBegin(GL.GL_TRIANGLE_STRIP);
+                                gl.glColor3f(1f, 0.42f, 0f);
+                                gl.glVertex3f(-hSW, -hSW, sCO);
+                                gl.glVertex3f(hSW, -hSW, sCO);
+                                gl.glVertex3f(-hSW, hSW, sCO);
+                                gl.glVertex3f(hSW, hSW, sCO);
+                                gl.glEnd();
+                            }
+
+                            gl.glTranslatef(1f, 0f, 0f);
+                        }
+                        gl.glTranslatef(-3f, 1f, 0f);
+                    }
+                    gl.glTranslatef(0f, -3f, 1f);
                 }
             }
 

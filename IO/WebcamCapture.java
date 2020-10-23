@@ -15,7 +15,7 @@ public class WebcamCapture {
 
     public WebcamCapture() {
         videoCapture = new VideoCapture();
-        System.out.println(listAvailableDevices());
+        createWebcamCapture(0);
     }
 
     public void createWebcamCapture(int webcamIndex) {

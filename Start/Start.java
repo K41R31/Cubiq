@@ -8,7 +8,6 @@ import Gui.ScreenInformation;
 import Gui.Settings.SettingsController;
 import Models.ScreenInformationModel;
 import Models.GuiModel;
-import Processing.CubeRendererWindow;
 import Processing.ScanCube;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

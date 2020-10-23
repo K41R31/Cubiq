@@ -61,6 +61,7 @@ public class ImageProcessing implements Observer {
 
         // Debug output for approximations
         List<MatOfPoint> drawableApproximations = convertMat2fToMat(approximations);
+        Point point = approximations.get(0).toArray()[0];
         Mat approximationMat = drawContoursOnMat(drawableApproximations);
         debugOutput(approximationMat, "3_approximations");
 
@@ -153,7 +154,7 @@ public class ImageProcessing implements Observer {
 
     /**
      * Returns the location of all nine stickers, based on the corners of the cube
-     * @param corners Four bounding corners of a cueb
+     * @param corners Four bounding corners of a cube
      * @return 2D array of all nine stickers
      */
     private Point[][] getCubeGrid(Point[] corners) {
