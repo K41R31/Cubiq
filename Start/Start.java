@@ -21,8 +21,6 @@ import javafx.stage.StageStyle;
 import org.opencv.core.Core;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Start extends Application {
 

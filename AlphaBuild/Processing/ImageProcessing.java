@@ -61,7 +61,6 @@ public class ImageProcessing implements Observer {
 
         // Debug output for approximations
         List<MatOfPoint> drawableApproximations = convertMat2fToMat(approximations);
-        Point point = approximations.get(0).toArray()[0];
         Mat approximationMat = drawContoursOnMat(drawableApproximations);
         debugOutput(approximationMat, "3_approximations");
 

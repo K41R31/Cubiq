@@ -1,14 +1,18 @@
 package AlphaBuild.Processing;
 
+import AlphaBuild.IO.InteractionHandler;
 import AlphaBuild.Model.Model;
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
+import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.javafx.NewtCanvasJFX;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
+
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,7 +23,10 @@ public class Renderer implements Observer {
     private Model model;
     private GLU glu;
     private GLWindow glWindow;
-    private float rotation = 0;
+    private InteractionHandler interactionHandler;
+    private float[] rotation = new float[] {0f, 0f, 0f};
+    private int[] startRotation = new int[] {-90,-90, -90};
+    private int frame;
     
     public Renderer() {
         createGLWindow();
@@ -29,10 +36,34 @@ public class Renderer implements Observer {
         Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
         Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+
+        // Enable FSAA (full screen antialiasing)
+        caps.setSampleBuffers(true);
+        caps.setNumSamples(4);
+
         glWindow = GLWindow.create(screen, caps);
     }
     
     private void startRenderer() {
+
+        Cubie[] cubies = new Cubie[27];
+
+        int counter = 0;
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                for (int z = 0; z < 3; z++) {
+                    cubies[counter] = new Cubie(x-1, y-1, z-1, new int[]{0, 0});
+                    counter++;
+                }
+            }
+        }
+        // TODO TESTEN !!!!!!!!!!!!
+        System.out.println(Arrays.toString(cubies[8].getPosition()));
+        cubies[8].rotateCubie(2, 1);
+        cubies[8].rotateCubie(2, 1);
+        System.out.println(Arrays.toString(cubies[8].getPosition()));
+
+
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
         glCanvas.setWidth(600);
         glCanvas.setHeight(700);
@@ -41,6 +72,9 @@ public class Renderer implements Observer {
         FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
         animator.start();
 
+        interactionHandler = new InteractionHandler();
+
+        glWindow.addMouseListener(interactionHandler);
         glWindow.addGLEventListener(new GLEventListener() {
 
             public void init(GLAutoDrawable drawable) {
@@ -67,7 +101,7 @@ public class Renderer implements Observer {
                 gl.glMatrixMode(gl.GL_PROJECTION);
                 gl.glLoadIdentity();
                 float aspectRatio = (float)width / (float)height;
-                glu.gluPerspective(45f, aspectRatio, 0.1, 1000f);
+                glu.gluPerspective(30f, aspectRatio, 0.1, 1000f);
                 gl.glMatrixMode(gl.GL_MODELVIEW);
             }
 
@@ -78,14 +112,26 @@ public class Renderer implements Observer {
                 gl.glLoadIdentity();
 
                 // Defines the position of the camera
-                glu.gluLookAt(-5f, 5f, 5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
+                glu.gluLookAt(-9.5f, 6.1f, 9.5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
-//                gl.glRotatef(rotation, 0f, 1f, 0f);
-//                rotation += 0.5f;
+                // Rotation button action
+                for (int i = 0; i < 3; i++) {
+                    if (rotation[i] < startRotation[i] + 90) {
+                        rotation[i] = easeOut(frame, startRotation[i], 90, 30);
+                        frame++;
+                    }
+                }
 
-                gl.glTranslatef(0f, -2f, 0f);
+                gl.glRotatef(rotation[0], 1f, 0f, 0f);
+                gl.glRotatef(rotation[1], 0f, 1f, 0f);
+                gl.glRotatef(rotation[2], 0f, 0f, 1f);
+
+                gl.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+                gl.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+
+
                 // Offset to center the cube in the scene
-                gl.glTranslatef(-1f, 1f, -1f);
+                gl.glTranslatef(-1f, -1f, -1f);
 
                 int[][] colors = mirrorSide(model.getNormalizedColors());
 
@@ -332,11 +378,44 @@ public class Renderer implements Observer {
         }
     }
 
+    /**
+     * Function to calculate a ease out animation
+     * Source: http://gizma.com/easing/
+     * @param t current time
+     * @param b start value
+     * @param c change in value
+     * @param d duration
+     * @return Eased value
+     */
+    private float easeOut(float t, float b, float c, float d) {
+        t /= d;
+        t--;
+        return c*(t*t*t + 1) + b;
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
             case "cubeFound":
                 startRenderer();
+                break;
+            case "rotateCubeX":
+                if (rotation[0] % 90 == 0) {
+                    startRotation[0] = (int)rotation[0];
+                    frame = 0;
+                }
+                break;
+            case "rotateCubeY":
+                if (rotation[1] % 90 == 0) {
+                    startRotation[1] = (int)rotation[1];
+                    frame = 0;
+                }
+                break;
+            case "rotateCubeZ":
+                if (rotation[2] % 90 == 0) {
+                    startRotation[2] = (int)rotation[2];
+                    frame = 0;
+                }
                 break;
         }
     }

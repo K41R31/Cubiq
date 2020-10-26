@@ -1,10 +1,10 @@
 package AlphaBuild.Gui;
 
 import AlphaBuild.Model.Model;
-import com.jogamp.newt.javafx.NewtCanvasJFX;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -35,6 +35,8 @@ public class Controller implements Observer {
     private AnchorPane rootPane, launcherPane, rendererPane, resultsPane;
     @FXML
     private ImageView originalImageView;
+    @FXML
+    private Slider camZSlider, camYSlider;
 
 
     private void generateMenu() {
@@ -162,6 +164,21 @@ public class Controller implements Observer {
             title.setDisable(true);
             return title;
         }
+    }
+
+    @FXML
+    private void rotateCubeX() {
+        model.callObservers("rotateCubeX");
+    }
+
+    @FXML
+    private void rotateCubeY() {
+        model.callObservers("rotateCubeY");
+    }
+
+    @FXML
+    private void rotateCubeZ() {
+        model.callObservers("rotateCubeZ");
     }
 
     @Override

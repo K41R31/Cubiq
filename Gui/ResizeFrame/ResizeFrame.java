@@ -156,12 +156,12 @@ public class ResizeFrame implements Observer {
                         sceneWidth = Start.primaryStage.getWidth();
                     });
                     lines[i].setOnMouseDragged(event -> {
-                    offsetX = event.getScreenX() - windowCursorPosX;
-                    if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
-                        Start.primaryStage.setX(scenePosX + offsetX);
-                        Start.primaryStage.setWidth(sceneWidth - offsetX);
-                    }
-                });
+                        offsetX = event.getScreenX() - windowCursorPosX;
+                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
+                            Start.primaryStage.setX(scenePosX + offsetX);
+                            Start.primaryStage.setWidth(sceneWidth - offsetX);
+                        }
+                    });
                     continue;
                 case 10:
                 case 11:
