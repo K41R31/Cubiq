@@ -1,11 +1,11 @@
 package Processing;
 
 import IO.DebugOutput;
+import IO.FileChooser;
 import IO.WebcamCapture;
 import Models.GuiModel;
 import org.opencv.core.*;
 import org.opencv.core.Point;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
@@ -26,28 +26,39 @@ public class ScanCube implements Observer {
     private List<Double> centerColorSaturations = new ArrayList<>();
 
     public ScanCube() {
-        webcamCapture = new WebcamCapture();
     }
 
-    private void startLoop() {
+    private void startWebcamLoop() {
+        // Initialize the webcam
+        webcamCapture = new WebcamCapture();
+
         // Create a loop, that repeats "processFrames" at the same speed as the framerate of the webcam
         timer = Executors.newSingleThreadScheduledExecutor();
-        timer.scheduleAtFixedRate(this::processFrames, 0, 1000 / webcamCapture.getFramerate(), TimeUnit.MILLISECONDS);
+        timer.scheduleAtFixedRate(this::webcamLoop, 0, 1000 / webcamCapture.getFramerate(), TimeUnit.MILLISECONDS);
     }
 
-    private void processFrames() {
-        //Mat frame = new Mat(new Size(1920, 1080), CV_8UC3, new Scalar(255, 255, 255)); TODO Webcamless mode
+    private void webcamLoop() {
         Mat frame = new Mat();
         webcamCapture.getVideoCapture().read(frame);
+        processFrame(frame);
+    }
+
+    private void startLoadedImagesLoop() {
+        model.callObservers("loadImage");
+        for (int i = 0; i < 6; i++)
+           processFrame(model.getLoadedImages()[i]);
+    }
+
+    private void processFrame(Mat frame) {
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
-        model.setWebcamframe(frame);
+        model.setWebcamFrame(frame);
 
         // Get the position of the stickers
         List<Point> centers = cubeBoundarys(frame);
 
         // If no or less than 8 stickers were found, show the unprocessed image
         if (centers == null || centers.size() < 8) {
-            model.updateImageView();
+            model.callObservers("updateImageView");
             return;
         }
 
@@ -56,7 +67,7 @@ public class ScanCube implements Observer {
 
         // Check if the boundingRect is a square. If not, show the unprocessed image
         if (!boundingRectIsSquare(boundingRect)) {
-            model.updateImageView();
+            model.callObservers("updateImageView");
             return;
         }
 
@@ -83,7 +94,7 @@ public class ScanCube implements Observer {
 
             // Build the cube with the given color faces
             new BuildCube(scannedCubeSides);
-            model.shutdown();
+            model.callObservers("shutdown");
         }
 
         // Draw the found contours in the unprocessed image
@@ -105,8 +116,8 @@ public class ScanCube implements Observer {
         //Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_BGR2HSV);
 
         // Show processedMat
-        model.setWebcamframe(contourMat);
-        model.updateImageView();
+        model.setWebcamFrame(contourMat);
+        model.callObservers("updateImageView");
     }
 
     private Mat alphaBlend(Mat foreground, Mat background, Mat alpha, Mat outImage) {
@@ -218,10 +229,10 @@ public class ScanCube implements Observer {
                 return false;
             }
             // Check for sides that are shorter than 2% of the image width
-            if (distance < model.getWebcamframe().width() * 0.02)
+            if (distance < model.getOriginalFrame().width() * 0.02)
                 return false;
             // Check for sides that are longer than 15% of the image width
-            if (distance > model.getWebcamframe().width() * 0.15)
+            if (distance > model.getOriginalFrame().width() * 0.15)
                 return false;
         }
 
@@ -473,6 +484,8 @@ public class ScanCube implements Observer {
                 else if (hue < 90) normalizedColors[x][y] = 1; // green
                 else if (hue < 140) normalizedColors[x][y] = 4; // blue
                 else if (hue <= 180) normalizedColors[x][y] = 2; // red
+
+                if (model.isDebug()) System.out.println("x: " + x + ", y: " + y + " -> " + hue + ", " + sat + ", " + val + " ->> " + normalizedColors[x][y]);
             }
         }
         return normalizedColors;
@@ -570,12 +583,17 @@ public class ScanCube implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "startCubeScan":
-                startLoop();
+            case "startWebcamLoop":
+                startWebcamLoop();
+                break;
+            case "startLoadedImagesLoop":
+                startLoadedImagesLoop();
                 break;
             case "shutdown":
-                webcamCapture.getVideoCapture().release();
-                timer.shutdownNow();
+                if (webcamCapture != null) {
+                    webcamCapture.getVideoCapture().release();
+                    timer.shutdownNow();
+                }
                 System.exit(0);
                 break;
         }

@@ -44,9 +44,9 @@ public class Footer extends AnchorPane implements Observer {
         MenuItem menuItemLearn = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "learn");
         MenuItem menuItemTimer = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "timer");
 
-        menuItemSolve.setOnMouseClicked(event -> guiModel.setMenuItemSolveActive());
-        menuItemLearn.setOnMouseClicked(event -> guiModel.setMenuItemLearnActive());
-        menuItemTimer.setOnMouseClicked(event -> guiModel.setMenuItemTimerActive());
+        menuItemSolve.setOnMouseClicked(event -> guiModel.callObservers("menuItemSolveActive"));
+        menuItemLearn.setOnMouseClicked(event -> guiModel.callObservers("menuItemLearnActive"));
+        menuItemTimer.setOnMouseClicked(event -> guiModel.callObservers("menuItemTimerActive"));
 
         menuItemContainer.getChildren().addAll(menuItemTimer, menuItemLearn, menuItemSolve, menuItemLeft);
 

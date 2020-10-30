@@ -16,10 +16,10 @@ public class DebugOutput {
 
     private final String fileLocation = "src/Resources/Debug/";
 
-    public void printSchemes(List<int[][]> colorSchemes) {
+    public void printSchemes(List<int[][]> colorSchemes, String name) {
         List<String[][]> convertedSchemes = convertSchemeToString(colorSchemes);
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fileLocation + "colors.txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fileLocation + name + ".txt"));
             for (int i = 0; i < convertedSchemes.size(); i++) {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 3; x++) {

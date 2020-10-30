@@ -1,6 +1,7 @@
 package Models;
 
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import org.opencv.core.Mat;
 
 import java.util.List;
@@ -8,10 +9,12 @@ import java.util.Observable;
 
 public class GuiModel extends Observable {
 
+    private Stage stage;
     private Font kiona;
     private Font bender;
-    private Mat webcamframe;
-    private boolean debug = true;
+    private Mat originalFrame;
+    private Mat[] loadedImages;
+    private boolean debug = false;
     private boolean mirrorWebcam = true;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
     private double sideLengthThreshold = 0.8; //0.8
@@ -23,49 +26,10 @@ public class GuiModel extends Observable {
     private List<int[][]> colorScheme;
     private int totalCubeSideFound = 0;
 
-    // Shutdown
 
-    public void shutdown() {
+    public void callObservers(String arg) {
         setChanged();
-        notifyObservers("shutdown");
-    }
-
-    // Start cube scan
-
-    public void startCubeScan() {
-        setChanged();
-        notifyObservers("startCubeScan");
-    }
-
-    // Update image view
-
-    public void updateImageView() {
-        setChanged();
-        notifyObservers("updateImageView");
-    }
-
-    // initFooter
-
-    public void initFooter() {
-        setChanged();
-        notifyObservers("initFooter");
-    }
-
-    // switchActiveMenuItem
-
-    public void setMenuItemSolveActive() {
-        setChanged();
-        notifyObservers("menuItemSolveActive");
-    }
-
-    public void setMenuItemLearnActive() {
-        setChanged();
-        notifyObservers("menuItemLearnActive");
-    }
-
-    public void setMenuItemTimerActive() {
-        setChanged();
-        notifyObservers("menuItemTimerActive");
+        notifyObservers(arg);
     }
 
     // kiona------------------------------------------------------------------------------------------------------------
@@ -90,12 +54,12 @@ public class GuiModel extends Observable {
 
     // Webcam frame-----------------------------------------------------------------------------------------------------
 
-    public Mat getWebcamframe() {
-        return this.webcamframe;
+    public Mat getOriginalFrame() {
+        return this.originalFrame;
     }
 
-    public void setWebcamframe(Mat frame) {
-        this.webcamframe = frame;
+    public void setWebcamFrame(Mat frame) {
+        this.originalFrame = frame;
     }
 
     public boolean isDebug() {
@@ -194,5 +158,21 @@ public class GuiModel extends Observable {
         this.totalCubeSideFound = totalCubeSideFound;
         setChanged();
         notifyObservers("newCubeSideFound");
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    public Mat[] getLoadedImages() {
+        return loadedImages;
+    }
+
+    public void setLoadedImages(Mat[] loadedImages) {
+        this.loadedImages = loadedImages;
     }
 }

@@ -12,20 +12,10 @@ public class ScreenInformationModel extends Observable {
     private int taskbarHeight = 40;
     private int[] minWindowSize = new int[] {1100, 612};
 
-    //toggleFullScreen--------------------------------------------------------------------------------------------------
-    public void toggleFullScreen() {
-        setChanged();
-        notifyObservers("toggleFullScreen");
-    }
 
-    public void toggleDraggedFullScreen() {
+    public void callObservers(String arg) {
         setChanged();
-        notifyObservers("toggleDraggedFullScreen");
-    }
-
-    public void alignResizeLines() {
-        setChanged();
-        notifyObservers("alignLines");
+        notifyObservers(arg);
     }
 
     //isFullscreen------------------------------------------------------------------------------------------------------

@@ -35,7 +35,7 @@ public class HeaderController implements Observer {
     //TODO Multimonitor Unterstützung (MouseInfo.getPointerInfo().getDevice() abgleichen)
     //TODO Beim drag-fullscreen Windowposition nicht beim letzten draggen speichern (also y < 0), sondern beim mousePress
 
-    @FXML
+
     private void initialize() {
         draggablePrimaryStage();
         redrawWindiowOnUnminimize();
@@ -44,24 +44,24 @@ public class HeaderController implements Observer {
 
     private void redrawWindiowOnUnminimize() {
         ChangeListener iconfieldChangeListener = (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
-            if (!Start.primaryStage.isIconified()) {
-                screenInformationModel.toggleFullScreen();
-                screenInformationModel.toggleFullScreen();
+            if (!guiModel.getStage().isIconified()) {
+                screenInformationModel.callObservers("toggleFullScreen");
+                screenInformationModel.callObservers("toggleFullScreen");
             }
         };
-        Start.primaryStage.iconifiedProperty().addListener(iconfieldChangeListener);
+        guiModel.getStage().iconifiedProperty().addListener(iconfieldChangeListener);
     }
 
     private void draggablePrimaryStage() {
 
         EventHandler<MouseEvent> onMousePressed =
                 event -> {
-                    if (event.getSceneX() < Start.primaryStage.getWidth() - 105) {
+                    if (event.getSceneX() < guiModel.getStage().getWidth() - 105) {
                         mousePressedInHeader = true;
                         windowCursorPosX = event.getScreenX();
                         windowCursorPosY = event.getScreenY();
-                        sceneOnWindowPosX = Start.primaryStage.getX();
-                        sceneOnWindowPosY = Start.primaryStage.getY();
+                        sceneOnWindowPosX = guiModel.getStage().getX();
+                        sceneOnWindowPosY = guiModel.getStage().getY();
                     }
                 };
 
@@ -73,11 +73,11 @@ public class HeaderController implements Observer {
                         double newPosX = sceneOnWindowPosX + offsetX;
                         double newPosY = sceneOnWindowPosY + offsetY;
                         if (screenInformationModel.getIsFullscreen()) {
-                            screenInformationModel.toggleDraggedFullScreen(); //Wenn das Fenster im Vollbildmodus gedraggt wird, wird es verkleinert
-                            sceneOnWindowPosX = Start.primaryStage.getX();
+                            screenInformationModel.callObservers("toggleDraggedFullScreen"); //Wenn das Fenster im Vollbildmodus gedraggt wird, wird es verkleinert
+                            sceneOnWindowPosX = guiModel.getStage().getX();
                         } else {
-                            Start.primaryStage.setX(newPosX);
-                            Start.primaryStage.setY(newPosY);
+                            guiModel.getStage().setX(newPosX);
+                            guiModel.getStage().setY(newPosY);
                         }
                     }
                 };
@@ -86,9 +86,9 @@ public class HeaderController implements Observer {
                 event -> {
                     if (mousePressedInHeader) {
                         mousePressedInHeader = false;
-                        if (MouseInfo.getPointerInfo().getLocation().y == 0) screenInformationModel.toggleFullScreen(); //Wenn das Fenster oben losgelassen wird, wird es in den Vollbildmodus gesetzt
-                        else if (Start.primaryStage.getY() < 0) Start.primaryStage.setY(0); //Wenn das Fenster höher als 0 losgelassen wird, wird die Höhe auf 0 gesetzt
-                        else if (Start.primaryStage.getY() + 30 > screenInformationModel.getScreenHeight() - 40) Start.primaryStage.setY(screenInformationModel.getScreenHeight() - 70); //Wenn das Fenster in der Taskbar losgelassen wird, wird es drüber gesetzt
+                        if (MouseInfo.getPointerInfo().getLocation().y == 0) screenInformationModel.callObservers("toggleFullScreen"); //Wenn das Fenster oben losgelassen wird, wird es in den Vollbildmodus gesetzt
+                        else if (guiModel.getStage().getY() < 0) guiModel.getStage().setY(0); //Wenn das Fenster höher als 0 losgelassen wird, wird die Höhe auf 0 gesetzt
+                        else if (guiModel.getStage().getY() + 30 > screenInformationModel.getScreenHeight() - 40) guiModel.getStage().setY(screenInformationModel.getScreenHeight() - 70); //Wenn das Fenster in der Taskbar losgelassen wird, wird es drüber gesetzt
                     }
                 };
 
@@ -96,7 +96,7 @@ public class HeaderController implements Observer {
                 event -> {
 
                     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY){
-                        screenInformationModel.toggleFullScreen();
+                        screenInformationModel.callObservers("toggleFullScreen");
                     }
 
                 };
@@ -165,20 +165,23 @@ public class HeaderController implements Observer {
 
     @FXML
     private void minimize() {
-        Start.primaryStage.setIconified(true);
+        guiModel.getStage().setIconified(true);
     }
     @FXML
     private void minMax() {
-        screenInformationModel.toggleFullScreen();
+        screenInformationModel.callObservers("toggleFullScreen");
     }
     @FXML
     private void exit() {
-        guiModel.shutdown();
+        guiModel.callObservers("shutdown");
     }
 
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
+            case "initializeHeaderController":
+                initialize();
+                break;
         }
     }
 

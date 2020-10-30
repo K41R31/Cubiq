@@ -1,10 +1,8 @@
 package IO;
 
-import org.opencv.core.CvException;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +12,14 @@ public class WebcamCapture {
     private int framerate;
 
     public WebcamCapture() {
-        videoCapture = new VideoCapture();
         createWebcamCapture(0);
     }
 
     public void createWebcamCapture(int webcamIndex) {
         videoCapture = new VideoCapture(webcamIndex);
+
+        if (!videoCapture.isOpened())
+            return;
 
         // Track the framerate
         framerate = calculateFramerate();

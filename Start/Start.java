@@ -6,6 +6,7 @@ import Gui.MainView.MainViewController;
 import Gui.ResizeFrame.ResizeFrame;
 import Gui.ScreenInformation;
 import Gui.Settings.SettingsController;
+import IO.FileChooser;
 import Models.ScreenInformationModel;
 import Models.GuiModel;
 import Processing.ScanCube;
@@ -18,17 +19,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.kociemba.twophase.Search;
 import org.opencv.core.Core;
 
 import java.awt.*;
 
 public class Start extends Application {
 
-    public static Stage primaryStage;
-
     @Override
     public void start(Stage stage) throws Exception {
-        Start.primaryStage = stage;
 
         // Load library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -80,103 +79,97 @@ public class Start extends Application {
         // Init ScanCube
         ScanCube scanCube = new ScanCube();
 
+        // Init FileChooser
+        IO.FileChooser fileChooser = new FileChooser();
+
         // Init Models--------------------------------------------------------------------------------------------------
         ScreenInformationModel screenInformationModel = new ScreenInformationModel();
         GuiModel guiModel = new GuiModel();
+
+        guiModel.setStage(stage);
 
         HeaderController headerController = headerLoader.getController();
         SettingsController settingsController = settingsLoader.getController();
         MainViewController mainViewController = mainViewLoader.getController();
 
-        dragFrame.initModel(screenInformationModel);
+        dragFrame.initScreenInformationModel(screenInformationModel);
+        dragFrame.initGuiModel(guiModel);
         headerController.initModels(screenInformationModel, guiModel);
         footer.initModel(guiModel);
         scanCube.initModel(guiModel);
         settingsController.initModel(guiModel);
         mainViewController.initModel(guiModel);
+        fileChooser.initModel(guiModel);
+        screenInformation.initGuiModel(guiModel);
 
         screenInformationModel.addObserver(dragFrame);
         screenInformationModel.addObserver(headerController);
         screenInformationModel.addObserver(screenInformation);
         guiModel.addObserver(scanCube);
         guiModel.addObserver(footer);
+        guiModel.addObserver(fileChooser);
         guiModel.addObserver(settingsController);
         guiModel.addObserver(mainViewController);
+        guiModel.addObserver(headerController);
 
-        screenInformation.initModel(screenInformationModel);
+        screenInformation.initScreenInformationModel(screenInformationModel);
 
         // Init ScreenInformation---------------------------------------------------------------------------------------
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         screenInformationModel.setScreenWidth(dimension.width);
         screenInformationModel.setScreenHeight(dimension.height);
 
-        /*
-
-        //TODO
-        // 0 white;
-        // 1 green,
-        // 2 red;
-        // 3 orange;
-        // 4 blue;
-        // 5 yellow
-        List<int[][]> colorScheme = new ArrayList<>();
-        colorScheme.add(new int[][] {
-                {2, 5, 3},
-                {4, 0, 1},
-                {0, 5, 4}
-        });
-        colorScheme.add(new int[][] {
-                {5, 1, 3},
-                {2, 4, 3},
-                {2, 0, 1}
-        });
-        colorScheme.add(new int[][] {
-                {1, 4, 2},
-                {4, 5, 0},
-                {3, 2, 1}
-        });
-        colorScheme.add(new int[][] {
-                {5, 0, 4},
-                {4, 2, 3},
-                {1, 2, 0}
-        });
-        colorScheme.add(new int[][] {
-                {0, 5, 4},
-                {3, 1, 5},
-                {5, 1, 3}
-        });
-        colorScheme.add(new int[][] {
-                {0, 0, 2},
-                {2, 3, 3},
-                {5, 1, 4}
-        });
-
-        BuildCube buildCube = new BuildCube(colorScheme);
-
-        guiModel.setColorScheme(colorScheme);
-
-        // Init cube renderer
-        CubeRendererWindow cubeRendererWindow = new CubeRendererWindow(guiModel);
-         */
-
         // Init Scene---------------------------------------------------------------------------------------------------
         Scene scene = new Scene(generalRoot, Color.TRANSPARENT);
         // Set the size of the window when toggling full screen
-        ScreenInformation.setStageSize(screenInformationModel.getScreenWidth() * 0.8, screenInformationModel.getScreenHeight() * 0.8);
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        screenInformationModel.callObservers("initStageSize");
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(scene);
+        stage.show();
 
         // Load Fonts
         Font bender = Font.loadFont(getClass().getResource("../Resources/Fonts/Bender-Light.ttf").toExternalForm().replace("%20", " "), 20);
         guiModel.setBender(bender);
 
-        screenInformationModel.toggleFullScreen();
-        screenInformationModel.alignResizeLines();
-        guiModel.initFooter();
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("../Resources/Assets/taskbarIcon.png")));
+        screenInformationModel.callObservers("toggleFullScreen");
+        guiModel.callObservers("initializeHeaderController");
+        guiModel.callObservers("initFooter");
+        guiModel.callObservers("initResizeLines");
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("../Resources/Assets/taskbarIcon.png")));
 
-        guiModel.startCubeScan();
+        String result = Search.solution("UDDUUBDRBUURRRLDFUBFLBFDLLFUDLUDLRDFBLLULRDFFFFRBBRRBB", 21, 5, false);
+        if (result.contains("Error"))
+            switch (result.charAt(result.length() - 1)) {
+                case '1':
+                    result = "There are not exactly nine facelets of each color!";
+                    break;
+                case '2':
+                    result = "Not all 12 edges exist exactly once!";
+                    break;
+                case '3':
+                    result = "Flip error: One edge has to be flipped!";
+                    break;
+                case '4':
+                    result = "Not all 8 corners exist exactly once!";
+                    break;
+                case '5':
+                    result = "Twist error: One corner has to be twisted!";
+                    break;
+                case '6':
+                    result = "Parity error: Two corners or two edges have to be exchanged!";
+                    break;
+                case '7':
+                    result = "No solution exists for the given maximum move number!";
+                    break;
+                case '8':
+                    result = "Timeout, no solution found within given maximum time!";
+                    break;
+            }
+        System.out.println("RESULT: " + result);
+
+
+        guiModel.callObservers("startWebcamLoop");
+        //guiModel.callObservers("startLoadedImagesLoop");
     }
 
     public static void main(String[] args) {

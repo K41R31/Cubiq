@@ -1,5 +1,6 @@
 package Gui;
 
+import Models.GuiModel;
 import Models.ScreenInformationModel;
 import Start.Start;
 
@@ -10,28 +11,29 @@ import java.util.Observer;
 public class ScreenInformation implements Observer {
 
     private ScreenInformationModel screenInformationModel;
+    private GuiModel guiModel;
 
-    public static void setStageSize(double width, double height) {
-        Start.primaryStage.setWidth(width);
-        Start.primaryStage.setHeight(height);
+    public void setStageSize(double width, double height) {
+        guiModel.getStage().setWidth(width);
+        guiModel.getStage().setHeight(height);
     }
 
     private void toggleFullScreen() {
         if (screenInformationModel.getIsFullscreen()) {
-            Start.primaryStage.setX(screenInformationModel.getSavedSceneX());
-            Start.primaryStage.setY(screenInformationModel.getSavedSceneY());
-            Start.primaryStage.setWidth(screenInformationModel.getSavedSceneWidth());
-            Start.primaryStage.setHeight(screenInformationModel.getSavedSceneHeight());
+            guiModel.getStage().setX(screenInformationModel.getSavedSceneX());
+            guiModel.getStage().setY(screenInformationModel.getSavedSceneY());
+            guiModel.getStage().setWidth(screenInformationModel.getSavedSceneWidth());
+            guiModel.getStage().setHeight(screenInformationModel.getSavedSceneHeight());
             screenInformationModel.setIsFullscreen(false);
         } else {
-            screenInformationModel.setSavedSceneX(Start.primaryStage.getX());
-            screenInformationModel.setSavedSceneY(Start.primaryStage.getY());
-            screenInformationModel.setSavedSceneWidth(Start.primaryStage.getWidth());
-            screenInformationModel.setSavedSceneHeight(Start.primaryStage.getHeight());
-            Start.primaryStage.setX(0);
-            Start.primaryStage.setY(0);
-            Start.primaryStage.setWidth(screenInformationModel.getScreenWidth());
-            Start.primaryStage.setHeight(screenInformationModel.getScreenHeight()
+            screenInformationModel.setSavedSceneX(guiModel.getStage().getX());
+            screenInformationModel.setSavedSceneY(guiModel.getStage().getY());
+            screenInformationModel.setSavedSceneWidth(guiModel.getStage().getWidth());
+            screenInformationModel.setSavedSceneHeight(guiModel.getStage().getHeight());
+            guiModel.getStage().setX(0);
+            guiModel.getStage().setY(0);
+            guiModel.getStage().setWidth(screenInformationModel.getScreenWidth());
+            guiModel.getStage().setHeight(screenInformationModel.getScreenHeight()
                     - screenInformationModel.getTaskbarHeight());
             screenInformationModel.setIsFullscreen(true);
         }
@@ -42,24 +44,24 @@ public class ScreenInformation implements Observer {
             double mousePosX = MouseInfo.getPointerInfo().getLocation().x;
             double screenWidthThird = screenInformationModel.getScreenWidth() / 3;
             if (mousePosX <= screenWidthThird) {
-                Start.primaryStage.setX(1);
+                guiModel.getStage().setX(1);
             } else if (mousePosX > screenWidthThird & mousePosX < screenWidthThird * 2) {
-                Start.primaryStage.setX(screenInformationModel.getScreenWidth() / 2
+                guiModel.getStage().setX(screenInformationModel.getScreenWidth() / 2
                         - screenInformationModel.getSavedSceneWidth() / 2);
             } else {
-                Start.primaryStage.setX(screenInformationModel.getScreenWidth()
+                guiModel.getStage().setX(screenInformationModel.getScreenWidth()
                         - screenInformationModel.getSavedSceneWidth());
             }
-            Start.primaryStage.setWidth(screenInformationModel.getSavedSceneWidth());
-            Start.primaryStage.setHeight(screenInformationModel.getSavedSceneHeight());
+            guiModel.getStage().setWidth(screenInformationModel.getSavedSceneWidth());
+            guiModel.getStage().setHeight(screenInformationModel.getSavedSceneHeight());
             screenInformationModel.setIsFullscreen(false);
         } else {
-            screenInformationModel.setSavedSceneWidth(Start.primaryStage.getWidth());
-            screenInformationModel.setSavedSceneHeight(Start.primaryStage.getHeight());
-            Start.primaryStage.setX(0);
-            Start.primaryStage.setY(0);
-            Start.primaryStage.setWidth(screenInformationModel.getScreenWidth());
-            Start.primaryStage.setHeight(screenInformationModel.getScreenHeight()
+            screenInformationModel.setSavedSceneWidth(guiModel.getStage().getWidth());
+            screenInformationModel.setSavedSceneHeight(guiModel.getStage().getHeight());
+            guiModel.getStage().setX(0);
+            guiModel.getStage().setY(0);
+            guiModel.getStage().setWidth(screenInformationModel.getScreenWidth());
+            guiModel.getStage().setHeight(screenInformationModel.getScreenHeight()
                     - screenInformationModel.getTaskbarHeight());
             screenInformationModel.setIsFullscreen(true);
         }
@@ -74,10 +76,16 @@ public class ScreenInformation implements Observer {
             case "toggleDraggedFullScreen":
                 toggleDraggedFullScreen();
                 break;
+            case "initStageSize":
+                setStageSize(screenInformationModel.getScreenWidth() * 0.8, screenInformationModel.getScreenHeight() * 0.8);
         }
     }
 
-    public void initModel(ScreenInformationModel model) {
-        this.screenInformationModel = model;
+    public void initScreenInformationModel(ScreenInformationModel screenInformationModel) {
+        this.screenInformationModel = screenInformationModel;
+    }
+
+    public void initGuiModel(GuiModel guiModel) {
+        this.guiModel = guiModel;
     }
 }

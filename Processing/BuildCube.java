@@ -1,7 +1,5 @@
 package Processing;
 
-import IO.DebugOutput;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +20,7 @@ public class BuildCube {
             return;
         }
 
-        //TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
+        // TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
 
         // Second side
         // Seiten, die oben an die weiße Seite passen
@@ -120,21 +118,56 @@ public class BuildCube {
 
                     if (!edgesCouldBeNeighbours(edge0, edge1)) break;
                     if (layer == 0) {
-                        new DebugOutput().printSchemes(sortedScheme);
-                        // TODO Test ob es nur eine mögliche Lösung ist
-                        new DebugOutput().printSchemes(finalizeScheme(combinations.getCombination(step, i), edgeOffset));
+                        List<int[][]> orientedScheme = orientScheme(combinations.getCombination(step, i), edgeOffset);
+                        if (isPossibleFinalCombination(orientedScheme))
+                            System.out.println("YO, THIS IS POSSIBLE");
                     }
-                    // Es können hier noch mehrere Möglichkeiten bestehen, da Achsensymetrische Seiten (nur die Werte müssen übereinstimmen zB Blau mittig gegenüber von grün)
-                    // von dem Algorithmus nicht erkannt werden können
                     // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
-                    // TODO Bei Farbwert achsensymetrischen Seiten nicht nur einzelne Seiten betrachten sondern Steine zusammenbauen und Kombinationsmöglichkeit bei doppelten Steinen aussortieren
                 }
             }
         }
     }
 
-    // TODO Macht noch nicht das was ich will
-    private List<int[][]> finalizeScheme(List<int[]> finalCombination, int lastLayerRotation) {
+    /**
+     * Since it is not possible to detect and exclude axis-symmetric faces with rules
+     * that only compare single faces, whole cubies must be assembled and compared.
+     * Axis symmetry is also given when colors from opposite sides meet:
+     * 0 White > 5 Yellow
+     * 1 Green > 4 Blue
+     * 2 Red > 3 Orange
+     * @return True if this combination is possible
+     */
+    private boolean isPossibleFinalCombination(List<int[][]> orientedScheme) {
+        // Edge Cubies
+        List<int[]> edgeCubies = new ArrayList<>();
+        for (int i = 0; i < )
+
+        // Corner Cubies
+        List<int[]> cornerCubies = new ArrayList<>();
+
+
+        return
+    }
+
+    private boolean isNewEdgeCubie(List<int[]> cubies, int[] colors) {
+        Arrays.sort(colors);
+        for (int i = 0; i < cubies.size(); i++) {
+            int[] tempCubie = cubies.get(i);
+            for (int j = 0; j < colors.length; j++) {
+                if (tempCubie[j] != colors[j]) break;
+                if (j == colors.length - 1) return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param finalCombination
+     * @param lastLayerRotation
+     * @return
+     */
+    private List<int[][]> orientScheme(List<int[]> finalCombination, int lastLayerRotation) {
         List<int[][]> scheme = new ArrayList<>();
 
         // Add the first side (always white)
@@ -142,44 +175,61 @@ public class BuildCube {
 
         // Add all sides between the white and yellow side
         for (int i = 0; i < 4; i++)
-            scheme.add(rotateSideClockwise(sortedScheme.get(finalCombination.get(i)[0]), finalCombination.get(i)[1]));
+            scheme.add(rotateSide(sortedScheme.get(finalCombination.get(i)[0]), finalCombination.get(i)[1], i));
 
         // Add the last side (always yellow)
-        scheme.add(rotateSideClockwise(sortedScheme.get(5), lastLayerRotation));
+        scheme.add(rotateSide(sortedScheme.get(5), lastLayerRotation, 7));
 
         return scheme;
     }
 
-    private int[][] rotateSideCounterclockwise(int[][] input, int steps) {
-        int[][] output = new int[3][3];
-        for (int x = 0; x < 3; x++)
-            for (int y = 0; y < 3; y++)
-                output[2-y][x] = input[x][y];
-        return output;
-    }
+    private int[][] rotateSide(int[][] input, int steps, int side) {
+        if (steps == 1) steps = 3;
+        else if (steps == 3) steps = 1;
+        steps = (steps + 2 + side) % 4;
 
-    private int[][] rotateSideClockwise(int[][] input, int steps) {
-        int[][] output = new int[3][3];
-        for (int x = 0; x < 3; x++)
-            for (int y = 0; y < 3; y++)
-                output[y][2-x] = input[x][y];
-        return output;
-    }
-
-    private int[][] rotateSide180(int[][] input, int steps) {
-        for (int row = 0; row < 3; row++) {
-            for (int x = 0, y = 2; x < y; x++, y--) {
-                // int temp = input[][];
-            }
+        switch (steps) {
+            case 0:
+                return input;
+            case 1:
+                return rotateSideClockwise(input);
+            case 2:
+                return rotateSide180(input);
+            case 3:
+                return rotateSideCounterclockwise(input);
+            default:
+                return null;
         }
+    }
 
+    private int[][] rotateSideClockwise(int[][] input) {
         int[][] output = new int[3][3];
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
-                output[x][y] = input[x][y];
+                output[2 - y][x] = input[x][y];
             }
         }
-        return null;
+        return output;
+    }
+
+    private int[][] rotateSideCounterclockwise(int[][] input) {
+        int[][] output = new int[3][3];
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                output[y][2 - x] = input[x][y];
+            }
+        }
+        return output;
+    }
+
+    private int[][] rotateSide180(int[][] input) {
+        int[][] output = new int[3][3];
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                output[2 - x][2 - y] = input[x][y];
+            }
+        }
+        return output;
     }
 
     /**

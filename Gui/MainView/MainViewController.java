@@ -29,7 +29,7 @@ public class MainViewController implements Observer {
 
 
     private void updateImageView() {
-        Mat convertedMat = model.getWebcamframe().clone();
+        Mat convertedMat = model.getOriginalFrame().clone();
         MatOfByte matOfByte = new MatOfByte();
 
         Imgproc.cvtColor(convertedMat, convertedMat, Imgproc.COLOR_HSV2BGR);
