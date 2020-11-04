@@ -85,7 +85,7 @@ public class ScanCube implements Observer {
             scannedCubeSides.add(colorMatrix);
             centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
             model.setTotalCubeSideFound(scannedCubeSides.size());
-            new DebugOutput().printImage(frame.clone(), scannedCubeSides.size()); // TODO DEBUG IMAGE PRINT
+            new DebugOutput().printImage(frame.clone(), scannedCubeSides.size());
         }
 
         // If all 6 sides were scanned, stop the loop

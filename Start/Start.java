@@ -137,7 +137,7 @@ public class Start extends Application {
         guiModel.callObservers("initResizeLines");
         stage.getIcons().add(new Image(getClass().getResourceAsStream("../Resources/Assets/taskbarIcon.png")));
 
-        String result = Search.solution("UDDUUBDRBUURRRLDFUBFLBFDLLFUDLUDLRDFBLLULRDFFFFRBBRRBB", 21, 5, false);
+        /*
         if (result.contains("Error"))
             switch (result.charAt(result.length() - 1)) {
                 case '1':
@@ -166,6 +166,7 @@ public class Start extends Application {
                     break;
             }
         System.out.println("RESULT: " + result);
+         */
 
 
         guiModel.callObservers("startWebcamLoop");

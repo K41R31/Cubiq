@@ -15,7 +15,7 @@ public class GuiModel extends Observable {
     private Mat originalFrame;
     private Mat[] loadedImages;
     private boolean debug = false;
-    private boolean mirrorWebcam = true;
+    private boolean mirrorWebcam = false;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
     private double sideLengthThreshold = 0.8; //0.8
     private double angleThreshold = 50; //50

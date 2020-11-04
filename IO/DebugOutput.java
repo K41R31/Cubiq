@@ -41,11 +41,6 @@ public class DebugOutput {
         Imgcodecs.imwrite("src/Resources/Debug/" + index + ".jpg", image);
     }
 
-    public void printFinalScheme(List<int[][]> colorScheme) {
-        Mat mat = new Mat(1920, 1080, CvType.CV_8UC3);
-
-    }
-
     private List<String[][]> convertSchemeToString(List<int[][]> colorSchemes) {
         List<String[][]> convertedSchemes = new ArrayList<>();
         for (int i = 0; i < colorSchemes.size(); i++) {
