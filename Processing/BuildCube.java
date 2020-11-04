@@ -1,5 +1,10 @@
 package Processing;
 
+import IO.DebugOutput;
+import javafx.geometry.Point3D;
+import org.kociemba.twophase.Search;
+import org.opencv.core.Point3;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +12,6 @@ import java.util.List;
 public class BuildCube {
 
     private List<int[][]> sortedScheme;
-    private List<int[][]> finalizedScheme;
 
 
     public BuildCube(List<int[][]> inputScheme) {
@@ -15,12 +19,14 @@ public class BuildCube {
 
         Combinations combinations = new Combinations();
 
+        System.out.println("?");
         if (!colorsExistsNineTimes()) {
             System.err.println("WRONG COLOR SCHEME");
             return;
         }
 
         // TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
+        // TODO Nebeneinander liegende Seiten auf centerfarben überprüfen. Grün nicht neben Balue,
 
         // Second side
         // Seiten, die oben an die weiße Seite passen
@@ -119,8 +125,12 @@ public class BuildCube {
                     if (!edgesCouldBeNeighbours(edge0, edge1)) break;
                     if (layer == 0) {
                         List<int[][]> orientedScheme = orientScheme(combinations.getCombination(step, i), edgeOffset);
-                        if (isPossibleFinalCombination(orientedScheme))
-                            System.out.println("YO, THIS IS POSSIBLE");
+                        if (isPossibleFinalCombination(orientedScheme)) {
+                            new DebugOutput().printSchemes(orientedScheme, "scheme");
+                            String solvableString = generateSolvableString(orientedScheme);
+                            String solution = Search.solution(solvableString, 22, 5, false);
+                            System.out.println(solution);
+                        }
                     }
                     // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
                 }
@@ -135,30 +145,101 @@ public class BuildCube {
      * 0 White > 5 Yellow
      * 1 Green > 4 Blue
      * 2 Red > 3 Orange
-     * @return True if this combination is possible
+     * @return True if this combination is possible, false if not
      */
     private boolean isPossibleFinalCombination(List<int[][]> orientedScheme) {
         // Edge Cubies
         List<int[]> edgeCubies = new ArrayList<>();
-        for (int i = 0; i < )
+
+        // Relative coordinates of all 12 edge pieces
+        // An edge stone is represented by six values
+        // Three values per color: side, x, y
+        int[] edgeValues = new int[] {
+                0, 1, 0, 1, 1, 2,
+                1, 1, 0, 5, 1, 0,
+                5, 1, 2, 3, 1, 2,
+                3, 1, 0, 0, 1, 2,
+                0, 0, 1, 4, 2, 1,
+                4, 0, 1, 5, 2, 1,
+                5, 0, 1, 2, 2, 1,
+                2, 0, 1, 0, 2, 1,
+                1, 2, 1, 2, 1, 0,
+                3, 2, 1, 2, 1, 2,
+                1, 0, 1, 4, 1, 0,
+                3, 0, 1, 4, 1, 2
+        };
+
+        for (int i = 0; i < 72; i += 6) {
+            // 
+            int color0 = orientedScheme.get(edgeValues[i])[edgeValues[i+1]][edgeValues[i+2]];
+            int color1 = orientedScheme.get(edgeValues[i+3])[edgeValues[i+4]][edgeValues[i+5]];
+            int[] colors = new int[]{color0, color1};
+            Arrays.sort(colors);
+            if (isNewCubie(edgeCubies, colors))
+                edgeCubies.add(colors);
+            else return false;
+        }
 
         // Corner Cubies
         List<int[]> cornerCubies = new ArrayList<>();
 
+        // Relative coordinates of all 18 corner pieces
+        // An corner stone is represented by nine values
+        // Three values per color: side, x, y
+        int[] cornerValues = new int[] {
+                0, 0, 0, 1, 2, 0, 4, 2, 0,
+                0, 2, 0, 1, 2, 2, 2, 0, 0,
+                0, 2, 2, 3, 2, 0, 2, 0, 2,
+                0, 0, 2, 3, 0, 0, 4, 2, 2,
+                5, 0, 0, 1, 2, 0, 2, 2, 0,
+                5, 2, 0, 1, 0, 0, 4, 0, 0,
+                5, 2, 2, 3, 0, 2, 4, 0, 2,
+                5, 0, 2, 3, 2, 2, 2, 2, 2
+        };
 
-        return
+        for (int i = 0; i < 72; i += 9) {
+            int color0 = orientedScheme.get(cornerValues[i])[cornerValues[i+1]][cornerValues[i+2]];
+            int color1 = orientedScheme.get(cornerValues[i+3])[cornerValues[i+4]][cornerValues[i+5]];
+            int color2 = orientedScheme.get(cornerValues[i+6])[cornerValues[i+7]][cornerValues[i+8]];
+            int[] colors = new int[]{color0, color1, color2};
+            Arrays.sort(colors);
+            if (isNewCubie(cornerCubies, colors))
+                cornerCubies.add(colors);
+            else return false;
+        }
+        return true;
     }
 
-    private boolean isNewEdgeCubie(List<int[]> cubies, int[] colors) {
-        Arrays.sort(colors);
-        for (int i = 0; i < cubies.size(); i++) {
-            int[] tempCubie = cubies.get(i);
-            for (int j = 0; j < colors.length; j++) {
-                if (tempCubie[j] != colors[j]) break;
-                if (j == colors.length - 1) return false;
+    private boolean isNewCubie(List<int[]> cubies, int[] colors) {
+        for (int[] cubie : cubies) {
+            for (int i = 0; i < colors.length; i++) {
+                if (colors[i] != cubie[i]) break;
+                if (i == colors.length - 1) return false;
             }
         }
         return true;
+    }
+
+    private String generateSolvableString(List<int[][]> scheme) {
+        // Colors corresponding to their position
+        String[] ref = new String[] {"F", "U", "R", "D", "L", "B"};
+        String[] orientations = new String[6];
+
+        for (int i = 0; i < 6; i++)
+            orientations[scheme.get(i)[1][1]] = ref[i];
+
+        // Side 1, 2, 0, 3, 4, 5
+        StringBuilder solvableBuilder = new StringBuilder();
+        for (int i = 1; i < 6; i++) {
+            for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    solvableBuilder.append(orientations[scheme.get(i)[x][y]]);
+                }
+            }
+            if (i == 2) i = -1;
+            else if (i == 0) i = 2;
+        }
+        return solvableBuilder.toString();
     }
 
     /**
