@@ -1,7 +1,7 @@
 package cubiq.alphaBuilds.cubeExplorer.processing;
 
-import cubiq.alphaBuilds.prototype.io.InteractionHandler;
-import cubiq.alphaBuilds.prototype.model.Model;
+import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandler;
+import cubiq.alphaBuilds.cubeExplorer.model.Model;
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
@@ -10,7 +10,8 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import cubiq.alphaBuilds.prototype.processing.Cubie;
+import cubiq.alphaBuilds.cubeExplorer.processing.Cubie;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.Arrays;
 import java.util.Observable;
@@ -46,7 +47,7 @@ public class Renderer implements Observer {
     
     private void startRenderer() {
 
-        cubiq.alphaBuilds.prototype.processing.Cubie[] cubies = new cubiq.alphaBuilds.prototype.processing.Cubie[27];
+        Cubie[] cubies = new Cubie[27];
 
         int counter = 0;
         for (int x = 0; x < 3; x++) {
@@ -63,9 +64,8 @@ public class Renderer implements Observer {
         cubies[8].rotateCubie(2, 1);
         System.out.println(Arrays.toString(cubies[8].getPosition()));
 
-
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
-        glCanvas.setWidth(600);
+        glCanvas.setWidth(700);
         glCanvas.setHeight(700);
         model.getRendererPane().getChildren().add(glCanvas);
 
@@ -132,8 +132,6 @@ public class Renderer implements Observer {
 
                 // Offset to center the cube in the scene
                 gl.glTranslatef(-1f, -1f, -1f);
-
-                int[][] colors = mirrorSide(model.getNormalizedColors());
 
                 for (int z = 0; z < 3; z++) {
                     for (int y = 0; y < 3; y++) {
@@ -217,7 +215,7 @@ public class Renderer implements Observer {
 
                             if (z == 2) {
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(-hSI, -hSI, sCO);
                                 gl.glVertex3f(hSI, -hSI, sCO);
                                 gl.glVertex3f(-hSI, hSI, sCO);
@@ -226,7 +224,7 @@ public class Renderer implements Observer {
 
                                 // LEFT ADDON
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(-hSO, -hSI, sCO);
                                 gl.glVertex3f(-hSI, -hSI, sCO);
                                 gl.glVertex3f(-hSO, hSI, sCO);
@@ -235,7 +233,7 @@ public class Renderer implements Observer {
 
                                 // RIGHT ADDON
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(hSI, -hSI, sCO);
                                 gl.glVertex3f(hSO, -hSI, sCO);
                                 gl.glVertex3f(hSI, hSI, sCO);
@@ -244,7 +242,7 @@ public class Renderer implements Observer {
 
                                 // TOP ADDON
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(-hSI, hSI, sCO);
                                 gl.glVertex3f(hSI, hSI, sCO);
                                 gl.glVertex3f(-hSI, hSO, sCO);
@@ -253,7 +251,7 @@ public class Renderer implements Observer {
 
                                 // BOTTOM ADDON
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(-hSI, -hSO, sCO);
                                 gl.glVertex3f(hSI, -hSO, sCO);
                                 gl.glVertex3f(-hSI, -hSI, sCO);
@@ -264,7 +262,7 @@ public class Renderer implements Observer {
 
                                 // TOP-LEFT ADDON
                                 gl.glBegin(GL_TRIANGLE_FAN);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(-0.35f, 0.35f, sCO);
                                 gl.glVertex3f(-tFP[0], tFP[1], sCO);
                                 gl.glVertex3f(-tFP[2], tFP[3], sCO);
@@ -278,7 +276,7 @@ public class Renderer implements Observer {
 
                                 // TOP-RIGHT ADDON
                                 gl.glBegin(GL_TRIANGLE_FAN);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(0.35f, 0.35f, sCO);
                                 gl.glVertex3f(tFP[1], tFP[0], sCO);
                                 gl.glVertex3f(tFP[3], tFP[2], sCO);
@@ -292,7 +290,7 @@ public class Renderer implements Observer {
 
                                 // BOTTOM-LEFT ADDON
                                 gl.glBegin(GL_TRIANGLE_FAN);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(-0.35f, -0.35f, sCO);
                                 gl.glVertex3f(-tFP[1], -tFP[0], sCO);
                                 gl.glVertex3f(-tFP[3], -tFP[2], sCO);
@@ -306,7 +304,7 @@ public class Renderer implements Observer {
 
                                 // BOTTOM-RIGHT ADDON
                                 gl.glBegin(GL_TRIANGLE_FAN);
-                                gl.glColor3fv(convert2Rgb(colors[x][y]), 0);
+                                gl.glColor3f(1.0f, 0.42f, 0.0f);
                                 gl.glVertex3f(0.35f, -0.35f, sCO);
                                 gl.glVertex3f(tFP[0], -tFP[1], sCO);
                                 gl.glVertex3f(tFP[2], -tFP[3], sCO);
@@ -347,37 +345,6 @@ public class Renderer implements Observer {
         
     }
 
-    private int[][] mirrorSide(int[][] side) {
-        int[][] mirroredSide = new int[3][3];
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
-                if (y == 0) mirroredSide[x][y] = side[x][2];
-                else if (y == 1) mirroredSide[x][y] = side[x][y];
-                else mirroredSide[x][y] = side[x][0];
-            }
-        }
-        return mirroredSide;
-    }
-
-    private float[] convert2Rgb(int normColor) {
-        switch (normColor) {
-            case 0:
-                return new float[]{1.0f, 1.0f, 1.0f};
-            case 1:
-                return new float[]{0.0f, 0.62f, 0.33f};
-            case 2:
-                return new float[]{0.86f, 0.26f, 0.18f};
-            case 3:
-                return new float[]{1.0f, 0.42f, 0.0f};
-            case 4:
-                return new float[]{0.24f, 0.51f, 0.96f};
-            case 5:
-                return new float[]{0.99f, 0.8f, 0.03f};
-            default:
-                return null;
-        }
-    }
-
     /**
      * Function to calculate a ease out animation
      * Source: http://gizma.com/easing/
@@ -396,7 +363,7 @@ public class Renderer implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "cubeFound":
+            case "startRenderer":
                 startRenderer();
                 break;
             case "rotateCubeX":

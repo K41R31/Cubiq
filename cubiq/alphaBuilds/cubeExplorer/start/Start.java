@@ -1,10 +1,8 @@
 package cubiq.alphaBuilds.cubeExplorer.start;
 
-import cubiq.alphaBuilds.prototype.gui.Controller;
-import cubiq.alphaBuilds.prototype.io.FileChooser;
-import cubiq.alphaBuilds.prototype.processing.ImageProcessing;
-import cubiq.alphaBuilds.prototype.model.Model;
-import cubiq.alphaBuilds.prototype.processing.Renderer;
+import cubiq.alphaBuilds.cubeExplorer.gui.Controller;
+import cubiq.alphaBuilds.cubeExplorer.model.Model;
+import cubiq.alphaBuilds.cubeExplorer.processing.Renderer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,9 +25,7 @@ public class Start extends Application {
         AnchorPane viewPane = viewLoader.load();
 
         // Init Classes
-        ImageProcessing imageProcessing = new ImageProcessing();
         Renderer renderer = new Renderer();
-        FileChooser fileChooser = new FileChooser();
 
         // Init Model
         Model model = new Model();
@@ -37,14 +33,10 @@ public class Start extends Application {
         Controller controller = viewLoader.getController();
 
         controller.initModel(model);
-        imageProcessing.initModel(model);
         renderer.initModel(model);
-        fileChooser.initModel(model);
 
         model.addObserver(controller);
-        model.addObserver(imageProcessing);
         model.addObserver(renderer);
-        model.addObserver(fileChooser);
 
         model.setStage(stage);
 
@@ -64,6 +56,7 @@ public class Start extends Application {
 
         // Tell all observers, that the GUI has been initialized
         model.callObservers("guiInitialized");
+        model.callObservers("startRenderer");
     }
 
     public static void main(String[] args) {
