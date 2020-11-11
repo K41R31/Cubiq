@@ -9,6 +9,10 @@ import java.util.Observable;
 
 public class GuiModel extends Observable {
 
+    /*
+    Ist das hier, das GuiModel weil es vorher noch aus dem Debugmodus stammt? Eigentlich haben wir ja keine Gui mehr in dem Sinne. Ist mir nur aufgefallen.. (Tim)
+     */
+
     private Stage stage;
     private Font kiona;
     private Font bender;

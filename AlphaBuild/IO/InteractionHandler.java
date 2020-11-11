@@ -15,12 +15,10 @@ public class InteractionHandler implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent mouseEvent) {
-
     }
 
     @Override
     public void mouseExited(MouseEvent mouseEvent) {
-
     }
 
     @Override
@@ -33,7 +31,6 @@ public class InteractionHandler implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-
     }
 
     @Override
@@ -64,7 +61,6 @@ public class InteractionHandler implements MouseListener {
 
     @Override
     public void mouseWheelMoved(MouseEvent mouseEvent) {
-
     }
 
     public float getAngleXaxis() {

@@ -140,7 +140,7 @@ public class Renderer implements Observer {
                         for (int x = 0; x < 3; x++) {
 
                             float hCW = 0.5f; // Half the width of the cubies (half cubie width)
-                            float sCO = 0.51f; // The offset from the stickers to the cubie center (sticker center offset)
+                            float sCO = 0.52f; // The offset from the stickers to the cubie center (sticker center offset)
                             float hSO = 0.45f; // Half the width of the inner sticker (half sticker outer)
                             float hSI = 0.35f; // Half the width of the outer sticker (half sticker inner)
 
