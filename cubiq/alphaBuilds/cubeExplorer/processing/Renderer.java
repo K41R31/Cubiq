@@ -47,6 +47,7 @@ public class Renderer implements Observer {
     
     private void startRenderer() {
 
+        // TODO Cubie test----------------------------------------------------------------------------------------------
         Cubie[] cubies = new Cubie[27];
 
         int counter = 0;
@@ -58,11 +59,11 @@ public class Renderer implements Observer {
                 }
             }
         }
-        // TODO TESTEN !!!!!!!!!!!!
         System.out.println(Arrays.toString(cubies[8].getPosition()));
         cubies[8].rotateCubie(2, 1);
         cubies[8].rotateCubie(2, 1);
         System.out.println(Arrays.toString(cubies[8].getPosition()));
+        // TODO Cubie test end------------------------------------------------------------------------------------------
 
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
         glCanvas.setWidth(700);
@@ -128,6 +129,7 @@ public class Renderer implements Observer {
 
                 gl.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
                 gl.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+                gl.glRotatef(interactionHandler.getAngleZaxis(), 0f, 0f, 1f);
 
 
                 // Offset to center the cube in the scene
