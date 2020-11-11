@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="700.0" style="-fx-background-color: #0b1320;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cubiq.alphaBuilds.cubeExplorer.gui.Controller">
+   <children>
+      <AnchorPane fx:id="rendererPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="700.0" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="700.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#rotateCubeX" text="Rotate Cube X" />
+            <Button mnemonicParsing="false" onAction="#rotateCubeY" text="Rotate Cube Y" />
+            <Button mnemonicParsing="false" onAction="#rotateCubeZ" text="Rotate Cube Z" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
