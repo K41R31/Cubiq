@@ -11,6 +11,7 @@ public class GuiModel extends Observable {
 
     /*
     Ist das hier, das GuiModel weil es vorher noch aus dem Debugmodus stammt? Eigentlich haben wir ja keine Gui mehr in dem Sinne. Ist mir nur aufgefallen.. (Tim)
+    TODO Der Name passt nicht wirklich, das stimmt. Die meisten Variablen sind eher für den Cube scan. Das sollten wir vielleicht noch anders aufteilen.
      */
 
     private Stage stage;
