@@ -59,7 +59,6 @@ public class Renderer implements Observer {
         // TODO TESTEN !!!!!!!!!!!!
         System.out.println(Arrays.toString(cubies[8].getPosition()));
         cubies[8].rotateCubie(2, 1);
-        cubies[8].rotateCubie(2, 1);
         System.out.println(Arrays.toString(cubies[8].getPosition()));
 
 
@@ -75,7 +74,6 @@ public class Renderer implements Observer {
 
         glWindow.addMouseListener(interactionHandler);
         glWindow.addGLEventListener(new GLEventListener() {
-
             public void init(GLAutoDrawable drawable) {
                 GL2 gl = glWindow.getGL().getGL2();
 
@@ -143,7 +141,8 @@ public class Renderer implements Observer {
                             float hSO = 0.45f; // Half the width of the inner sticker (half sticker outer)
                             float hSI = 0.35f; // Half the width of the outer sticker (half sticker inner)
 
-                            gl.glBegin(GL.GL_TRIANGLE_STRIP); // TODO QUAD Strip
+                            // Cubie shell
+                            gl.glBegin(GL.GL_TRIANGLE_STRIP); // TODO QUAD STRIP
                             gl.glColor3f(0f, 0f, 0f);
                             gl.glVertex3f(hCW, -hCW, hCW);
                             gl.glVertex3f(-hCW, -hCW, hCW);
@@ -161,6 +160,7 @@ public class Renderer implements Observer {
                             gl.glVertex3f(-hCW, hCW, hCW);
                             gl.glEnd();
 
+                            // Stickers
                             // X
                             if (x == 0) {
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);

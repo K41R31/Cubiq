@@ -10,8 +10,6 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import cubiq.alphaBuilds.cubeExplorer.processing.Cubie;
-import org.opencv.imgproc.Imgproc;
 
 import java.util.Arrays;
 import java.util.Observable;
@@ -25,9 +23,7 @@ public class Renderer implements Observer {
     private GLU glu;
     private GLWindow glWindow;
     private InteractionHandler interactionHandler;
-    private float[] rotation = new float[] {0f, 0f, 0f};
     private int[] startRotation = new int[] {-90,-90, -90};
-    private int frame;
     
     public Renderer() {
         createGLWindow();
@@ -60,7 +56,6 @@ public class Renderer implements Observer {
             }
         }
         System.out.println(Arrays.toString(cubies[8].getPosition()));
-        cubies[8].rotateCubie(2, 1);
         cubies[8].rotateCubie(2, 1);
         System.out.println(Arrays.toString(cubies[8].getPosition()));
         // TODO Cubie test end------------------------------------------------------------------------------------------
@@ -99,6 +94,8 @@ public class Renderer implements Observer {
 
                 if (height == 0) height = 1;
                 gl.glViewport(0, 0, width, height);
+                interactionHandler.setWindowWidth(width);
+                interactionHandler.setWindowHeight(height);
                 gl.glMatrixMode(gl.GL_PROJECTION);
                 gl.glLoadIdentity();
                 float aspectRatio = (float)width / (float)height;
@@ -115,21 +112,11 @@ public class Renderer implements Observer {
                 // Defines the position of the camera
                 glu.gluLookAt(-9.5f, 6.1f, 9.5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
-                // Rotation button action
-                for (int i = 0; i < 3; i++) {
-                    if (rotation[i] < startRotation[i] + 90) {
-                        rotation[i] = easeOut(frame, startRotation[i], 90, 30);
-                        frame++;
-                    }
-                }
+                interactionHandler.nextFrame();
 
-                gl.glRotatef(rotation[0], 1f, 0f, 0f);
-                gl.glRotatef(rotation[1], 0f, 1f, 0f);
-                gl.glRotatef(rotation[2], 0f, 0f, 1f);
-
-                gl.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-                gl.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
-                gl.glRotatef(interactionHandler.getAngleZaxis(), 0f, 0f, 1f);
+                gl.glRotatef(interactionHandler.getActualAngleX(), 1f, 0f, 0f);
+                gl.glRotatef(interactionHandler.getActualAngleY(), 0f, 1f, 0f);
+                gl.glRotatef(interactionHandler.getActualAngleZ(), 0f, 0f, 1f);
 
 
                 // Offset to center the cube in the scene
@@ -347,44 +334,11 @@ public class Renderer implements Observer {
         
     }
 
-    /**
-     * Function to calculate a ease out animation
-     * Source: http://gizma.com/easing/
-     * @param t current time
-     * @param b cubiq.start value
-     * @param c change in value
-     * @param d duration
-     * @return Eased value
-     */
-    private float easeOut(float t, float b, float c, float d) {
-        t /= d;
-        t--;
-        return c*(t*t*t + 1) + b;
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
             case "startRenderer":
                 startRenderer();
-                break;
-            case "rotateCubeX":
-                if (rotation[0] % 90 == 0) {
-                    startRotation[0] = (int)rotation[0];
-                    frame = 0;
-                }
-                break;
-            case "rotateCubeY":
-                if (rotation[1] % 90 == 0) {
-                    startRotation[1] = (int)rotation[1];
-                    frame = 0;
-                }
-                break;
-            case "rotateCubeZ":
-                if (rotation[2] % 90 == 0) {
-                    startRotation[2] = (int)rotation[2];
-                    frame = 0;
-                }
                 break;
         }
     }

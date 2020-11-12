@@ -21,7 +21,7 @@ public class FileChooser implements Observer {
         fileChooser.setTitle("Select an image");
 
         // Set the standard location, where the file chooser starts
-        fileChooser.setInitialDirectory(new File("src/Resources/CubeImages"));
+        fileChooser.setInitialDirectory(new File("src/cubiq/resources/cubeImages"));
 
         // Set the extensions that you can select with the file chooser
         fileChooser.getExtensionFilters().addAll(

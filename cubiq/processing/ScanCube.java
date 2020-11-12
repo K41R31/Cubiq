@@ -134,25 +134,6 @@ public class ScanCube implements Observer {
         model.callObservers("updateImageView");
     }
 
-    private Mat alphaBlend(Mat foreground, Mat background, Mat alpha, Mat outImage) {
-        // Find number of pixels.
-        int numberOfPixels = foreground.rows() * foreground.cols() * foreground.channels();
-
-        // Get floating point pointers to the data matrices
-        /*
-        float fptr = reinterpret_cast<float>(foreground.dataAddr());
-        float bptr = reinterpret_cast<float>(background.data);
-        float aptr = reinterpret_cast<float>(alpha.data);
-        float outImagePtr = reinterpret_cast<float>(outImage.data);
-
-        // Loop over all pixesl ONCE
-        for(int i = 0; i < numberOfPixels; i++, outImagePtr++, fptr++, aptr++, bptr++) {
-            *outImagePtr = (*fptr)*(*aptr) + (*bptr)*(1 - *aptr);
-        }
-        */
-        return null;
-    }
-
     private List<Point> cubeBoundarys(Mat frame) {
         // Convert hsv to gray
         List<Mat> splittedMat = new ArrayList<>();
