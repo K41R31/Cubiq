@@ -17,14 +17,14 @@ import java.util.Observer;
 
 import static com.jogamp.opengl.GL.*;
 
-public class RendererFPP implements Observer {
+public class RendererFFP implements Observer {
 
     private Model model;
     private GLU glu;
     private GLWindow glWindow;
     private InteractionHandlerFFP interactionHandler;
     
-    public RendererFPP() {
+    public RendererFFP() {
         createGLWindow();
     }
     
@@ -112,11 +112,11 @@ public class RendererFPP implements Observer {
                 glu.gluLookAt(-9.5f, 6.1f, 9.5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
                 interactionHandler.nextFrame();
-/*
-                gl.glRotatef(controller.getActualAngleX(), 1f, 0f, 0f); // x
-                gl.glRotatef(controller.getActualAngleY(), 0f, 1f, 0f); // y
-                gl.glRotatef(controller.getActualAngleZ(), 0f, 0f, 1f); // z
-*/
+
+                gl.glRotatef(interactionHandler.getActualAngleX(), 1f, 0f, 0f); // x
+                gl.glRotatef(interactionHandler.getActualAngleY(), 0f, 1f, 0f); // y
+                gl.glRotatef(interactionHandler.getActualAngleZ(), 0f, 0f, 1f); // z
+
 
                 // Offset to center the cube in the scene
                 gl.glTranslatef(-1f, -1f, -1f);
