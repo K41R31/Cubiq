@@ -2,8 +2,8 @@ package cubiq.alphaBuilds.prototype.start;
 
 import cubiq.alphaBuilds.prototype.gui.Controller;
 import cubiq.alphaBuilds.prototype.io.FileChooser;
-import cubiq.alphaBuilds.prototype.processing.ImageProcessing;
 import cubiq.alphaBuilds.prototype.model.Model;
+import cubiq.alphaBuilds.prototype.processing.ImageProcessing;
 import cubiq.alphaBuilds.prototype.processing.Renderer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -27,9 +27,9 @@ public class Start extends Application {
         AnchorPane viewPane = viewLoader.load();
 
         // Init Classes
-        ImageProcessing imageProcessing = new ImageProcessing();
         Renderer renderer = new Renderer();
         FileChooser fileChooser = new FileChooser();
+        ImageProcessing imageProcessing = new ImageProcessing();
 
         // Init Model
         Model model = new Model();
@@ -37,14 +37,14 @@ public class Start extends Application {
         Controller controller = viewLoader.getController();
 
         controller.initModel(model);
-        imageProcessing.initModel(model);
         renderer.initModel(model);
         fileChooser.initModel(model);
+        imageProcessing.initModel(model);
 
         model.addObserver(controller);
-        model.addObserver(imageProcessing);
         model.addObserver(renderer);
         model.addObserver(fileChooser);
+        model.addObserver(imageProcessing);
 
         model.setStage(stage);
 

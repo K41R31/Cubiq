@@ -170,6 +170,7 @@ public class ImageProcessing implements Observer {
                 cubeGrid[x][y] = new Point(cubieMinX + x * cubieDistance, cubieMinY + y * cubieDistance);
             }
         }
+
         return cubeGrid;
     }
 

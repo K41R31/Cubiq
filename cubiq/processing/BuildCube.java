@@ -2,6 +2,8 @@ package cubiq.processing;
 
 import cubiq.io.DebugOutput;
 import org.kociemba.twophase.Search;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +127,7 @@ public class BuildCube {
                         if (isPossibleFinalCombination(orientedScheme)) {
                             new DebugOutput().printSchemes(orientedScheme, "scheme");
                             String solvableString = generateSolvableString(orientedScheme);
-                            String solution = Search.solution(solvableString, 20, 10, false);
+                            String solution = Search.solution(solvableString, 20, 5, false);
                             System.out.println(solution);
                         }
                     }

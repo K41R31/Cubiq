@@ -2,7 +2,7 @@ package cubiq.alphaBuilds.cubeExplorer.start;
 
 import cubiq.alphaBuilds.cubeExplorer.gui.Controller;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
-import cubiq.alphaBuilds.cubeExplorer.processing.Renderer;
+import cubiq.alphaBuilds.cubeExplorer.processing.RendererPP;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,7 +25,7 @@ public class Start extends Application {
         AnchorPane viewPane = viewLoader.load();
 
         // Init Classes
-        Renderer renderer = new Renderer();
+        RendererPP renderer = new RendererPP();
 
         // Init Model
         Model model = new Model();

@@ -1,6 +1,6 @@
 package cubiq.alphaBuilds.cubeExplorer.processing;
 
-import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandler;
+import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandlerFFP;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
@@ -17,15 +17,14 @@ import java.util.Observer;
 
 import static com.jogamp.opengl.GL.*;
 
-public class Renderer implements Observer {
+public class RendererFPP implements Observer {
 
     private Model model;
     private GLU glu;
     private GLWindow glWindow;
-    private InteractionHandler interactionHandler;
-    private int[] startRotation = new int[] {-90,-90, -90};
+    private InteractionHandlerFFP interactionHandler;
     
-    public Renderer() {
+    public RendererFPP() {
         createGLWindow();
     }
     
@@ -44,13 +43,13 @@ public class Renderer implements Observer {
     private void startRenderer() {
 
         // TODO Cubie test----------------------------------------------------------------------------------------------
-        Cubie[] cubies = new Cubie[27];
+        CubieFFP[] cubies = new CubieFFP[27];
 
         int counter = 0;
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
-                    cubies[counter] = new Cubie(x-1, y-1, z-1, new int[]{0, 0});
+                    cubies[counter] = new CubieFFP(x-1, y-1, z-1, new int[]{0, 0});
                     counter++;
                 }
             }
@@ -68,7 +67,7 @@ public class Renderer implements Observer {
         FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
         animator.start();
 
-        interactionHandler = new InteractionHandler();
+        interactionHandler = new InteractionHandlerFFP();
 
         glWindow.addMouseListener(interactionHandler);
         glWindow.addGLEventListener(new GLEventListener() {
@@ -113,11 +112,11 @@ public class Renderer implements Observer {
                 glu.gluLookAt(-9.5f, 6.1f, 9.5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
                 interactionHandler.nextFrame();
-
-                gl.glRotatef(interactionHandler.getActualAngleX(), 1f, 0f, 0f);
-                gl.glRotatef(interactionHandler.getActualAngleY(), 0f, 1f, 0f);
-                gl.glRotatef(interactionHandler.getActualAngleZ(), 0f, 0f, 1f);
-
+/*
+                gl.glRotatef(controller.getActualAngleX(), 1f, 0f, 0f); // x
+                gl.glRotatef(controller.getActualAngleY(), 0f, 1f, 0f); // y
+                gl.glRotatef(controller.getActualAngleZ(), 0f, 0f, 1f); // z
+*/
 
                 // Offset to center the cube in the scene
                 gl.glTranslatef(-1f, -1f, -1f);
@@ -126,7 +125,7 @@ public class Renderer implements Observer {
                     for (int y = 0; y < 3; y++) {
                         for (int x = 0; x < 3; x++) {
 
-                            float hCW = 0.5f; // Half the width of the cubies (half cubie width)
+                            float hCW = 0.5f;  // Half the width of the cubies (half cubie width)
                             float sCO = 0.51f; // The offset from the stickers to the cubie center (sticker center offset)
                             float hSO = 0.45f; // Half the width of the inner sticker (half sticker outer)
                             float hSI = 0.35f; // Half the width of the outer sticker (half sticker inner)
@@ -148,7 +147,6 @@ public class Renderer implements Observer {
                             gl.glVertex3f(hCW, hCW, hCW);
                             gl.glVertex3f(-hCW, hCW, hCW);
                             gl.glEnd();
-
                             // X
                             if (x == 0) {
                                 gl.glBegin(GL.GL_TRIANGLE_STRIP);

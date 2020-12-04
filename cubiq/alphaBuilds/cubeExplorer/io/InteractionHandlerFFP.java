@@ -3,7 +3,7 @@ package cubiq.alphaBuilds.cubeExplorer.io;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
-public class InteractionHandler implements MouseListener {
+public class InteractionHandlerFFP implements MouseListener {
 
     private final int MOVE_DISTANCE_THRESHOLD = 5;
     private final int FAST_ROTATION_CLICK_SPEED = 7;
@@ -11,6 +11,7 @@ public class InteractionHandler implements MouseListener {
     private final float CUBE_SNAP_BACK_SPEED = 2.5f;
     private int pressedPosX, pressedPosY;
     private final float[] actualAngles, pressedAngles, releasedAngles, diffsToSteps, nextSteps;
+    private float[] xOrientation, yOrientation, zOrientation;
     private int windowWidth, windowHeight;
     private int direction = -1; // -1 -> no direction; 0 -> x; 1 -> y; 2 -> z
     private boolean mousePressed = false;
@@ -21,7 +22,7 @@ public class InteractionHandler implements MouseListener {
     // TODO ACHSEN VERÄNDERN SICH BEIM DREHEN
 
 
-    public InteractionHandler() {
+    public InteractionHandlerFFP() {
         actualAngles = new float[] {0, 0, 0};
         pressedAngles = new float[] {0, 0, 0};
         releasedAngles = new float[] {0, 0, 0};
@@ -73,7 +74,7 @@ public class InteractionHandler implements MouseListener {
             // If the mouse was released shortly after it was pressed
             if (actualFrame < pressedFrame + FAST_ROTATION_CLICK_SPEED) {
                 // If the mouse travelled enough to trigger the direction
-                if (direction != -1) {
+                if (direction > -1) {
                     // Set the angle the cube should rotate to, one 90° step further
                     if (diffAngles[direction] > 0)
                         nextSteps[direction] += 90;
@@ -122,12 +123,12 @@ public class InteractionHandler implements MouseListener {
                 }
             }
             else {
-                // Differentiation whether the X or Y axis is used for calculation
-                if (direction == 1) mouseAbsoluteMoved = pressedPosX - currentPosX;
-                else mouseAbsoluteMoved = pressedPosY - currentPosY;
+                // Differentiation whether the X or Y axis is used for the calculation
+                if (direction == 1) mouseAbsoluteMoved = currentPosX - pressedPosX;
+                else mouseAbsoluteMoved = currentPosY - pressedPosY;
 
                 // Dragged movement of the cube
-                actualAngles[direction] = pressedAngles[direction] + mouseAbsoluteMoved * -CUBE_ROTATION_SPEED;
+                actualAngles[direction] = pressedAngles[direction] + mouseAbsoluteMoved * CUBE_ROTATION_SPEED;
             }
         }
     }
@@ -151,7 +152,7 @@ public class InteractionHandler implements MouseListener {
                     actualAngles[i] = Math.round(easeOut(snapBackFrameCount, releasedAngles[i], diffsToSteps[i], animationLength) * 100f) / 100f;
 
                     snapBackFrameCount++;
-                    if (snapBackFrameCount == animationLength) {
+                    if (snapBackFrameCount >= animationLength) {
                         actualAngles[i] = nextSteps[i];
                         swingingBack = false;
                     }

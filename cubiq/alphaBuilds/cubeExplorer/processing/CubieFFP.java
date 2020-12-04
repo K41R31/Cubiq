@@ -1,12 +1,12 @@
 package cubiq.alphaBuilds.cubeExplorer.processing;
 
-public class Cubie {
+public class CubieFFP {
 
     int cubieType;
     int[] position = new int[3]; // [0] -> x, [1] -> y, [2] -> z
     int[] colors; // Colors on the x, y and z axis; [0] -> x, [1] -> y, [2] -> z
 
-    public Cubie(int x, int y, int z, int[] colors) {
+    public CubieFFP(int x, int y, int z, int[] colors) {
         position[0] = x;
         position[1] = y;
         position[2] = z;
@@ -14,7 +14,7 @@ public class Cubie {
         cubieType = calculateCubieType();
     }
 
-    public Cubie(int[] position, int[] colors) {
+    public CubieFFP(int[] position, int[] colors) {
         for (int i = 0; i < 3; i++)
             this.position[i] = position[i];
         this.colors = colors;

@@ -147,11 +147,7 @@ public class ScanCube implements Observer {
         // Add Canny
         Imgproc.Canny(processedMat, processedMat, model.getCannyThreshold1(), model.getCannyThreshold2());
 
-/*
-        Mat cannyMat = new Mat(processedMat.rows(), processedMat.cols(), CvType.CV_8UC3);
-        Imgproc.Canny(processedMat, cannyMat, model.getCannyThreshold1(), model.getCannyThreshold2());
-        model.setWebcamFrame(cannyMat);
-*/
+//        model.setWebcamFrame(processedMat);
 
         // Make the lines thicker
         Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2 * model.getDilateKernel() + 1, 2 * model.getDilateKernel() + 1));
