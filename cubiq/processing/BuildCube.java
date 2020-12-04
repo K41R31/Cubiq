@@ -182,7 +182,7 @@ public class BuildCube {
         // Corner Cubies
         List<int[]> cornerCubies = new ArrayList<>();
 
-        // Relative coordinates of all 18 corner pieces
+        // Relative coordinates of all 8 corner pieces //TODO: Für das Schema brauche ich leider noch mal eine Erklärung
         // An corner stone is represented by nine values
         // Three values per color: side, x, y
         int[] cornerValues = new int[] {
