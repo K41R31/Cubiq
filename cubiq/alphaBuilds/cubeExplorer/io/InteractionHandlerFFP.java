@@ -3,6 +3,8 @@ package cubiq.alphaBuilds.cubeExplorer.io;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
+import java.awt.event.MouseMotionListener;
+
 public class InteractionHandlerFFP implements MouseListener {
 
     private final int MOVE_DISTANCE_THRESHOLD = 5;

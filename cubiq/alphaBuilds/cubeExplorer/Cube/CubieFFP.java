@@ -1,4 +1,4 @@
-package cubiq.alphaBuilds.cubeExplorer.processing;
+package cubiq.alphaBuilds.cubeExplorer.Cube;
 
 public class CubieFFP {
 

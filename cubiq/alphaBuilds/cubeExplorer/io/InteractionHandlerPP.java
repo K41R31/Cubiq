@@ -8,27 +8,24 @@ public class InteractionHandlerPP implements MouseListener {
 
     private final int MOVE_DISTANCE_THRESHOLD = 5;
     private final int FAST_ROTATION_CLICK_SPEED = 7;
+    private final int CUBE_SNAP_BACK_SPEED = 23;
     private final float CUBE_ROTATION_SPEED = 0.15f;
-    private final float CUBE_SNAP_BACK_SPEED = 2.5f;
-    private int pressedPosX, pressedPosY;
-    private Quaternion quaternion = new Quaternion();
-    private final float[] actualAngles, pressedAngles, releasedAngles, diffsToSteps, nextSteps;
-    private int windowWidth, windowHeight;
-    private int direction = -1; // -1 -> no direction; 0 -> x; 1 -> y; 2 -> z
-    private boolean mousePressed = false;
-    private boolean swingingBack = false;
-    private int snapBackFrameCount = 0;
-    private int actualFrame, pressedFrame;
-
-    // TODO ACHSEN VERÄNDERN SICH BEIM DREHEN
+    private Quaternion actualQuat, pressedQuat, snapToQuat, releasedQuat;
+    private int mousePressedX, mousePressedY, windowWidth, actualFrame, pressedFrame;
+    private float rotatedSincePress, snapBackDiff;
+    private boolean swingingBack, mousePressed;
+    private int snapBackFrameCount, direction; // -1 -> no direction; 0 -> x; 1 -> y; 2 -> z
 
 
     public InteractionHandlerPP() {
-        actualAngles = new float[] {0, 0, 0};
-        pressedAngles = new float[] {0, 0, 0};
-        releasedAngles = new float[] {0, 0, 0};
-        diffsToSteps = new float[] {0, 0, 0};
-        nextSteps = new float[] {0, 0, 0};
+        mousePressed = false;
+        swingingBack = false;
+        actualQuat = new Quaternion();
+        pressedQuat = new Quaternion();
+        snapToQuat = new Quaternion();
+        releasedQuat = new Quaternion();
+        snapBackFrameCount = 0;
+        direction = -1;
     }
 
 
@@ -46,50 +43,53 @@ public class InteractionHandlerPP implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-        if (mouseEvent.getButton() == 1 && !swingingBack) {
+        if (mouseEvent.getButton() == MouseEvent.BUTTON1 && !swingingBack) {
             mousePressed = true;
             pressedFrame = actualFrame;
-            pressedPosX = mouseEvent.getX();
-            pressedPosY = mouseEvent.getY();
 
-            // Store the angles of the cube when the mouse was pressed
-            System.arraycopy(actualAngles, 0, pressedAngles, 0, 3);
+            // Store the position of the mouse when it was pressed
+            mousePressedX = mouseEvent.getX();
+            mousePressedY = mouseEvent.getY();
+
+            // Store the angles of the cube when the mouse was pressed in an quaternion
+            pressedQuat.set(actualQuat);
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-        if (mousePressed) {
-            mousePressed = false;
+        mousePressed = false;
+        // If the mouse travelled enough to trigger a direction
+        if (direction != -1) {
+            float nextSnapAngle;
+            float[] directionAxis = new float[3];
+            directionAxis[direction] = 1f;
+
             // Reset the animation frame counter
             snapBackFrameCount = 0;
-            float[] diffAngles = new float[3];
 
-            for (int i = 0; i < 3; i++) {
-                // The angle that the cube moved since the mouse was pressed
-                diffAngles[i] = actualAngles[i] - pressedAngles[i];
-                // Next angle in 90° steps
-                nextSteps[i] = pressedAngles[i] + Math.round(diffAngles[i] / 90) * 90;
-            }
+            // Save the released rotation quaternion
+            releasedQuat.set(actualQuat);
 
-            // If the mouse was released shortly after it was pressed
+            // Round the angle that the cube has been rotated since the mouse was pressed to 90°
+            nextSnapAngle = (float)(Math.round(rotatedSincePress / (Math.PI/2)) * (Math.PI/2));
+
+            // If the mouse was released shortly after it was pressed, increase the rotation by 90°
             if (actualFrame < pressedFrame + FAST_ROTATION_CLICK_SPEED) {
-                // If the mouse travelled enough to trigger the direction
-                if (direction > -1) {
-                    // Set the angle the cube should rotate to, one 90° step further
-                    if (diffAngles[direction] > 0)
-                        nextSteps[direction] += 90;
-                    else
-                        nextSteps[direction] -= 90;
-                }
+                // Increase or decrease the rotation by 90°
+                if (rotatedSincePress > 0)
+                    nextSnapAngle += Math.PI/2;
+                else
+                    nextSnapAngle -= Math.PI/2;
             }
 
-            for (int i = 0; i < 3; i++) {
-                // Calculate the angles the cube must rotate to reach the next 90° steps
-                diffsToSteps[i] = nextSteps[i] - actualAngles[i];
-                // Save the angles of the cube when the mouse was released
-                releasedAngles[i] = actualAngles[i];
-            }
+            // Create a quaternion with the rounded angle
+            snapToQuat.setFromAngleNormalAxis(nextSnapAngle, directionAxis);
+
+            snapToQuat.mult(pressedQuat);
+
+            // Calculate the angle the cube must rotate to reach the next step
+            snapBackDiff = rotatedSincePress - nextSnapAngle;
 
             // Reset the direction
             direction = -1;
@@ -103,20 +103,17 @@ public class InteractionHandlerPP implements MouseListener {
     @Override
     public void mouseDragged(MouseEvent mouseEvent) {
         if (mousePressed) {
+            int mouseMovedX = Math.abs(mousePressedX - mouseEvent.getX());
+            int mouseMovedY = Math.abs(mousePressedY - mouseEvent.getY());
+            Quaternion stepRotQuat = new Quaternion();
 
-            int currentPosX = mouseEvent.getX();
-            int currentPosY = mouseEvent.getY();
-            int mouseMovedX = Math.abs(pressedPosX - currentPosX);
-            int mouseMovedY = Math.abs(pressedPosY - currentPosY);
-            int mouseAbsoluteMoved;
-
+            // Process in which direction the mouse moved
             if (direction == -1) {
-                // Process in which direction the mouse moved
                 if (mouseMovedX > MOVE_DISTANCE_THRESHOLD || mouseMovedY > MOVE_DISTANCE_THRESHOLD) {
                     if (mouseMovedX > mouseMovedY)
                         direction = 1;
                     else {
-                        if (pressedPosX < windowWidth / 2)
+                        if (mousePressedX < windowWidth / 2)
                             direction = 2;
                         else
                             direction = 0;
@@ -125,12 +122,20 @@ public class InteractionHandlerPP implements MouseListener {
             }
             else {
                 // Differentiation whether the X or Y axis is used for the calculation
-                if (direction == 1) mouseAbsoluteMoved = currentPosX - pressedPosX;
-                else mouseAbsoluteMoved = currentPosY - pressedPosY;
-
-                // Dragged movement of the cube
-                actualAngles[direction] = pressedAngles[direction] + mouseAbsoluteMoved * CUBE_ROTATION_SPEED;
-                quaternion.setFromEuler((float)Math.toRadians(actualAngles[0]), (float)Math.toRadians(actualAngles[1]), (float)Math.toRadians(actualAngles[2]));
+                if (direction == 1) {
+                    float mouseMoved = (float)Math.toRadians(mouseEvent.getX() - mousePressedX);
+                    rotatedSincePress = mouseMoved * CUBE_ROTATION_SPEED;
+                    stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{0, 1, 0});
+                }
+                else {
+                    float mouseMoved = (float)Math.toRadians(mouseEvent.getY() - mousePressedY);
+                    rotatedSincePress = mouseMoved * CUBE_ROTATION_SPEED;
+                    if (direction == 2)
+                        stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{0, 0, 1});
+                    else
+                        stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{1, 0, 0});
+                }
+                actualQuat = stepRotQuat.mult(pressedQuat);
             }
         }
     }
@@ -139,27 +144,46 @@ public class InteractionHandlerPP implements MouseListener {
     public void mouseWheelMoved(MouseEvent mouseEvent) {
     }
 
-    public Quaternion getQuaternion() {
-        return quaternion;
+    public void nextFrame() {
+        actualFrame++;
+        if (!mousePressed && !actualQuat.equals(snapToQuat))
+            snapBack();
     }
 
-    public float getActualAngleX() {
-        return actualAngles[0];
+    private void snapBack() {
+        swingingBack = true;
+        snapBackFrameCount++;
+
+        float animationLength = Math.round(Math.abs(snapBackDiff * CUBE_SNAP_BACK_SPEED));
+
+        if (animationLength != 0 && snapBackFrameCount < animationLength)
+            actualQuat.setSlerp(releasedQuat, snapToQuat, easeOut(snapBackFrameCount, 0, 1, animationLength));
+        else {
+            actualQuat.set(snapToQuat);
+            swingingBack = false;
+        }
     }
 
-    public float getActualAngleY() {
-        return actualAngles[1];
+    /**
+     * Function to calculate a ease out animation
+     * Source: http://gizma.com/easing/
+     * @param t current time
+     * @param b start value
+     * @param c change in value
+     * @param d duration
+     * @return Eased value
+     */
+    private float easeOut(float t, float b, float c, float d) {
+        t /= d;
+        t--;
+        return c*(t*t*t + 1) + b;
     }
 
-    public float getActualAngleZ() {
-        return actualAngles[2];
+    public Quaternion getActualQuat() {
+        return actualQuat;
     }
 
     public void setWindowWidth(int windowWidth) {
         this.windowWidth = windowWidth;
-    }
-
-    public void setWindowHeight(int windowHeight) {
-        this.windowHeight = windowHeight;
     }
 }

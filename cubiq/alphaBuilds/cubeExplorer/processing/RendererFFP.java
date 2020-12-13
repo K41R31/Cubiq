@@ -1,5 +1,6 @@
 package cubiq.alphaBuilds.cubeExplorer.processing;
 
+import cubiq.alphaBuilds.cubeExplorer.Cube.CubieFFP;
 import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandlerFFP;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
 import com.jogamp.newt.Display;

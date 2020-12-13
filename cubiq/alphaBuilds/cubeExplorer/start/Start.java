@@ -26,7 +26,7 @@ public class Start extends Application {
         AnchorPane viewPane = viewLoader.load();
 
         // Init Classes
-        RendererFFP renderer = new RendererFFP();
+        RendererPP renderer = new RendererPP();
 
         // Init Model
         Model model = new Model();

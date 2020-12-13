@@ -12,22 +12,6 @@ public class Controller implements Observer {
     @FXML
     private AnchorPane rendererPane;
 
-
-    @FXML
-    private void rotateCubeX() {
-        model.callObservers("rotateCubeX");
-    }
-
-    @FXML
-    private void rotateCubeY() {
-        model.callObservers("rotateCubeY");
-    }
-
-    @FXML
-    private void rotateCubeZ() {
-        model.callObservers("rotateCubeZ");
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {

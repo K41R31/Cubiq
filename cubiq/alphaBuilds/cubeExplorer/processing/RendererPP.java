@@ -6,17 +6,15 @@ import com.jogamp.newt.Screen;
 import com.jogamp.newt.javafx.NewtCanvasJFX;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
+import cubiq.alphaBuilds.cubeExplorer.Cube.Cube;
 import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandlerPP;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -26,9 +24,9 @@ import static com.jogamp.opengl.GL.GL_LESS;
 public class RendererPP implements GLEventListener, Observer {
 
     private Model model;
-    private GLWindow glWindow;
+    private final GLWindow glWindow;
+    private Cube cube;
     private InteractionHandlerPP interactionHandler;
-    private CubiePP cubie;
 
     private ShaderProgram shaderProgram;
 
@@ -55,6 +53,7 @@ public class RendererPP implements GLEventListener, Observer {
 
     private void startRenderer() {
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
+
         glCanvas.setWidth(700);
         glCanvas.setHeight(700);
         model.getRendererPane().getChildren().add(glCanvas);
@@ -69,9 +68,6 @@ public class RendererPP implements GLEventListener, Observer {
     }
 
     private void initCubie(GL3 gl) {
-        // Create a cubie
-        cubie = new CubiePP(1, new float[]{0, 0, 0});
-
         gl.glBindVertexArray(vaoName[0]);
         // Shader program
         shaderProgram = new ShaderProgram(gl);
@@ -81,14 +77,14 @@ public class RendererPP implements GLEventListener, Observer {
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubie.getVertices().length * 4,
-                FloatBuffer.wrap(cubie.getVertices()), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cube.getCubieVertices().length * 4,
+                FloatBuffer.wrap(cube.getCubieVertices()), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubie.getIndices().length * 4,
-                IntBuffer.wrap(cubie.getIndices()), GL.GL_STATIC_DRAW);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cube.getCubieIndices().length * 4,
+                IntBuffer.wrap(cube.getCubieIndices()), GL.GL_STATIC_DRAW);
 
         // Activate and order vertex buffer object data for the vertex shader
         // The vertex buffer contains: position (3), color (3)
@@ -107,8 +103,9 @@ public class RendererPP implements GLEventListener, Observer {
         gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glBindVertexArray(vaoName[0]);
+
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cubie.getIndices().length, GL.GL_UNSIGNED_INT, 0);
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
     }
 
     @Override
@@ -138,7 +135,8 @@ public class RendererPP implements GLEventListener, Observer {
             System.err.println("Error allocating index buffer object.");
         // END: Allocating vertex array objects and buffers for each object
 
-        // Initialize objects to be drawn (see respective sub-methods)
+        // Initialize cubie
+        cube = new Cube(3);
         initCubie(gl);
         // END: Preparing scene
 
@@ -177,7 +175,6 @@ public class RendererPP implements GLEventListener, Observer {
         gl.glViewport(0, 0, width, height);
         // Set the window size in the interactionHandler
         interactionHandler.setWindowWidth(width);
-        interactionHandler.setWindowHeight(height);
 
         // Switch the pmv-tool to perspective projection
         pmvMatrix.glMatrixMode(PMVMatrix.GL_PROJECTION);
@@ -201,26 +198,28 @@ public class RendererPP implements GLEventListener, Observer {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
         // Tell the interactionHandler that the program has run one frame further
-//        interactionHandler.nextFrame();
+        interactionHandler.nextFrame();
 
         // Apply view transform using the PMV-Tool
         // Camera positioning is steered by the interaction handler
         pmvMatrix.glLoadIdentity();
         pmvMatrix.gluLookAt(-9.5f, 6.1f, 9.5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 
-        Quaternion quaternion0 = new Quaternion();
-        quaternion0.setFromEuler((float)Math.toRadians(45), (float)Math.toRadians(0), (float)Math.toRadians(0));
-
-        Quaternion quaternion1 = new Quaternion();
-        quaternion1.setFromEuler((float)Math.toRadians(0), (float)Math.toRadians(0), (float)Math.toRadians(0));
-
-        Quaternion quaternion2;
-        quaternion2 = quaternion0.mult(quaternion1);
-
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glRotate(quaternion2);
-        displayCubie(gl);
-        pmvMatrix.glPopMatrix();
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                for (int z = 0; z < 3; z++) {
+                    pmvMatrix.glPushMatrix();
+                    // Cubie rotation
+                    pmvMatrix.glRotate(cube.getCubieRotation(x, y, z));
+                    // Cubie translation
+                    float[] qbPos = cube.getCubiePosition(x, y, z);
+                    pmvMatrix.glTranslatef(qbPos[0], qbPos[1], qbPos[2]);
+                    // Display Cubie
+                    displayCubie(gl);
+                    pmvMatrix.glPopMatrix();
+                }
+            }
+        }
     }
 
     @Override
@@ -241,7 +240,6 @@ public class RendererPP implements GLEventListener, Observer {
 
         System.exit(0);
     }
-
 
     @Override
     public void update(Observable o, Object arg) {
