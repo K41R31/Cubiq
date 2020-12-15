@@ -43,6 +43,9 @@ public class InteractionHandlerPP implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
+        /* TODO Wenn die Maus neben dem Würfel gedrückt wurde -> frage die Rotation des Würfels ab und gebe das rotierte Quaternion zurück
+                Wenn die Maus auf dem Würfel gedrückt wurde -> frage die Rotation des aktuellen Steins ab
+         */
         if (mouseEvent.getButton() == MouseEvent.BUTTON1 && !swingingBack) {
             mousePressed = true;
             pressedFrame = actualFrame;
@@ -74,7 +77,7 @@ public class InteractionHandlerPP implements MouseListener {
             // Round the angle that the cube has been rotated since the mouse was pressed to 90°
             nextSnapAngle = (float)(Math.round(rotatedSincePress / (Math.PI/2)) * (Math.PI/2));
 
-            // If the mouse was released shortly after it was pressed, increase the rotation by 90°
+            // If the mouse was released shortly after it was pressed, increase or decrease the rotation by 90°
             if (actualFrame < pressedFrame + FAST_ROTATION_CLICK_SPEED) {
                 // Increase or decrease the rotation by 90°
                 if (rotatedSincePress > 0)

@@ -23,4 +23,8 @@ public class Cubie {
     public Quaternion getRotation() {
         return rot;
     }
+
+    public void setRotation(Quaternion rotation) {
+        this.rot = rotation;
+    }
 }

@@ -97,8 +97,34 @@ public class ImageProcessing implements Observer {
             }
         }
 
+        copyTo();
+
         model.setNormalizedColors(normalizedColors);
         model.callObservers("cubeFound");
+    }
+
+    private void copyTo() {
+/*
+        Mat matToEdit = model.getOriginalImage().clone();
+        Mat texture = new Mat(200, 200, CvType.CV_8UC3, new Scalar(0, 0, 0));
+        int brushSize = 20;
+        int xCoord = 500;
+        int yCoord = 500;
+
+        for (int x = brushSize/-2; x < brushSize/2; x++) {
+            for (int y = brushSize/-2; y < brushSize/2; y++) {
+                double[] color0 = matToEdit.get(yCoord + y, xCoord + x);
+                double[] color1 = texture.get(y + brushSize/2, x + brushSize/2);
+
+            }
+        }
+
+        Rect roi = new Rect(new Point(200, 200), new Point(start.x + 200, start.y + 200));
+
+        stamp.copyTo(mat.submat(roi));
+
+        model.setOriginalImage(mat);
+*/
     }
 
     /**

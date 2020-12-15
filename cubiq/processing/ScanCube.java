@@ -119,7 +119,6 @@ public class ScanCube implements Observer {
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 Imgproc.circle(contourMat, scanpoints[x][y], 5, new Scalar(0, 0, 255), 10);
-                //Rect roi = new Rect((int)Math.round(scanpoints[x][y].x), (int)Math.round(scanpoints[x][y].y), scanpointOverlay.width(),scanpointOverlay.height());
             }
         }
 

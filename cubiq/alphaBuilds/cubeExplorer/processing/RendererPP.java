@@ -14,7 +14,6 @@ import cubiq.alphaBuilds.cubeExplorer.model.Model;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
