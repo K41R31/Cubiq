@@ -127,7 +127,7 @@ public class Start extends Application {
         stage.show();
 
         // Load Fonts
-        Font bender = Font.loadFont(getClass().getResource("../Resources/Fonts/Bender-Light.ttf").toExternalForm().replace("%20", " "), 20);
+        Font bender = Font.loadFont(getClass().getResource("fonts/Bender-Light.ttf").toExternalForm().replace("%20", " "), 20);
         guiModel.setBender(bender);
 
         screenInformationModel.callObservers("toggleFullScreen");

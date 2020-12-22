@@ -2,11 +2,13 @@ package cubiq.alphaBuilds.cubeExplorer.Cube;
 
 import com.jogamp.opengl.math.Quaternion;
 
+import java.util.Arrays;
+
 public class Cube {
 
     private final float CUBIE_SIZE = 1;
     private final float[] CUBIE_COLOR = {0, 0, 0};
-    private int cubeLayers = 3;
+    private int cubeLayers;
     private Cubie[][][] cubies;
     private Quaternion cubeRotation;
     private float[] cubieVertices;
@@ -14,9 +16,11 @@ public class Cube {
 
     public Cube(int cubeLayers) {
         this.cubeLayers = cubeLayers;
+        this.cubeRotation = new Quaternion();
         createCubieVertices();
         createCubieIndices();
         initCubies();
+        initMousePickerGrid();
     }
 
     private void initCubies() {
@@ -30,6 +34,10 @@ public class Cube {
                 }
             }
         }
+    }
+
+    private void initMousePickerGrid() {
+
     }
 
     private void createCubieVertices() {
@@ -56,11 +64,23 @@ public class Cube {
         return cubieIndices;
     }
 
+    public int getCubeLayers() {
+        return cubeLayers;
+    }
+
     public float[] getCubiePosition(int qbIndexX, int qbIndexY, int qbIndexZ) {
         return cubies[qbIndexX][qbIndexY][qbIndexZ].getPosition();
     }
 
     public Quaternion getCubieRotation(int qbIndexX, int qbIndexY, int qbIndexZ) {
         return cubies[qbIndexX][qbIndexY][qbIndexZ].getRotation();
+    }
+
+    public Quaternion getCubeRotation() {
+        return cubeRotation;
+    }
+
+    public void setCubeRotation(Quaternion cubeRotation) {
+        this.cubeRotation = cubeRotation;
     }
 }

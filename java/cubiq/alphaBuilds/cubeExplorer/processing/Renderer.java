@@ -6,11 +6,10 @@ import com.jogamp.newt.Screen;
 import com.jogamp.newt.javafx.NewtCanvasJFX;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.math.VectorUtil;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
 import cubiq.alphaBuilds.cubeExplorer.Cube.Cube;
-import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandlerPP;
+import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandler;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
 
 import java.nio.FloatBuffer;
@@ -21,12 +20,15 @@ import java.util.Observer;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 
-public class RendererPP implements GLEventListener, Observer {
+public class Renderer implements GLEventListener, Observer {
 
     private Model model;
     private final GLWindow glWindow;
     private Cube cube;
-    private InteractionHandlerPP interactionHandler;
+    private InteractionHandler interactionHandler;
+    private int DEVICE_WIDTH = 700;
+    private int DEVICE_HEIGHT = 700;
+    private float[] CAM_POS = new float[] {-9.5f, 6.1f, 9.5f};
 
     private ShaderProgram shaderProgram;
 
@@ -39,7 +41,7 @@ public class RendererPP implements GLEventListener, Observer {
     PMVMatrix pmvMatrix;
 
 
-    public RendererPP() {
+    public Renderer() {
         Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
         Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
@@ -54,14 +56,14 @@ public class RendererPP implements GLEventListener, Observer {
     private void startRenderer() {
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
 
-        glCanvas.setWidth(700);
-        glCanvas.setHeight(700);
+        glCanvas.setWidth(DEVICE_WIDTH);
+        glCanvas.setHeight(DEVICE_HEIGHT);
         model.getRendererPane().getChildren().add(glCanvas);
 
         FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
         animator.start();
 
-        interactionHandler = new InteractionHandlerPP();
+        interactionHandler = new InteractionHandler(CAM_POS, DEVICE_WIDTH, DEVICE_HEIGHT);
 
         glWindow.addMouseListener(interactionHandler);
         glWindow.addGLEventListener(this);
@@ -97,6 +99,52 @@ public class RendererPP implements GLEventListener, Observer {
         gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 3* Float.BYTES);
     }
 
+    private void initTestIntersectionObject(GL3 gl) {
+
+        float[] testIntersectionObjectVertices = new float[] {
+                1.5f, 1.5f, 1.5f,
+                1f, 1f, 1f,
+                -1.5f, 1.5f, 1.5f,
+                1f, 1f, 1f,
+                1.5f, -1.5f, 1.5f,
+                1f, 1f, 1f,
+                -1.5f, -1.5f, 1.5f,
+                1f, 1f, 1f
+        };
+
+        int[] testIntersectionObjectIndices = new int[] {
+                0, 1, 2, 3
+        };
+
+        gl.glBindVertexArray(vaoName[1]);
+        // Shader program
+        shaderProgram = new ShaderProgram(gl);
+        shaderProgram.loadShaderAndCreateProgram("resources\\shaders\\",
+                "O0_Basic.vert", "O0_Basic.frag");
+
+        // activate and initialize vertex buffer object (VBO)
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[1]);
+        // floats use 4 bytes in Java
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, testIntersectionObjectVertices.length * 4,
+                FloatBuffer.wrap(testIntersectionObjectVertices), GL.GL_STATIC_DRAW);
+
+        // activate and initialize index buffer object (IBO)
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[1]);
+        // integers use 4 bytes in Java
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, testIntersectionObjectIndices.length * 4,
+                IntBuffer.wrap(testIntersectionObjectIndices), GL.GL_STATIC_DRAW);
+
+        // Activate and order vertex buffer object data for the vertex shader
+        // The vertex buffer contains: position (3), color (3)
+        // Defining input for vertex shader
+        // Pointer for the vertex shader to the position information per vertex
+        gl.glEnableVertexAttribArray(0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 0);
+        // Pointer for the vertex shader to the color information per vertex
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 3* Float.BYTES);
+    }
+
     private void displayCubie(GL3 gl) {
         gl.glUseProgram(shaderProgram.getShaderProgramID());
         // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
@@ -108,6 +156,17 @@ public class RendererPP implements GLEventListener, Observer {
         gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
     }
 
+    private void displayTestIntersectionObject(GL3 gl) {
+        gl.glUseProgram(shaderProgram.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+        gl.glBindVertexArray(vaoName[1]);
+
+        // Draws the elements in the order defined by the index buffer object (IBO)
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, 4, GL.GL_UNSIGNED_INT, 0);
+    }
+
     @Override
     public void init(GLAutoDrawable drawable) {
         // Retrieve the OpenGL graphics context
@@ -115,7 +174,7 @@ public class RendererPP implements GLEventListener, Observer {
 
         // BEGIN: Preparing scene
         // BEGIN: Allocating vertex array objects and buffers for each object
-        int noOfObjects = 1;
+        int noOfObjects = 2;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -138,7 +197,10 @@ public class RendererPP implements GLEventListener, Observer {
         // Initialize cubie
         cube = new Cube(3);
         initCubie(gl);
+        initTestIntersectionObject(gl);
         // END: Preparing scene
+
+        interactionHandler.setCube(cube);
 
         // Create object for projection-model-view matrix calculation.
         pmvMatrix = new PMVMatrix();
@@ -180,12 +242,14 @@ public class RendererPP implements GLEventListener, Observer {
         pmvMatrix.glMatrixMode(PMVMatrix.GL_PROJECTION);
         // Reset projection matrix to identity
         pmvMatrix.glLoadIdentity();
+
         // Calculate projection matrix
         //      Parameters:
         //          fovy (field of view), aspect ratio,
         //          zNear (near clipping plane), zFar (far clipping plane)
         float aspectRatio = (float)width / (float)height;
         pmvMatrix.gluPerspective(30f, aspectRatio, 0.1f, 1000f);
+
         // Switch to model-view transform
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
     }
@@ -203,11 +267,22 @@ public class RendererPP implements GLEventListener, Observer {
         // Apply view transform using the PMV-Tool
         // Camera positioning is steered by the interaction handler
         pmvMatrix.glLoadIdentity();
-        pmvMatrix.gluLookAt(-9.5f, 6.1f, 9.5f, 0f, 0f, 0f, 0f, 1.0f, 0f);
+        pmvMatrix.gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2], 0f, 0f, 0f, 0f, 1.0f, 0f);
 
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                for (int z = 0; z < 3; z++) {
+        // Set matrices in the interaction handler
+        float[] pMatrix = new float[16];
+        System.arraycopy(pmvMatrix.glGetPMvMatrixf().array(), 0, pMatrix, 0, 16);
+        interactionHandler.setProjectionMatrix(pMatrix);
+
+        float[] mvMatrix = new float[16];
+        System.arraycopy(pmvMatrix.glGetPMvMatrixf().array(), 16, mvMatrix, 0, 16);
+        interactionHandler.setModelviewMatrix(mvMatrix);
+
+        displayTestIntersectionObject(gl);
+        pmvMatrix.glRotate(cube.getCubeRotation());
+        for (int x = 0; x < cube.getCubeLayers(); x++) {
+            for (int y = 0; y < cube.getCubeLayers(); y++) {
+                for (int z = 0; z < cube.getCubeLayers(); z++) {
                     pmvMatrix.glPushMatrix();
                     // Cubie rotation
                     pmvMatrix.glRotate(cube.getCubieRotation(x, y, z));

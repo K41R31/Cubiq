@@ -22,7 +22,7 @@
                <children>
                   <ImageView fitHeight="46.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../resources/assets/headerLeft.png" />
+                        <Image url="@../../../../resources/cubiq/assets/headerLeft.png" />
                      </image>
                   </ImageView>
                   <Polygon fx:id="pg_frameHeaderHitboxLeft" fill="#fafafa00" points="1.0, -23.5, 105.5, -23.5, 131.0, -60.0, 1.0, -60.0" stroke="#ffffff00" strokeType="INSIDE" strokeWidth="0.0" />
@@ -33,7 +33,7 @@
                <children>
                   <ImageView fitHeight="99.0" fitWidth="1207.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../resources/assets/headerCenter.png" />
+                        <Image url="@../../../../resources/cubiq/assets/headerCenter.png" />
                      </image>
                   </ImageView>
                   <Polygon fx:id="pg_frameHeaderHitboxCenter" fill="#ffffff00" points="233.0, 54.0, 419.0, 48.5, 473.0, 23.0, 1010.5, 23.0, 1066.5, 48.5, 1249.0, 54.0, 1303.5, 0.0, 176.5, 0.0" stroke="#ffffff00" strokeType="INSIDE" strokeWidth="0.0" />
@@ -44,7 +44,7 @@
                <children>
                   <ImageView fitHeight="46.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <image>
-                        <Image url="@../../resources/assets/headerRight.png" />
+                        <Image url="@../../../../resources/cubiq/assets/headerRight.png" />
                      </image>
                   </ImageView>
                   <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="36.0" prefWidth="105.0" style="-fx-background-color: TRANSPARENT;" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
