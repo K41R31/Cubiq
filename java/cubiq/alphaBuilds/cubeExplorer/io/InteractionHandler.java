@@ -24,7 +24,7 @@ public class InteractionHandler implements MouseListener {
     private int mousePressedX, mousePressedY, windowWidth, actualFrame, pressedFrame;
     private float rotatedSincePress, snapBackDiff;
     private boolean swingingBack, mousePressed;
-    private int snapBackFrameCount, direction; // -1 -> no direction; 0 -> x; 1 -> y; 2 -> z
+    private int snapBackFrameCount, mouseDraggedDirection; // -1 -> no direction; 0 -> x; 1 -> y; 2 -> z
     private Cube cube;
     private float[][] testIntersectionObject;
 
@@ -39,12 +39,11 @@ public class InteractionHandler implements MouseListener {
         releasedQuat = new Quaternion();
         pressedLayerQuats = new ArrayList<>();
         snapBackFrameCount = 0;
-        direction = -1;
+        mouseDraggedDirection = -1;
         this.camPos = camPos;
         this.deviceWidth = deviceWidth;
         this.deviceHeight = deviceHeight;
         testIntersectionObject = new float[6][3];
-        testIntersectionObject[0] = new float[] {-1.5f, 1.5f, 1.5f};
     }
 
 
@@ -82,10 +81,10 @@ public class InteractionHandler implements MouseListener {
     public void mouseReleased(MouseEvent mouseEvent) {
         mousePressed = false;
         // If the mouse travelled enough to trigger a direction
-        if (direction != -1) {
+        if (mouseDraggedDirection != -1) {
             float nextSnapAngle;
             float[] directionAxis = new float[3];
-            directionAxis[direction] = 1f;
+            directionAxis[mouseDraggedDirection] = 1f;
 
             // Reset the animation frame counter
             snapBackFrameCount = 0;
@@ -114,7 +113,7 @@ public class InteractionHandler implements MouseListener {
             snapBackDiff = rotatedSincePress - nextSnapAngle;
 
             // Reset the direction
-            direction = -1;
+            mouseDraggedDirection = -1;
         }
     }
 
@@ -130,21 +129,21 @@ public class InteractionHandler implements MouseListener {
             Quaternion stepRotQuat = new Quaternion();
 
             // Process in which direction the mouse moved
-            if (direction == -1) {
+            if (mouseDraggedDirection == -1) {
                 if (mouseMovedX > MOVE_DISTANCE_THRESHOLD || mouseMovedY > MOVE_DISTANCE_THRESHOLD) {
                     if (mouseMovedX > mouseMovedY)
-                        direction = 1;
+                        mouseDraggedDirection = 1;
                     else {
                         if (mousePressedX < windowWidth / 2)
-                            direction = 2;
+                            mouseDraggedDirection = 2;
                         else
-                            direction = 0;
+                            mouseDraggedDirection = 0;
                     }
                 }
             }
             else {
                 // Differentiation whether the X or Y axis is used for the calculation
-                if (direction == 1) {
+                if (mouseDraggedDirection == 1) {
                     float mouseMoved = (float)Math.toRadians(mouseEvent.getX() - mousePressedX);
                     rotatedSincePress = mouseMoved * CUBE_ROTATION_SPEED;
                     stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{0, 1, 0});
@@ -152,7 +151,7 @@ public class InteractionHandler implements MouseListener {
                 else {
                     float mouseMoved = (float)Math.toRadians(mouseEvent.getY() - mousePressedY);
                     rotatedSincePress = mouseMoved * CUBE_ROTATION_SPEED;
-                    if (direction == 2)
+                    if (mouseDraggedDirection == 2)
                         stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{0, 0, 1});
                     else
                         stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{1, 0, 0});
@@ -170,9 +169,6 @@ public class InteractionHandler implements MouseListener {
         actualFrame++;
         if (!mousePressed && !actualQuat.equals(snapToQuat))
             snapBack();
-        for (int i = 0; i < pressedLayerQuats.size(); i++) {
-            pressedLayerQuats.get(i).mult(actualQuat);
-        }
     }
 
     private void snapBack() {

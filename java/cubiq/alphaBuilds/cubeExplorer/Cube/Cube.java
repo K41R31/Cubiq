@@ -2,8 +2,6 @@ package cubiq.alphaBuilds.cubeExplorer.Cube;
 
 import com.jogamp.opengl.math.Quaternion;
 
-import java.util.Arrays;
-
 public class Cube {
 
     private final float CUBIE_SIZE = 1;
