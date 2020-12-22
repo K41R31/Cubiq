@@ -7,6 +7,9 @@ import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
 import cubiq.alphaBuilds.cubeExplorer.Cube.Cube;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InteractionHandler implements MouseListener {
 
     private final int MOVE_DISTANCE_THRESHOLD = 5;
@@ -17,6 +20,7 @@ public class InteractionHandler implements MouseListener {
     private float[] camPos, pMatrix, mvMatrix;
     private float deviceWidth, deviceHeight;
     private Quaternion actualQuat, pressedQuat, snapToQuat, releasedQuat;
+    private List<Quaternion> pressedLayerQuats;
     private int mousePressedX, mousePressedY, windowWidth, actualFrame, pressedFrame;
     private float rotatedSincePress, snapBackDiff;
     private boolean swingingBack, mousePressed;
@@ -33,6 +37,7 @@ public class InteractionHandler implements MouseListener {
         pressedQuat = new Quaternion();
         snapToQuat = new Quaternion();
         releasedQuat = new Quaternion();
+        pressedLayerQuats = new ArrayList<>();
         snapBackFrameCount = 0;
         direction = -1;
         this.camPos = camPos;
@@ -66,7 +71,7 @@ public class InteractionHandler implements MouseListener {
             mousePressedY = mouseEvent.getY();
 
             // Check where the mouse was pressed
-            if ()
+            cube.getCubieRotation(0, 0, 0).toMatrix()
 
             // Store the angles of the cube when the mouse was pressed in an quaternion
             pressedQuat.set(actualQuat);
@@ -152,7 +157,7 @@ public class InteractionHandler implements MouseListener {
                     else
                         stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{1, 0, 0});
                 }
-                actualQuat = stepRotQuat.mult(pressedQuat);
+                actualQuat.set(stepRotQuat.mult(pressedQuat));
             }
         }
     }
@@ -165,6 +170,9 @@ public class InteractionHandler implements MouseListener {
         actualFrame++;
         if (!mousePressed && !actualQuat.equals(snapToQuat))
             snapBack();
+        for (int i = 0; i < pressedLayerQuats.size(); i++) {
+            pressedLayerQuats.get(i).mult(actualQuat);
+        }
     }
 
     private void snapBack() {
@@ -196,14 +204,22 @@ public class InteractionHandler implements MouseListener {
         return c*(t*t*t + 1) + b;
     }
 
-    private boolean clickedCubie() {
+    private boolean mousePressedOnXSide() {
+        boolean intersects0 = intersectTriangle(new float[] {-1.5f, 1.5f, 1.5f}, new float[] {-1.5f, 1.5f, -1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
+        boolean intersects1 = intersectTriangle(new float[] {-1.5f, 1.5f, -1.5f}, new float[] {-1.5f, -1.5f, -1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
+        return intersects0 || intersects1;
+    }
+
+    private boolean mousePressedOnYSide() {
+        boolean intersects0 = intersectTriangle(new float[] {1.5f, 1.5f, -1.5f}, new float[] {-1.5f, 1.5f, -1.5f}, new float[] {1.5f, 1.5f, 1.5f});
+        boolean intersects1 = intersectTriangle(new float[] {-1.5f, 1.5f, -1.5f}, new float[] {-1.5f, 1.5f, 1.5f}, new float[] {1.5f, 1.5f, 1.5f});
+        return intersects0 || intersects1;
+    }
+
+    private boolean mousePressedOnZSide() {
         boolean intersects0 = intersectTriangle(new float[] {-1.5f, 1.5f, 1.5f}, new float[] {1.5f, 1.5f, 1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
         boolean intersects1 = intersectTriangle(new float[] {1.5f, 1.5f, 1.5f}, new float[] {1.5f, -1.5f, 1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
-        System.out.println(intersects0 || intersects1);
-        for (int axis = 0; axis < 3; axis++) {
-
-        }
-        return intersects0;
+        return intersects0 || intersects1;
     }
 
     /**

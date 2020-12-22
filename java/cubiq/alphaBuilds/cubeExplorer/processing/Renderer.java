@@ -9,6 +9,7 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
 import cubiq.alphaBuilds.cubeExplorer.Cube.Cube;
+import cubiq.alphaBuilds.cubeExplorer.start.Start;
 import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandler;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
 
@@ -73,7 +74,8 @@ public class Renderer implements GLEventListener, Observer {
         gl.glBindVertexArray(vaoName[0]);
         // Shader program
         shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram("resources\\shaders\\",
+        shaderProgram.loadShaderAndCreateProgram(
+                getClass().getResource("../resources/shaders/").getPath().replace("%20", " "),
                 "O0_Basic.vert", "O0_Basic.frag");
 
         // activate and initialize vertex buffer object (VBO)
@@ -99,52 +101,6 @@ public class Renderer implements GLEventListener, Observer {
         gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 3* Float.BYTES);
     }
 
-    private void initTestIntersectionObject(GL3 gl) {
-
-        float[] testIntersectionObjectVertices = new float[] {
-                1.5f, 1.5f, 1.5f,
-                1f, 1f, 1f,
-                -1.5f, 1.5f, 1.5f,
-                1f, 1f, 1f,
-                1.5f, -1.5f, 1.5f,
-                1f, 1f, 1f,
-                -1.5f, -1.5f, 1.5f,
-                1f, 1f, 1f
-        };
-
-        int[] testIntersectionObjectIndices = new int[] {
-                0, 1, 2, 3
-        };
-
-        gl.glBindVertexArray(vaoName[1]);
-        // Shader program
-        shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram("resources\\shaders\\",
-                "O0_Basic.vert", "O0_Basic.frag");
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[1]);
-        // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, testIntersectionObjectVertices.length * 4,
-                FloatBuffer.wrap(testIntersectionObjectVertices), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[1]);
-        // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, testIntersectionObjectIndices.length * 4,
-                IntBuffer.wrap(testIntersectionObjectIndices), GL.GL_STATIC_DRAW);
-
-        // Activate and order vertex buffer object data for the vertex shader
-        // The vertex buffer contains: position (3), color (3)
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 3* Float.BYTES);
-    }
-
     private void displayCubie(GL3 gl) {
         gl.glUseProgram(shaderProgram.getShaderProgramID());
         // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
@@ -154,17 +110,6 @@ public class Renderer implements GLEventListener, Observer {
 
         // Draws the elements in the order defined by the index buffer object (IBO)
         gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
-    }
-
-    private void displayTestIntersectionObject(GL3 gl) {
-        gl.glUseProgram(shaderProgram.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[1]);
-
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, 4, GL.GL_UNSIGNED_INT, 0);
     }
 
     @Override
@@ -197,7 +142,6 @@ public class Renderer implements GLEventListener, Observer {
         // Initialize cubie
         cube = new Cube(3);
         initCubie(gl);
-        initTestIntersectionObject(gl);
         // END: Preparing scene
 
         interactionHandler.setCube(cube);
@@ -278,7 +222,7 @@ public class Renderer implements GLEventListener, Observer {
         System.arraycopy(pmvMatrix.glGetPMvMatrixf().array(), 16, mvMatrix, 0, 16);
         interactionHandler.setModelviewMatrix(mvMatrix);
 
-        displayTestIntersectionObject(gl);
+        System.out.println(cube.getCubeRotation());
         pmvMatrix.glRotate(cube.getCubeRotation());
         for (int x = 0; x < cube.getCubeLayers(); x++) {
             for (int y = 0; y < cube.getCubeLayers(); y++) {
