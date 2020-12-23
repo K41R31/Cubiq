@@ -19,8 +19,8 @@ public class ScanCube implements Observer {
     private GuiModel model;
     private WebcamCapture webcamCapture;
     private ScheduledExecutorService timer;
-    private List<int[][]> scannedCubeSides = new ArrayList<>();
-    private List<Double> centerColorSaturations = new ArrayList<>();
+    private final List<int[][]> scannedCubeSides = new ArrayList<>();
+    private final List<Double> centerColorSaturations = new ArrayList<>();
     private int sameSideCounter = 0;
     private int[][] foundCubeSide;
 
@@ -260,16 +260,13 @@ public class ScanCube implements Observer {
 
         if (corners[0].y > corners[1].y) {
             double angleRight = getAngle(corners[0], boundingRectTopLeft, corners[1]);
-            if (angleRight > model.getRotationThreshold())
-                return false;
+            return !(angleRight > model.getRotationThreshold());
         }
 
         else {
             double angleLeft = getAngle(corners[1], boundingRectTopRight, corners[0]);
-            if (angleLeft > model.getRotationThreshold())
-                return false;
+            return !(angleLeft > model.getRotationThreshold());
         }
-        return true;
     }
 
     private void logoCorrection() {
@@ -388,8 +385,7 @@ public class ScanCube implements Observer {
 
         // If the rectangle is rotated further than allowed
         if (rotatedRect.angle < -90 || rotatedRect.angle > 0) return false;
-        if (rotatedRect.angle > -60 && rotatedRect.angle < -30) return false;
-        return true;
+        return !(rotatedRect.angle > -60) || !(rotatedRect.angle < -30);
     }
 
     private Point centerBetweenTwoPoints(Point point0, Point point1) {

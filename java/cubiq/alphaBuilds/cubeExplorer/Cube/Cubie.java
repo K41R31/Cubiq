@@ -1,7 +1,6 @@
 package cubiq.alphaBuilds.cubeExplorer.Cube;
 
 import com.jogamp.opengl.math.Quaternion;
-import com.jogamp.opengl.math.VectorUtil;
 
 public class Cubie {
 
@@ -13,18 +12,12 @@ public class Cubie {
         rot = new Quaternion();
     }
 
-    /**
-     * Applies the transformation applied to this cubie to the given vector.
-     * @return Transformed vector.
-     */
-    public float[] orientVector(float[] vec) {
-        rot.rotateVector(vec, 0, vec, 0);
-        VectorUtil.addVec3(vec, vec, pos);
-        return vec;
+    public void rotateTo(Quaternion rotation) {
+        rot.set(rotation);
     }
 
-    public void rotateCubie(Quaternion rotation) {
-        rot.mult(rotation);
+    public void updateLocalPos() {
+        rot.rotateVector(pos, 0, pos, 0);
     }
 
     public float[] getPosition() {

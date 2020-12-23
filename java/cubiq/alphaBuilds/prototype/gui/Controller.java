@@ -89,10 +89,10 @@ public class Controller implements Observer {
 
     // Inner class, that generates custom styled buttons
     private class MenuItem extends StackPane {
-        private String name;
-        private int width;
-        private int height = 50;
-        private int skewValue = 10;
+        private final String name;
+        private final int width;
+        private final int height = 50;
+        private final int skewValue = 10;
 
         /**
          * Generates a styled button with representative functions inside a stackpane

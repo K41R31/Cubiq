@@ -16,9 +16,9 @@ public class ResizeFrame implements Observer {
 
     private GuiModel guiModel;
     private ScreenInformationModel screenInformationModel;
-    private AnchorPane dragFramePane;
-    private Line[] lines;
-    private Point[] alignPoints;
+    private final AnchorPane dragFramePane;
+    private final Line[] lines;
+    private final Point[] alignPoints;
     private double windowCursorPosX, windowCursorPosY;
     private double scenePosX, scenePosY;
     private double sceneWidth, sceneHeight;

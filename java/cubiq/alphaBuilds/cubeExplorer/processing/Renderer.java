@@ -9,7 +9,6 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
 import cubiq.alphaBuilds.cubeExplorer.Cube.Cube;
-import cubiq.alphaBuilds.cubeExplorer.start.Start;
 import cubiq.alphaBuilds.cubeExplorer.io.InteractionHandler;
 import cubiq.alphaBuilds.cubeExplorer.model.Model;
 
@@ -27,9 +26,9 @@ public class Renderer implements GLEventListener, Observer {
     private final GLWindow glWindow;
     private Cube cube;
     private InteractionHandler interactionHandler;
-    private int DEVICE_WIDTH = 700;
-    private int DEVICE_HEIGHT = 700;
-    private float[] CAM_POS = new float[] {-9.5f, 6.1f, 9.5f};
+    private final int DEVICE_WIDTH = 700;
+    private final int DEVICE_HEIGHT = 700;
+    private final float[] CAM_POS = new float[] {-9.5f, 6.1f, 9.5f};
 
     private ShaderProgram shaderProgram;
 
@@ -222,17 +221,14 @@ public class Renderer implements GLEventListener, Observer {
         System.arraycopy(pmvMatrix.glGetPMvMatrixf().array(), 16, mvMatrix, 0, 16);
         interactionHandler.setModelviewMatrix(mvMatrix);
 
-        System.out.println(cube.getCubeRotation());
-        pmvMatrix.glRotate(cube.getCubeRotation());
-        for (int x = 0; x < cube.getCubeLayers(); x++) {
-            for (int y = 0; y < cube.getCubeLayers(); y++) {
-                for (int z = 0; z < cube.getCubeLayers(); z++) {
+        for (int x = 0; x < cube.getCubeLayersCount(); x++) {
+            for (int y = 0; y < cube.getCubeLayersCount(); y++) {
+                for (int z = 0; z < cube.getCubeLayersCount(); z++) {
                     pmvMatrix.glPushMatrix();
                     // Cubie rotation
                     pmvMatrix.glRotate(cube.getCubieRotation(x, y, z));
                     // Cubie translation
-                    float[] qbPos = cube.getCubiePosition(x, y, z);
-                    pmvMatrix.glTranslatef(qbPos[0], qbPos[1], qbPos[2]);
+                    pmvMatrix.glTranslatef(x-1, y-1, z-1);
                     // Display Cubie
                     displayCubie(gl);
                     pmvMatrix.glPopMatrix();

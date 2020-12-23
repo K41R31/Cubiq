@@ -6,8 +6,8 @@ import java.util.List;
 
 public class OLDCubeFace {
 
-    private List<int[][]> colorScheme;
-    private List<int[]> faceIndices;
+    private final List<int[][]> colorScheme;
+    private final List<int[]> faceIndices;
 
     public OLDCubeFace(List<int[][]> colorScheme) {
         this.colorScheme = colorScheme;

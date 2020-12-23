@@ -13,7 +13,7 @@ import java.util.Observer;
 public class FileChooser implements Observer {
 
     private Model model;
-    private javafx.stage.FileChooser fileChooser;
+    private final javafx.stage.FileChooser fileChooser;
 
 
     public FileChooser() {

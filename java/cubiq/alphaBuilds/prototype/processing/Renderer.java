@@ -23,8 +23,8 @@ public class Renderer implements Observer {
     private GLU glu;
     private GLWindow glWindow;
     private InteractionHandler interactionHandler;
-    private float[] rotation = new float[] {0f, 0f, 0f};
-    private int[] startRotation = new int[] {-90,-90, -90};
+    private final float[] rotation = new float[] {0f, 0f, 0f};
+    private final int[] startRotation = new int[] {-90,-90, -90};
     private int frame;
     
     public Renderer() {

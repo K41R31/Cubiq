@@ -9,6 +9,7 @@ import cubiq.alphaBuilds.cubeExplorer.Cube.Cube;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class InteractionHandler implements MouseListener {
 
@@ -17,33 +18,34 @@ public class InteractionHandler implements MouseListener {
     private final int CUBE_SNAP_BACK_SPEED = 23;
     private final float CUBE_ROTATION_SPEED = 0.15f;
     private final float INTERSECTION_EPSILON = 0.000001f;
-    private float[] camPos, pMatrix, mvMatrix;
-    private float deviceWidth, deviceHeight;
-    private Quaternion actualQuat, pressedQuat, snapToQuat, releasedQuat;
-    private List<Quaternion> pressedLayerQuats;
-    private int mousePressedX, mousePressedY, windowWidth, actualFrame, pressedFrame;
+    private final float[] camPos;
+    private float[] pMatrix;
+    private float[] mvMatrix;
+    private final float deviceWidth;
+    private final float deviceHeight;
+    private List<Quaternion> actualQuats, pressedQuats, snapToQuats, releasedQuats;
+    private final int[] pressedLayer; // [0] -> side, [1] -> rotation axis, [2] -> layer (1, 0, 0) = every cubie on layer
+    private int mousePressedX, mousePressedY, windowWidth, pressedFrameCount, pressedFrame;
     private float rotatedSincePress, snapBackDiff;
     private boolean swingingBack, mousePressed;
     private int snapBackFrameCount, mouseDraggedDirection; // -1 -> no direction; 0 -> x; 1 -> y; 2 -> z
     private Cube cube;
-    private float[][] testIntersectionObject;
 
-    private int[][][] clickGrid = new int[3][3][3];
+    private final int[][][] clickGrid = new int[3][3][3];
 
     public InteractionHandler(float[] camPos, float deviceWidth, float deviceHeight) {
         mousePressed = false;
         swingingBack = false;
-        actualQuat = new Quaternion();
-        pressedQuat = new Quaternion();
-        snapToQuat = new Quaternion();
-        releasedQuat = new Quaternion();
-        pressedLayerQuats = new ArrayList<>();
+        actualQuats = new ArrayList<>();
+        pressedQuats = new ArrayList<>();
+        snapToQuats = new ArrayList<>();
+        releasedQuats = new ArrayList<>();
         snapBackFrameCount = 0;
         mouseDraggedDirection = -1;
+        pressedLayer = new int[3];
         this.camPos = camPos;
         this.deviceWidth = deviceWidth;
         this.deviceHeight = deviceHeight;
-        testIntersectionObject = new float[6][3];
     }
 
 
@@ -63,23 +65,30 @@ public class InteractionHandler implements MouseListener {
     public void mousePressed(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseEvent.BUTTON1 && !swingingBack) {
             mousePressed = true;
-            pressedFrame = actualFrame;
+            pressedFrame = pressedFrameCount;
 
             // Store the position of the mouse when it was pressed
             mousePressedX = mouseEvent.getX();
             mousePressedY = mouseEvent.getY();
 
             // Check where the mouse was pressed
-            cube.getCubieRotation(0, 0, 0).toMatrix()
-
-            // Store the angles of the cube when the mouse was pressed in an quaternion
-            pressedQuat.set(actualQuat);
+            pressedLayer[0] = 0;
+            for (int x = 0; x < 3; x++) {
+                for (int y = 0; y < 3; y++) {
+                    for (int z = 0; z < 3; z++) {
+                        Quaternion cubieQuat = cube.getCubieRotation(x, y, z);
+                        // Load the cubie quaternions in actual quads
+                        actualQuats.add(cubieQuat);
+                        // Store the angles of the cube when the mouse was pressed in an quaternion
+                        pressedQuats.add(new Quaternion(cubieQuat));
+                    }
+                }
+            }
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-        mousePressed = false;
         // If the mouse travelled enough to trigger a direction
         if (mouseDraggedDirection != -1) {
             float nextSnapAngle;
@@ -89,14 +98,11 @@ public class InteractionHandler implements MouseListener {
             // Reset the animation frame counter
             snapBackFrameCount = 0;
 
-            // Save the released rotation quaternion
-            releasedQuat.set(actualQuat);
-
             // Round the angle that the cube has been rotated since the mouse was pressed to 90°
             nextSnapAngle = (float)(Math.round(rotatedSincePress / (Math.PI/2)) * (Math.PI/2));
 
             // If the mouse was released shortly after it was pressed, increase or decrease the rotation by 90°
-            if (actualFrame < pressedFrame + FAST_ROTATION_CLICK_SPEED) {
+            if (pressedFrameCount < pressedFrame + FAST_ROTATION_CLICK_SPEED) {
                 // Increase or decrease the rotation by 90°
                 if (rotatedSincePress > 0)
                     nextSnapAngle += Math.PI/2;
@@ -104,17 +110,27 @@ public class InteractionHandler implements MouseListener {
                     nextSnapAngle -= Math.PI/2;
             }
 
-            // Create a quaternion with the rounded angle
-            snapToQuat.setFromAngleNormalAxis(nextSnapAngle, directionAxis);
-
-            snapToQuat.mult(pressedQuat);
-
             // Calculate the angle the cube must rotate to reach the next step
             snapBackDiff = rotatedSincePress - nextSnapAngle;
 
+            for (int i = 0; i < actualQuats.size(); i++) {
+                // Create quaternions with the rounded angle
+                snapToQuats.add(new Quaternion().setFromAngleNormalAxis(nextSnapAngle, directionAxis));
+                snapToQuats.get(i).mult(pressedQuats.get(i));
+                // Save the released rotation quaternion
+                releasedQuats.add(new Quaternion(actualQuats.get(i)));
+            }
+            // Update every local cubie location
+            cube.updateLocalPos();
+
             // Reset the direction
             mouseDraggedDirection = -1;
+
+            pressedFrameCount = 0;
+
+            swingingBack = true;
         }
+        mousePressed = false;
     }
 
     @Override
@@ -156,7 +172,9 @@ public class InteractionHandler implements MouseListener {
                     else
                         stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{1, 0, 0});
                 }
-                actualQuat.set(stepRotQuat.mult(pressedQuat));
+                for (int i = 0; i < actualQuats.size(); i++) {
+                    actualQuats.get(i).set(stepRotQuat.mult(pressedQuats.get(i)));
+                }
             }
         }
     }
@@ -166,21 +184,26 @@ public class InteractionHandler implements MouseListener {
     }
 
     public void nextFrame() {
-        actualFrame++;
-        if (!mousePressed && !actualQuat.equals(snapToQuat))
+        if (mousePressed)
+            pressedFrameCount++;
+        else if (swingingBack)
             snapBack();
     }
 
     private void snapBack() {
-        swingingBack = true;
         snapBackFrameCount++;
 
         float animationLength = Math.round(Math.abs(snapBackDiff * CUBE_SNAP_BACK_SPEED));
 
-        if (animationLength != 0 && snapBackFrameCount < animationLength)
-            actualQuat.setSlerp(releasedQuat, snapToQuat, easeOut(snapBackFrameCount, 0, 1, animationLength));
+        if (animationLength != 0 && snapBackFrameCount < animationLength) {
+            for (int i = 0; i < actualQuats.size(); i++) {
+                actualQuats.get(i).setSlerp(releasedQuats.get(i), snapToQuats.get(i), easeOut(snapBackFrameCount, 0, 1, animationLength));
+            }
+        }
         else {
-            actualQuat.set(snapToQuat);
+            for (int i = 0; i < actualQuats.size(); i++) {
+                actualQuats.get(i).set(snapToQuats.get(i));
+            }
             swingingBack = false;
         }
     }
@@ -290,10 +313,6 @@ public class InteractionHandler implements MouseListener {
         outVec[2] = inVec[0] * inMat[2] + inVec[1] * inMat[6] + inVec[2] * inMat[10] + inVec[3] * inMat[14];
         outVec[3] = inVec[0] * inMat[3] + inVec[1] * inMat[7] + inVec[2] * inMat[11] + inVec[3] * inMat[15];
         return outVec;
-    }
-
-    public Quaternion getActualQuat() {
-        return actualQuat;
     }
 
     public void setWindowWidth(int windowWidth) {
