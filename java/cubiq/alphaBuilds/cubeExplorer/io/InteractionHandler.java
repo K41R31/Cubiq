@@ -71,6 +71,9 @@ public class InteractionHandler implements MouseListener {
             mousePressedX = mouseEvent.getX();
             mousePressedY = mouseEvent.getY();
 
+            pressedQuats.clear();
+            actualQuats.clear();
+
             // Check where the mouse was pressed
             pressedLayer[0] = 0;
             for (int x = 0; x < 3; x++) {
@@ -112,6 +115,9 @@ public class InteractionHandler implements MouseListener {
 
             // Calculate the angle the cube must rotate to reach the next step
             snapBackDiff = rotatedSincePress - nextSnapAngle;
+
+            snapToQuats.clear();
+            releasedQuats.clear();
 
             for (int i = 0; i < actualQuats.size(); i++) {
                 // Create quaternions with the rounded angle
