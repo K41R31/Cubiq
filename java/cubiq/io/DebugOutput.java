@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DebugOutput {
 
-    private final String fileLocation = "src/cubiq/resources/debug/";
+    private final String fileLocation = "src/resources/debug/";
 
     public void printSchemes(List<int[][]> colorSchemes, String name) {
         List<String[][]> convertedSchemes = convertSchemeToString(colorSchemes);

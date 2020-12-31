@@ -127,7 +127,8 @@ public class BuildCube {
                         if (isPossibleFinalCombination(orientedScheme)) {
                             new DebugOutput().printSchemes(orientedScheme, "scheme");
                             String solvableString = generateSolvableString(orientedScheme);
-                            String solution = Search.solution(solvableString, 20, 5, false);
+                            // TODO Braucht aus irgendeinem Grund 1.5 Minuten
+                            String solution = Search.solution(solvableString, 21, 5, false);
                             System.out.println(solution);
                         }
                     }

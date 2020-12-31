@@ -12,7 +12,7 @@ public class ScreenInformation implements Observer {
     private ScreenInformationModel screenInformationModel;
     private GuiModel guiModel;
 
-    public void setStageSize(double width, double height) {
+    private void setStageSize(double width, double height) {
         guiModel.getStage().setWidth(width);
         guiModel.getStage().setHeight(height);
     }

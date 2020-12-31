@@ -15,7 +15,7 @@ public class GuiModel extends Observable {
      */
 
     private Stage stage;
-    private Font kiona;
+    private Font kiona, kionaItalic;
     private Font bender;
     private Mat originalFrame;
     private Mat[] loadedImages;
@@ -45,6 +45,14 @@ public class GuiModel extends Observable {
 
     public void setKiona(Font font) {
         this.kiona = font;
+    }
+
+    public Font getKionaItalic() {
+        return this.kionaItalic;
+    }
+
+    public void setKionaItalic(Font font) {
+        this.kionaItalic = font;
     }
 
     // bender-----------------------------------------------------------------------------------------------------------
