@@ -1,6 +1,7 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -20,49 +21,120 @@ import javafx.scene.shape.Polyline;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Footer extends AnchorPane implements Observer {
+public class ScanView extends AnchorPane implements Observer {
 
     private GuiModel guiModel;
-    private MenuItem menuItemLeft;
+    private ImageView webcamView;
+    private FooterMenuItem footerMenuItemLeft;
 
-    private void initFooter() {
-        HBox menuItemContainer = new HBox();
-        menuItemContainer.setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
-        menuItemContainer.setAlignment(Pos.BOTTOM_RIGHT);
-        menuItemContainer.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        AnchorPane.setLeftAnchor(menuItemContainer, 0d);
-        AnchorPane.setRightAnchor(menuItemContainer, 0d);
-        AnchorPane.setBottomAnchor(menuItemContainer, 0d);
+    private void init() {
+        // Webcam view
+        webcamView = new ImageView();
+        webcamView.setFitWidth(1920);
+        webcamView.setFitHeight(1080);
+        setTopAnchor(webcamView, 0d);
+        setRightAnchor(webcamView, 0d);
+        setBottomAnchor(webcamView, 0d);
+        setLeftAnchor(webcamView, 0d);
+        this.getChildren().add(webcamView);
 
-        menuItemLeft = new MenuItem(new Double[] {0d, 0d, 53d, 0d, 105d, 50d, 480d, 50d, 510d, 81d, 0d, 81d}, "leftItem");
-        MenuItem menuItemSolve = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "solve");
-        MenuItem menuItemLearn = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "learn");
-        MenuItem menuItemTimer = new MenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "timer");
+        // Webcam Overlay
+        ImageView camOverlay = new ImageView();
+        setTopAnchor(camOverlay, 0d);
+        setRightAnchor(camOverlay, 0d);
+        setBottomAnchor(camOverlay, 0d);
+        setLeftAnchor(camOverlay, 0d);
+        camOverlay.setFitWidth(1920);
+        camOverlay.setFitHeight(1080);
+        camOverlay.setImage(new Image(getClass().getResourceAsStream(("/assets/camOverlay.png"))));
+        this.getChildren().add(camOverlay);
 
-        menuItemSolve.setOnMouseClicked(event -> guiModel.callObservers("menuItemSolveActive"));
-        menuItemLearn.setOnMouseClicked(event -> guiModel.callObservers("menuItemLearnActive"));
-        menuItemTimer.setOnMouseClicked(event -> guiModel.callObservers("menuItemTimerActive"));
+        // Left and right addons
+        StackPane leftAddonPane = new StackPane();
+        leftAddonPane.setPrefWidth(USE_COMPUTED_SIZE);
+        leftAddonPane.setPrefHeight(USE_COMPUTED_SIZE);
+        leftAddonPane.setAlignment(Pos.CENTER);
+        AnchorPane.setTopAnchor(leftAddonPane, 0d);
+        AnchorPane.setBottomAnchor(leftAddonPane, 0d);
+        AnchorPane.setLeftAnchor(leftAddonPane, 0d);
+        ImageView leftAddonImage = new ImageView();
+        leftAddonPane.getChildren().add(leftAddonImage);
+        leftAddonImage.setFitWidth(130);
+        leftAddonImage.setFitHeight(635);
+        leftAddonImage.setImage(new Image(getClass().getResourceAsStream(("/assets/leftAddon.png"))));
+        this.getChildren().add(leftAddonPane);
 
-        menuItemContainer.getChildren().addAll(menuItemTimer, menuItemLearn, menuItemSolve, menuItemLeft);
+        StackPane rightAddonPane = new StackPane();
+        rightAddonPane.setPrefWidth(USE_COMPUTED_SIZE);
+        rightAddonPane.setPrefHeight(USE_COMPUTED_SIZE);
+        rightAddonPane.setAlignment(Pos.CENTER);
+        AnchorPane.setTopAnchor(rightAddonPane, 0d);
+        AnchorPane.setBottomAnchor(rightAddonPane, 0d);
+        AnchorPane.setRightAnchor(rightAddonPane, 0d);
+        ImageView rightAddonImage = new ImageView();
+        rightAddonPane.getChildren().add(rightAddonImage);
+        rightAddonImage.setFitWidth(130);
+        rightAddonImage.setFitHeight(635);
+        rightAddonImage.setImage(new Image(getClass().getResourceAsStream(("/assets/rightAddon.png"))));
+        this.getChildren().add(rightAddonPane);
+
+        // Footer
+        HBox footerItemContainer = new HBox();
+        footerItemContainer.setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
+        footerItemContainer.setAlignment(Pos.BOTTOM_RIGHT);
+        footerItemContainer.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+        AnchorPane.setLeftAnchor(footerItemContainer, 0d);
+        AnchorPane.setRightAnchor(footerItemContainer, 0d);
+        AnchorPane.setBottomAnchor(footerItemContainer, 0d);
+
+        footerMenuItemLeft = new FooterMenuItem(new Double[] {0d, 0d, 53d, 0d, 105d, 50d, 480d, 50d, 510d, 81d, 0d, 81d}, "leftItem");
+        FooterMenuItem menuItemCubeDepth = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "3x3x3 Cube");
+        FooterMenuItem menuItemSettings = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "settings");
+        FooterMenuItem menuItemHelp = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "help");
+
+        menuItemCubeDepth.setOnMouseClicked(event -> guiModel.callObservers("menuItemCubeDepthActive"));
+        menuItemSettings.setOnMouseClicked(event -> guiModel.callObservers("menuItemSettingsActive"));
+        menuItemHelp.setOnMouseClicked(event -> guiModel.callObservers("menuItemHelpActive"));
+
+        footerItemContainer.getChildren().addAll(menuItemHelp, menuItemSettings, menuItemCubeDepth, footerMenuItemLeft);
 
         ChangeListener sizeChangeListener = (ChangeListener<Double>) (observable, oldValue, newValue) -> {
-            double width = menuItemContainer.getWidth() / 4;
-            menuItemLeft.updateWidth(width);
-            menuItemSolve.updateWidth(width);
-            menuItemLearn.updateWidth(width);
-            menuItemTimer.updateWidth(width);
+            double width = footerItemContainer.getWidth() / 4;
+            footerMenuItemLeft.updateWidth(width);
+            menuItemCubeDepth.updateWidth(width);
+            menuItemSettings.updateWidth(width);
+            menuItemHelp.updateWidth(width);
         };
-        menuItemContainer.widthProperty().addListener(sizeChangeListener);
+        footerItemContainer.widthProperty().addListener(sizeChangeListener);
 
-        this.getChildren().addAll(menuItemContainer);
+        this.getChildren().add(footerItemContainer);
     }
 
-    private class MenuItem extends StackPane {
+    private void updateImageView() {
+        Mat convertedMat = guiModel.getOriginalFrame().clone();
+        MatOfByte matOfByte = new MatOfByte();
+
+        Imgproc.cvtColor(convertedMat, convertedMat, Imgproc.COLOR_HSV2BGR);
+
+        if (guiModel.isMirrorWebcam()) Core.flip(convertedMat, convertedMat, 1);
+
+        Imgcodecs.imencode(".jpg", convertedMat, matOfByte);
+
+        Platform.runLater(() -> webcamView.setImage(new Image(new ByteArrayInputStream(matOfByte.toArray()))));
+    }
+
+    private class FooterMenuItem extends StackPane {
         Polygon mainShape, leftItemCaptionBackground;
         ImageView overlay;
         Polyline glowLine, blurredLine;
@@ -70,7 +142,7 @@ public class Footer extends AnchorPane implements Observer {
         String title;
         Text leftItemText;
 
-        MenuItem(Double[] points, String title) {
+        FooterMenuItem(Double[] points, String title) {
             this.points = points;
             this.title = title;
             setPadding(new Insets(0, -33, 0, 0));
@@ -257,7 +329,8 @@ public class Footer extends AnchorPane implements Observer {
             blurredLine.getPoints().set(vals[1], width + 30d);
         }
 
-        private void updateSidesFound(int count) {
+        private void updateSidesFound() {
+            int count = guiModel.getTotalCubeSideFound();
             String addition = "  S";
             if (count == 1) addition = "";
             leftItemText.setText("\\\\   " + count + "   S  I  D  E" + addition);
@@ -266,17 +339,23 @@ public class Footer extends AnchorPane implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        switch ((String) arg) {
-            case "initFooter":
-                initFooter();
+        switch ((String)arg) {
+            case "initGuiElements":
+                init();
+                break;
+            case "addScanPointOverlay":
+                // TODO-------------------------------------------------------------------------------------------------
+                break;
+            case "updateImageView":
+                updateImageView();
                 break;
             case "newCubeSideFound":
-                menuItemLeft.updateSidesFound(guiModel.getTotalCubeSideFound());
+                footerMenuItemLeft.updateSidesFound();
                 break;
         }
     }
 
-    public void initModel(GuiModel model) {
-        this.guiModel = model;
+    public void initModel(GuiModel guiModel) {
+        this.guiModel = guiModel;
     }
 }

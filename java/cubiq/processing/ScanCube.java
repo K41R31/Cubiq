@@ -5,7 +5,6 @@ import cubiq.io.WebcamCapture;
 import cubiq.models.GuiModel;
 import org.opencv.core.*;
 import org.opencv.core.Point;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
@@ -24,8 +23,6 @@ public class ScanCube implements Observer {
     private int sameSideCounter = 0;
     private int[][] foundCubeSide;
 
-    public ScanCube() {
-    }
 
     private void startWebcamLoop() {
         // Initialize the webcam
@@ -50,7 +47,7 @@ public class ScanCube implements Observer {
 
     private void processFrame(Mat frame) {
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
-        model.setWebcamFrame(frame);
+        model.setOriginalFrame(frame);
 
         // Get the position of the stickers
         List<Point> centers = cubeBoundarys(frame);
@@ -91,6 +88,7 @@ public class ScanCube implements Observer {
                     scannedCubeSides.add(colorMatrix);
                     centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
                     model.setTotalCubeSideFound(scannedCubeSides.size());
+                    model.callObservers("newCubeSideFound");
                     new DebugOutput().printImage(frame.clone(), scannedCubeSides.size());
                     // Reset counter and same side variable
                     foundCubeSide = null;
@@ -127,7 +125,7 @@ public class ScanCube implements Observer {
         //Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_BGR2HSV);
 
         // Show processedMat
-        model.setWebcamFrame(contourMat);
+        model.setOriginalFrame(contourMat);
         model.callObservers("updateImageView");
     }
 
@@ -579,7 +577,7 @@ public class ScanCube implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "startWebcamLoop":
+            case "startSolver":
                 startWebcamLoop();
                 break;
             case "startLoadedImagesLoop":

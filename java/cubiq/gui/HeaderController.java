@@ -1,6 +1,5 @@
 package cubiq.gui;
 
-import cubiq.models.ScreenInformationModel;
 import cubiq.models.GuiModel;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
@@ -31,7 +30,6 @@ public class HeaderController implements Observer {
     private double sceneOnWindowPosX, sceneOnWindowPosY;
     private boolean mousePressedInHeader = false;
     private GraphicsDevice[] graphicsDevices;
-    private ScreenInformationModel screenInformationModel;
     private GuiModel guiModel;
 
     //TODO Multimonitor Unterstützung (MouseInfo.getPointerInfo().getDevice() abgleichen)
@@ -48,8 +46,8 @@ public class HeaderController implements Observer {
     private void redrawWindiowOnUnminimize() {
         ChangeListener iconfieldChangeListener = (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
             if (!guiModel.getStage().isIconified()) {
-                screenInformationModel.callObservers("toggleFullScreen");
-                screenInformationModel.callObservers("toggleFullScreen");
+                guiModel.callObservers("toggleFullScreen");
+                guiModel.callObservers("toggleFullScreen");
             }
         };
         guiModel.getStage().iconifiedProperty().addListener(iconfieldChangeListener);
@@ -75,8 +73,8 @@ public class HeaderController implements Observer {
                         double offsetY = event.getScreenY() - windowCursorPosY;
                         double newPosX = sceneOnWindowPosX + offsetX;
                         double newPosY = sceneOnWindowPosY + offsetY;
-                        if (screenInformationModel.getIsFullscreen()) {
-                            screenInformationModel.callObservers("toggleDraggedFullScreen"); //Wenn das Fenster im Vollbildmodus gedraggt wird, wird es verkleinert
+                        if (guiModel.getIsFullscreen()) {
+                            guiModel.callObservers("toggleDraggedFullScreen"); //Wenn das Fenster im Vollbildmodus gedraggt wird, wird es verkleinert
                             sceneOnWindowPosX = guiModel.getStage().getX();
                         } else {
                             guiModel.getStage().setX(newPosX);
@@ -89,9 +87,9 @@ public class HeaderController implements Observer {
                 event -> {
                     if (mousePressedInHeader) {
                         mousePressedInHeader = false;
-                        if (MouseInfo.getPointerInfo().getLocation().y == 0) screenInformationModel.callObservers("toggleFullScreen"); //Wenn das Fenster oben losgelassen wird, wird es in den Vollbildmodus gesetzt
+                        if (MouseInfo.getPointerInfo().getLocation().y == 0) guiModel.callObservers("toggleFullScreen"); //Wenn das Fenster oben losgelassen wird, wird es in den Vollbildmodus gesetzt
                         else if (guiModel.getStage().getY() < 0) guiModel.getStage().setY(0); //Wenn das Fenster höher als 0 losgelassen wird, wird die Höhe auf 0 gesetzt
-                        else if (guiModel.getStage().getY() + 30 > screenInformationModel.getScreenHeight() - 40) guiModel.getStage().setY(screenInformationModel.getScreenHeight() - 70); //Wenn das Fenster in der Taskbar losgelassen wird, wird es drüber gesetzt
+                        else if (guiModel.getStage().getY() + 30 > guiModel.getScreenHeight() - 40) guiModel.getStage().setY(guiModel.getScreenHeight() - 70); //Wenn das Fenster in der Taskbar losgelassen wird, wird es drüber gesetzt
                     }
                 };
 
@@ -99,7 +97,7 @@ public class HeaderController implements Observer {
                 event -> {
 
                     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY){
-                        screenInformationModel.callObservers("toggleFullScreen");
+                        guiModel.callObservers("toggleFullScreen");
                     }
 
                 };
@@ -172,7 +170,7 @@ public class HeaderController implements Observer {
     }
     @FXML
     private void minMax() {
-        screenInformationModel.callObservers("toggleFullScreen");
+        guiModel.callObservers("toggleFullScreen");
     }
     @FXML
     private void exit() {
@@ -182,14 +180,13 @@ public class HeaderController implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
-            case "initializeHeaderController":
+            case "initGuiElements":
                 initialize();
                 break;
         }
     }
 
-    public void initModels(ScreenInformationModel screenInformationModel, GuiModel guiModel) {
-        this.screenInformationModel = screenInformationModel;
+    public void initModel(GuiModel guiModel) {
         this.guiModel = guiModel;
     }
 }

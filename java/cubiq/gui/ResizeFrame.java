@@ -1,7 +1,6 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
-import cubiq.models.ScreenInformationModel;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Cursor;
 import javafx.scene.layout.AnchorPane;
@@ -12,11 +11,9 @@ import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class ResizeFrame implements Observer {
+public class ResizeFrame extends AnchorPane implements Observer {
 
     private GuiModel guiModel;
-    private ScreenInformationModel screenInformationModel;
-    private final AnchorPane dragFramePane;
     private final Line[] lines;
     private final Point[] alignPoints;
     private double windowCursorPosX, windowCursorPosY;
@@ -28,8 +25,7 @@ public class ResizeFrame implements Observer {
     public ResizeFrame() {
         alignPoints = new Point[13];
         lines = new Line[12];
-        dragFramePane = new AnchorPane();
-        dragFramePane.setPickOnBounds(false);
+        this.setPickOnBounds(false);
     }
 
     private void addResizePointsUpdater() {
@@ -38,7 +34,7 @@ public class ResizeFrame implements Observer {
         guiModel.getStage().heightProperty().addListener(sizeChangeListener);
     }
 
-    private void initResizeLines() {
+    public void initResizeLines() {
         for (int i = 0; i < 13; i++) {
             alignPoints[i] = new Point();
         }
@@ -46,7 +42,7 @@ public class ResizeFrame implements Observer {
             lines[i] = new Line();
             lines[i].setStrokeWidth(4);
             lines[i].setStroke(Color.TRANSPARENT);
-            dragFramePane.getChildren().add(lines[i]);
+            this.getChildren().add(lines[i]);
             switch (i) {
                 case 0:
                     lines[i].setCursor(Cursor.N_RESIZE);
@@ -57,7 +53,7 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (sceneHeight - offsetY > screenInformationModel.getMinWindowSize()[1]) {
+                        if (sceneHeight - offsetY > guiModel.getMinWindowSize()[1]) {
                             guiModel.getStage().setY(scenePosY + offsetY);
                             guiModel.getStage().setHeight(sceneHeight - offsetY);
                         }
@@ -76,9 +72,9 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (sceneWidth + offsetX > screenInformationModel.getMinWindowSize()[0])
+                        if (sceneWidth + offsetX > guiModel.getMinWindowSize()[0])
                             guiModel.getStage().setWidth(sceneWidth + offsetX);
-                        if (sceneHeight - offsetY > screenInformationModel.getMinWindowSize()[1]) {
+                        if (sceneHeight - offsetY > guiModel.getMinWindowSize()[1]) {
                             guiModel.getStage().setHeight(sceneHeight - offsetY);
                             guiModel.getStage().setY(scenePosY + offsetY);
                         }
@@ -92,7 +88,7 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
-                        if (sceneWidth + offsetX > screenInformationModel.getMinWindowSize()[0])
+                        if (sceneWidth + offsetX > guiModel.getMinWindowSize()[0])
                             guiModel.getStage().setWidth(sceneWidth + offsetX);
                     });
                     continue;
@@ -108,9 +104,9 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (sceneWidth + offsetX > screenInformationModel.getMinWindowSize()[0])
+                        if (sceneWidth + offsetX > guiModel.getMinWindowSize()[0])
                             guiModel.getStage().setWidth(sceneWidth + offsetX);
-                        if (sceneHeight + offsetY > screenInformationModel.getMinWindowSize()[1])
+                        if (sceneHeight + offsetY > guiModel.getMinWindowSize()[1])
                             guiModel.getStage().setHeight(sceneHeight + offsetY);
                     });
                     continue;
@@ -122,7 +118,7 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (sceneHeight + offsetY > screenInformationModel.getMinWindowSize()[1])
+                        if (sceneHeight + offsetY > guiModel.getMinWindowSize()[1])
                             guiModel.getStage().setHeight(sceneHeight + offsetY);
                     });
                     continue;
@@ -139,11 +135,11 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
+                        if (sceneWidth - offsetX > guiModel.getMinWindowSize()[0]) {
                             guiModel.getStage().setX(scenePosX + offsetX);
                             guiModel.getStage().setWidth(sceneWidth - offsetX);
                         }
-                        if (sceneHeight + offsetY > screenInformationModel.getMinWindowSize()[1])
+                        if (sceneHeight + offsetY > guiModel.getMinWindowSize()[1])
                             guiModel.getStage().setHeight(sceneHeight + offsetY);
                     });
                     continue;
@@ -156,7 +152,7 @@ public class ResizeFrame implements Observer {
                     });
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
-                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
+                        if (sceneWidth - offsetX > guiModel.getMinWindowSize()[0]) {
                             guiModel.getStage().setX(scenePosX + offsetX);
                             guiModel.getStage().setWidth(sceneWidth - offsetX);
                         }
@@ -176,18 +172,18 @@ public class ResizeFrame implements Observer {
                     lines[i].setOnMouseDragged(event -> {
                         offsetX = event.getScreenX() - windowCursorPosX;
                         offsetY = event.getScreenY() - windowCursorPosY;
-                        if (sceneWidth - offsetX > screenInformationModel.getMinWindowSize()[0]) {
+                        if (sceneWidth - offsetX > guiModel.getMinWindowSize()[0]) {
                             guiModel.getStage().setX(scenePosX + offsetX);
                             guiModel.getStage().setWidth(sceneWidth - offsetX);
                         }
-                        if (sceneHeight - offsetY > screenInformationModel.getMinWindowSize()[1]) {
+                        if (sceneHeight - offsetY > guiModel.getMinWindowSize()[1]) {
                             guiModel.getStage().setY(scenePosY + offsetY);
                             guiModel.getStage().setHeight(sceneHeight - offsetY);
                         }
                     });
                     lines[i].setOnMouseReleased(event -> {
-                        if (event.getScreenY() == 0 || event.getScreenY() == screenInformationModel.getScreenHeight() - 1) {
-                            guiModel.getStage().setHeight(screenInformationModel.getScreenHeight() - 40);
+                        if (event.getScreenY() == 0 || event.getScreenY() == guiModel.getScreenHeight() - 1) {
+                            guiModel.getStage().setHeight(guiModel.getScreenHeight() - 40);
                             guiModel.getStage().setY(0);
                         }
                     });
@@ -222,32 +218,24 @@ public class ResizeFrame implements Observer {
 
     }
 
-    public AnchorPane getDragFramePane() {
-        return dragFramePane;
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
-            case "initResizeLines":
+            case "initGuiElements":
                 initResizeLines();
                 addResizePointsUpdater();
                 break;
-            case "alignLines":
+            case "alignResizeLines":
                 alignResizeLines();
                 break;
             case "toggleDraggedFullScreen":
             case "toggleFullScreen":
-                dragFramePane.setDisable(screenInformationModel.getIsFullscreen());
+                this.setDisable(!guiModel.getIsFullscreen());
                 break;
         }
     }
 
-    public void initScreenInformationModel(ScreenInformationModel model) {
-        this.screenInformationModel = model;
-    }
-
-    public void initGuiModel(GuiModel guiModel) {
+    public void initModel(GuiModel guiModel) {
         this.guiModel = guiModel;
     }
 }

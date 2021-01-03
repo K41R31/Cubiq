@@ -16,11 +16,11 @@ import javafx.scene.text.Text;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Launcher extends AnchorPane implements Observer {
+public class LauncherView extends AnchorPane implements Observer {
 
     GuiModel guiModel;
 
-    public void initLauncher() {
+    private void initLauncher() {
         setMinWidth(USE_PREF_SIZE);
         setMinHeight(USE_PREF_SIZE);
         setPrefWidth(800);
@@ -31,7 +31,7 @@ public class Launcher extends AnchorPane implements Observer {
 
         VBox contentPane = new VBox();
         contentPane.setAlignment(Pos.CENTER);
-        contentPane.setSpacing(50);
+        contentPane.setSpacing(60);
         contentPane.setPrefWidth(USE_COMPUTED_SIZE);
         contentPane.setPrefHeight(USE_COMPUTED_SIZE);
         setBottomAnchor(contentPane, 0d);
@@ -42,7 +42,7 @@ public class Launcher extends AnchorPane implements Observer {
 
         Text title = new Text("cubiq");
         title.setFont(guiModel.getKiona());
-        title.setStyle("-fx-font-size: 30");
+        title.setStyle("-fx-font-size: 35");
         title.setFill(Color.web("#d5d5d5"));
         title.setFontSmoothingType(FontSmoothingType.GRAY);
         contentPane.getChildren().add(title);
@@ -199,7 +199,7 @@ public class Launcher extends AnchorPane implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "initLauncher":
+            case "initGuiElements":
                 initLauncher();
                 break;
         }

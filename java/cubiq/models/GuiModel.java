@@ -30,6 +30,12 @@ public class GuiModel extends Observable {
     private double scanAreaSize = 20;
     private List<int[][]> colorScheme;
     private int totalCubeSideFound = 0;
+    private boolean isFullscreen = false;
+    private double screenWidth, screenHeight;
+    private int headerHeight = 23;
+    private int taskbarHeight = 40;
+    private int[] minWindowSize = new int[] {1484, 716};
+    private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
 
 
     public void callObservers(String arg) {
@@ -37,7 +43,7 @@ public class GuiModel extends Observable {
         notifyObservers(arg);
     }
 
-    // kiona------------------------------------------------------------------------------------------------------------
+    // Kiona------------------------------------------------------------------------------------------------------------
 
     public Font getKiona() {
         return this.kiona;
@@ -55,7 +61,7 @@ public class GuiModel extends Observable {
         this.kionaItalic = font;
     }
 
-    // bender-----------------------------------------------------------------------------------------------------------
+    // Bender-----------------------------------------------------------------------------------------------------------
 
     public Font getBender() {
         return this.bender;
@@ -71,7 +77,7 @@ public class GuiModel extends Observable {
         return this.originalFrame;
     }
 
-    public void setWebcamFrame(Mat frame) {
+    public void setOriginalFrame(Mat frame) {
         this.originalFrame = frame;
     }
 
@@ -169,8 +175,62 @@ public class GuiModel extends Observable {
 
     public void setTotalCubeSideFound(int totalCubeSideFound) {
         this.totalCubeSideFound = totalCubeSideFound;
-        setChanged();
-        notifyObservers("newCubeSideFound");
+    }
+
+    // IsFullscreen-----------------------------------------------------------------------------------------------------
+    public void setIsFullscreen(boolean isFullscreen) {
+        this.isFullscreen = isFullscreen;
+    }
+
+    public boolean getIsFullscreen() {
+        return isFullscreen;
+    }
+
+    // ScreenSize-------------------------------------------------------------------------------------------------------
+    public void setScreenWidth(double screenWidth) {
+        this.screenWidth = screenWidth;
+    }
+
+    public void setScreenHeight(double screenHeight) {
+        this.screenHeight = screenHeight;
+    }
+
+    public double getScreenWidth() {
+        return screenWidth;
+    }
+
+    public double getScreenHeight() {
+        return screenHeight;
+    }
+
+    // HeaderHeight-----------------------------------------------------------------------------------------------------
+
+    public int getHeaderHeight() {
+        return headerHeight;
+    }
+
+    public void setHeaderHeight(int headerHeight) {
+        this.headerHeight = headerHeight;
+    }
+
+    // TaskbarHeight----------------------------------------------------------------------------------------------------
+
+    public int getTaskbarHeight() {
+        return taskbarHeight;
+    }
+
+    public void setTaskbarHeight(int taskbarHeight) {
+        this.taskbarHeight = taskbarHeight;
+    }
+
+    // MinWindowSize----------------------------------------------------------------------------------------------------
+
+    public int[] getMinWindowSize() {
+        return minWindowSize;
+    }
+
+    public void setMinWindowSize(int[] minWindowSize) {
+        this.minWindowSize = minWindowSize;
     }
 
     public Stage getStage() {
@@ -187,5 +247,42 @@ public class GuiModel extends Observable {
 
     public void setLoadedImages(Mat[] loadedImages) {
         this.loadedImages = loadedImages;
+    }
+
+
+    // SavedScenePosition-----------------------------------------------------------------------------------------------
+
+    public double getSavedSceneX() {
+        return savedSceneX;
+    }
+
+    public void setSavedSceneX(double savedSceneX) {
+        this.savedSceneX = savedSceneX;
+    }
+
+    public double getSavedSceneY() {
+        return savedSceneY;
+    }
+
+    public void setSavedSceneY(double savedSceneY) {
+        this.savedSceneY = savedSceneY;
+    }
+
+    // SavedSceneSize---------------------------------------------------------------------------------------------------
+
+    public double getSavedSceneWidth() {
+        return savedSceneWidth;
+    }
+
+    public void setSavedSceneWidth(double savedSceneWidth) {
+        this.savedSceneWidth = savedSceneWidth;
+    }
+
+    public double getSavedSceneHeight() {
+        return savedSceneHeight;
+    }
+
+    public void setSavedSceneHeight(double savedSceneHeight) {
+        this.savedSceneHeight = savedSceneHeight;
     }
 }
