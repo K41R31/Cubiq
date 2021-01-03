@@ -1,4 +1,4 @@
-package cubeExplorer.cube;
+package cubiq.cube;
 
 import com.jogamp.opengl.math.Quaternion;
 
