@@ -4,6 +4,7 @@ import cubiq.gui.*;
 import cubiq.io.FileChooser;
 import cubiq.models.GuiModel;
 import cubiq.processing.ScanCube;
+import cubiq.renderer.ObjectLoader;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -17,6 +18,10 @@ public class Start extends Application {
 
     @Override
     public void start(Stage stage) {
+        ObjectLoader cxx = new ObjectLoader();
+        cxx.texture_loader();
+
+
         // Load library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
