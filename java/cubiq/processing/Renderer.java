@@ -1,4 +1,4 @@
-package cubeExplorer.processing;
+package cubiq.processing;
 
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
@@ -8,9 +8,8 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
-import cubeExplorer.cube.Cube;
-import cubeExplorer.io.InteractionHandler;
-import cubeExplorer.model.Model;
+import cubiq.cube.Cube;
+import cubiq.io.InteractionHandler;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

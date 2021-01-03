@@ -1,11 +1,11 @@
-package cubeExplorer.io;
+package cubiq.io;
 
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
-import cubeExplorer.cube.Cube;
+import cubiq.cube.Cube;
 
 import java.util.ArrayList;
 import java.util.List;
