@@ -12,12 +12,9 @@ public class Cubie {
     public Cubie(float x, float y, float z) {
         translation = new float[] {x, y, z};
         rot = new Quaternion();
-        indices = new float[] {
-                -0.5f,
-        };
     }
 
-    public void rotateTo(Quaternion rotation) {
+    public void rotateToQuat(Quaternion rotation) {
         rot.set(rotation);
     }
 
@@ -25,15 +22,15 @@ public class Cubie {
         rot.rotateVector(localPos, 0, localPos, 0);
     }
 
-    public float[] getPosition() {
+    public float[] getLocalPosition() {
         return localPos;
     }
 
-    public Quaternion getRotation() {
+    public Quaternion getRotationQuat() {
         return rot;
     }
 
-    public void setRotation(Quaternion rotation) {
+    public void setRotationQuat(Quaternion rotation) {
         this.rot = rotation;
     }
 

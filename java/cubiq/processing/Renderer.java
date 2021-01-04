@@ -21,7 +21,7 @@ import static com.jogamp.opengl.GL.GL_LESS;
 
 public class Renderer implements GLEventListener, Observer {
 
-    private Model model;
+//    private Model model;
     private final GLWindow glWindow;
     private Cube cube;
     private InteractionHandler interactionHandler;
@@ -57,7 +57,7 @@ public class Renderer implements GLEventListener, Observer {
 
         glCanvas.setWidth(DEVICE_WIDTH);
         glCanvas.setHeight(DEVICE_HEIGHT);
-        model.getRendererPane().getChildren().add(glCanvas);
+//        model.getRendererPane().getChildren().add(glCanvas);
 
         FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
         animator.start();
@@ -261,7 +261,7 @@ public class Renderer implements GLEventListener, Observer {
         }
     }
 
-    public void initModel(Model model) {
-        this.model = model;
-    }
+//    public void initModel(Model model) {
+//        this.model = model;
+//    }
 }

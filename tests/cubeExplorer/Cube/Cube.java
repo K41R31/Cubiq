@@ -2,8 +2,6 @@ package cubeExplorer.cube;
 
 import com.jogamp.opengl.math.Quaternion;
 
-import java.util.Arrays;
-
 public class Cube {
 
     private final float CUBIE_SIZE = 1;
@@ -45,7 +43,6 @@ public class Cube {
             if (i == 3) a[1] *= -1;
             a[2] *= -1;
         }
-        System.out.println(Arrays.toString(cubieVertices));
     }
 
     private void createCubieIndices() {
@@ -60,7 +57,7 @@ public class Cube {
 
     public void rotateCubeTo(Quaternion rotation) {
         for (Cubie qb: cubies) {
-            qb.rotateTo(rotation);
+            qb.rotateToQuat(rotation);
         }
     }
 
@@ -77,7 +74,7 @@ public class Cube {
     }
 
     public float[] getCubiePosition(int qbIndex) {
-        return cubies[qbIndex].getPosition();
+        return cubies[qbIndex].getLocalPosition();
     }
 
     public float[] getCubieTranslation(int qbIndex) {
@@ -85,7 +82,7 @@ public class Cube {
     }
 
     public Quaternion getCubieRotation(int qbIndex) {
-        return cubies[qbIndex].getRotation();
+        return cubies[qbIndex].getRotationQuat();
     }
 
     public int getTotalCubies() {

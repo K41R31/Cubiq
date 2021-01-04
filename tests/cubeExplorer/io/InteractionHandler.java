@@ -122,7 +122,7 @@ public class InteractionHandler implements MouseListener {
                 releasedQuats.add(new Quaternion(actualQuats.get(i)));
             }
             // Update every local cubie location
-            cube.updateLocalPos();
+//            cube.updateLocalPos();
 
             // Reset the direction
             mouseDraggedDirection = -1;
