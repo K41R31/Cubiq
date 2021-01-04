@@ -2,6 +2,8 @@ package cubeExplorer.cube;
 
 import com.jogamp.opengl.math.Quaternion;
 
+import java.util.Arrays;
+
 public class CubieNew {
 
     private final float CUBIE_SIZE = 1;
@@ -14,8 +16,10 @@ public class CubieNew {
     public CubieNew(float x, float y, float z) {
         translation = new float[] {x, y, z};
         rotation = new Quaternion();
+        verticesPos = new float[42];
         createVertices();
         createIndices();
+        getBoundingBox();
     }
 
     private void createVertices() {
@@ -33,11 +37,12 @@ public class CubieNew {
 
     public float[] getBoundingBox() {
         float[][] boundingBoxVertices = new float[36][3];
-        for (int i = 0; i < indices.length; i++) {
+        for (int index : indices) {
             float[] pos = new float[3];
-            System.arraycopy(verticesPos, indices[i] * 3, pos, 0, 3);
-            verticesPos[]
+            System.arraycopy(verticesPos, index * 3, pos, 0, 3);
         }
+        System.out.println(Arrays.toString(verticesPos));
+        return verticesPos;
     }
 
     private void createIndices() {

@@ -80,14 +80,14 @@ public class Renderer implements GLEventListener, Observer {
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cube.getCubieVertices().length * 4L,
-                FloatBuffer.wrap(cube.getCubieVertices()), GL.GL_STATIC_DRAW);
+//        gl.glBufferData(GL.GL_ARRAY_BUFFER, cube.getCubieVertices().length * 4L,
+//                FloatBuffer.wrap(cube.getCubieVertices()), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cube.getCubieIndices().length * 4L,
-                IntBuffer.wrap(cube.getCubieIndices()), GL.GL_STATIC_DRAW);
+//        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cube.getCubieIndices().length * 4L,
+//                IntBuffer.wrap(cube.getCubieIndices()), GL.GL_STATIC_DRAW);
 
         // Activate and order vertex buffer object data for the vertex shader
         // The vertex buffer contains: position (3), color (3)
@@ -108,7 +108,7 @@ public class Renderer implements GLEventListener, Observer {
         gl.glBindVertexArray(vaoName[0]);
 
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
+//        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
     }
 
     @Override

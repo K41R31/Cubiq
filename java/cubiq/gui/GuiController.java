@@ -11,7 +11,7 @@ import java.util.Observer;
 
 public class GuiController extends AnchorPane implements Observer {
 
-    private AnchorPane headerPane;
+    private AnchorPane headerPane, solverPane;
     private LauncherView launcherView;
     private ResizeFrame resizeFrame;
     private ScanView scanView;
@@ -59,9 +59,24 @@ public class GuiController extends AnchorPane implements Observer {
         AnchorPane.setBottomAnchor(scanView, 0d);
         scanView.initModel(guiModel);
         guiModel.addObserver(scanView);
+
+        // Solver
+        FXMLLoader solverLoader = new FXMLLoader(getClass().getResource("/fxml/SolverView.fxml"));
+        try {
+            solverPane = solverLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        headerPane.getStylesheets().add("css/SolverStyle.css");
+        AnchorPane.setTopAnchor(headerPane, 0d);
+        AnchorPane.setLeftAnchor(headerPane, 0d);
+        AnchorPane.setRightAnchor(headerPane, 0d);
+        SolverController solverController = solverLoader.getController();
+        solverController.initModel(guiModel);
+        guiModel.addObserver(solverController);
     }
 
-    public void showLauncher() {
+    public void startLauncher() {
         // Set the launcher view on the empty root pane
         this.getChildren().clear();
         this.getChildren().add(launcherView);
@@ -86,6 +101,21 @@ public class GuiController extends AnchorPane implements Observer {
         guiModel.setSavedSceneY(guiModel.getScreenHeight() / 2 - guiModel.getSavedSceneHeight() / 2);
 
 //        guiModel.callObservers("startWebcamLoop");
+    }
+
+    private void startSolver() {
+        this.getChildren().clear();
+        this.getChildren().add(solverPane);
+        this.getChildren().add(headerPane);
+        this.getChildren().add(resizeFrame);
+
+        guiModel.callObservers("toggleFullScreen");
+
+        // Set the size the stage get set to when minimized
+        guiModel.setSavedSceneWidth(guiModel.getScreenWidth() * 0.8);
+        guiModel.setSavedSceneHeight(guiModel.getScreenHeight() * 0.8);
+        guiModel.setSavedSceneX(guiModel.getScreenWidth() / 2 - guiModel.getSavedSceneWidth() / 2);
+        guiModel.setSavedSceneY(guiModel.getScreenHeight() / 2 - guiModel.getSavedSceneHeight() / 2);
     }
 
     private void showTimer() {
@@ -158,10 +188,13 @@ public class GuiController extends AnchorPane implements Observer {
                 toggleDraggedFullScreen();
                 break;
             case "showLauncher":
-                showLauncher();
+                startLauncher();
+                break;
+            case "startScan":
+                startScan();
                 break;
             case "startSolver":
-                startScan();
+                startSolver();
                 break;
         }
     }

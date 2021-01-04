@@ -34,7 +34,8 @@ public class GuiModel extends Observable {
     private double screenWidth, screenHeight;
     private int headerHeight = 23;
     private int taskbarHeight = 40;
-    private int[] minWindowSize = new int[] {1484, 716};
+//    private int[] minWindowSize = new int[] {1484, 716};
+    private int[] minWindowSize = new int[] {1368, 716};
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
 
 

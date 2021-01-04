@@ -577,7 +577,7 @@ public class ScanCube implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "startSolver":
+            case "startScan":
                 startWebcamLoop();
                 break;
             case "startLoadedImagesLoop":
