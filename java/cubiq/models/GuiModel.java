@@ -39,10 +39,23 @@ public class GuiModel extends Observable {
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
 
 
+    private String solveString = "R2,D,B,R',B2,D,R,U,F',L',U',F2,D,R2,D2,B2,L2,F2,U',L2";
+
     public void callObservers(String arg) {
         setChanged();
         notifyObservers(arg);
     }
+
+    // SolveString------------------------------------------------------------------------------------------------------
+    public String getSolveString() {
+        return solveString;
+    }
+
+    public void setSolveString(String solveString) {
+        this.solveString = solveString;
+    }
+
+
 
     // Kiona------------------------------------------------------------------------------------------------------------
 
