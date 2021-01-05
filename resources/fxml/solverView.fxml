@@ -36,16 +36,19 @@
                   <HBox fx:id="buttonPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="2052.0" minHeight="-Infinity" prefHeight="63.0" prefWidth="1920.0">
                      <children>
                         <Button mnemonicParsing="false" text="Restart" />
-                        <Button mnemonicParsing="false" text="Start" />
+                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#startSolution" text="Start" />
                         <Button mnemonicParsing="false" text="Speed" />
                      </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
                   </HBox>
                   <StackPane prefHeight="150.0" prefWidth="200.0">
                      <children>
                         <HBox fx:id="solveIconPane" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="144.0" prefWidth="97.0" spacing="52.0">
-                           <padding>
-                              <Insets left="-149.0" />
-                           </padding>
+                           <StackPane.margin>
+                              <Insets />
+                           </StackPane.margin>
                         </HBox>
                      </children>
                   </StackPane>
