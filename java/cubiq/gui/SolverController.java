@@ -1,7 +1,6 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
-
 import java.util.Observable;
 import java.util.Observer;
 

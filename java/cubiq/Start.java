@@ -95,7 +95,7 @@ public class Start extends Application {
             }
         System.out.println("RESULT: " + result);
          */
-        //guiModel.callObservers("startLoadedImagesLoop");
+//        guiModel.callObservers("startLoadedImagesLoop");
     }
 
     public static void main(String[] args) {

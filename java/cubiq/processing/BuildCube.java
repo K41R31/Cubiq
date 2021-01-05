@@ -2,8 +2,6 @@ package cubiq.processing;
 
 import cubiq.io.DebugOutput;
 import org.kociemba.twophase.Search;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
