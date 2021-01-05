@@ -12,8 +12,6 @@ import cubeExplorer.cube.Cube;
 import cubeExplorer.io.InteractionHandler;
 import cubeExplorer.model.Model;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -69,48 +67,6 @@ public class Renderer implements GLEventListener, Observer {
         glWindow.addGLEventListener(this);
     }
 
-    private void initCubie(GL3 gl) {
-        gl.glBindVertexArray(vaoName[0]);
-        // Shader program
-        shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram(
-                getClass().getResource("/cubeExplorer/shaders/").getPath().replace("%20", " "),
-                "O0_Basic.vert", "O0_Basic.frag");
-
-        // activate and initialize vertex buffer object (VBO)
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
-        // floats use 4 bytes in Java
-//        gl.glBufferData(GL.GL_ARRAY_BUFFER, cube.getCubieVertices().length * 4L,
-//                FloatBuffer.wrap(cube.getCubieVertices()), GL.GL_STATIC_DRAW);
-
-        // activate and initialize index buffer object (IBO)
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
-        // integers use 4 bytes in Java
-//        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cube.getCubieIndices().length * 4L,
-//                IntBuffer.wrap(cube.getCubieIndices()), GL.GL_STATIC_DRAW);
-
-        // Activate and order vertex buffer object data for the vertex shader
-        // The vertex buffer contains: position (3), color (3)
-        // Defining input for vertex shader
-        // Pointer for the vertex shader to the position information per vertex
-        gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
-        // Pointer for the vertex shader to the color information per vertex
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-    }
-
-    private void displayCubie(GL3 gl) {
-        gl.glUseProgram(shaderProgram.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glBindVertexArray(vaoName[0]);
-
-        // Draws the elements in the order defined by the index buffer object (IBO)
-//        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
-    }
-
     @Override
     public void init(GLAutoDrawable drawable) {
         // Retrieve the OpenGL graphics context
@@ -118,7 +74,7 @@ public class Renderer implements GLEventListener, Observer {
 
         // BEGIN: Preparing scene
         // BEGIN: Allocating vertex array objects and buffers for each object
-        int noOfObjects = 1;
+        int noOfObjects = 81;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -140,10 +96,16 @@ public class Renderer implements GLEventListener, Observer {
 
         // Initialize cubie
         cube = new Cube(3);
-        initCubie(gl);
-        // END: Preparing scene
+        cube.initCubies(gl, vaoName, vboName, iboName);
+
+        // Shader program
+        shaderProgram = new ShaderProgram(gl);
+        shaderProgram.loadShaderAndCreateProgram(
+                getClass().getResource("/cubeExplorer/shaders/").getPath().replace("%20", " "),
+                "O0_Basic.vert", "O0_Basic.frag");
 
         interactionHandler.setCube(cube);
+
 
         // Create object for projection-model-view matrix calculation.
         pmvMatrix = new PMVMatrix();
@@ -159,7 +121,7 @@ public class Renderer implements GLEventListener, Observer {
         gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
 
         // Set background color of the GLCanvas.
-        gl.glClearColor(0.04f, 0.07f, 0.12f, 1.0f);
+        gl.glClearColor(0.098f, 0.106f, 0.114f, 1.0f);
     }
 
     /**
@@ -221,15 +183,27 @@ public class Renderer implements GLEventListener, Observer {
         System.arraycopy(pmvMatrix.glGetPMvMatrixf().array(), 16, mvMatrix, 0, 16);
         interactionHandler.setModelviewMatrix(mvMatrix);
 
-        for (int i = 0; i < cube.getCubeLayersCount(); i++) {
+        displayCubies(gl);
+    }
+
+    private void displayCubies(GL3 gl) {
+        for (int i = 0; i < cube.getTotalCubies(); i++) {
             pmvMatrix.glPushMatrix();
             // Cubie rotation
             pmvMatrix.glRotate(cube.getCubieRotation(i));
             // Cubie translation
             float[] qbTransl = cube.getCubieTranslation(i);
             pmvMatrix.glTranslatef(qbTransl[0], qbTransl[1], qbTransl[2]);
-            // Display Cubie
-            displayCubie(gl);
+
+            gl.glUseProgram(shaderProgram.getShaderProgramID());
+            // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+            gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+            gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+            gl.glBindVertexArray(vaoName[i]);
+
+            // Draws the elements in the order defined by the index buffer object (IBO)
+            gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices(i).length, GL.GL_UNSIGNED_INT, 0);
+
             pmvMatrix.glPopMatrix();
         }
     }

@@ -1,6 +1,12 @@
 package cubeExplorer.cube;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.math.Quaternion;
+import com.jogamp.opengl.util.PMVMatrix;
+import cubeExplorer.processing.ShaderProgram;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class Cube {
 
@@ -10,10 +16,9 @@ public class Cube {
 
     public Cube(int cubeLayersCount) {
         this.cubeLayersCount = cubeLayersCount;
-        initCubies();
     }
 
-    private void initCubies() {
+    public void initCubies(GL3 gl, int[] vaoName, int[] vboName, int[] iboName) {
         totalCubies = (int)Math.pow(cubeLayersCount, 3);
         cubies = new CubieNew[totalCubies];
         // Offset, to center the cube in the scene
@@ -22,6 +27,17 @@ public class Cube {
             for (int y = 0; y < cubeLayersCount; y++) {
                 for (int z = 0; z < cubeLayersCount; z++, c++) {
                     cubies[c] = new CubieNew(x - cubePosOffset, y - cubePosOffset, z - cubePosOffset);
+                    gl.glBindVertexArray(vaoName[c]);
+                    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[c]);
+                    gl.glBufferData(GL.GL_ARRAY_BUFFER, cubies[c].getVerticesPosColor().length * 4L,
+                            FloatBuffer.wrap(cubies[c].getVerticesPosColor()), GL.GL_STATIC_DRAW);
+                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[c]);
+                    gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubies[c].getIndices().length * 4L,
+                            IntBuffer.wrap(cubies[c].getIndices()), GL.GL_STATIC_DRAW);
+                    gl.glEnableVertexAttribArray(0);
+                    gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
+                    gl.glEnableVertexAttribArray(1);
+                    gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
                 }
             }
         }
@@ -37,6 +53,14 @@ public class Cube {
         for (CubieNew qb: cubies) {
             qb.rotateToQuat(rotation);
         }
+    }
+
+    public float[] getCubieBoundingBox(int index) {
+        return cubies[index].getBoundingBox();
+    }
+
+    public int[] getCubieIndices(int index) {
+        return cubies[index].getIndices();
     }
 
     public int getCubeLayersCount() {
