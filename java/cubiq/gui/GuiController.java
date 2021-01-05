@@ -60,7 +60,7 @@ public class GuiController extends AnchorPane implements Observer {
         scanView.initModel(guiModel);
         guiModel.addObserver(scanView);
 
-        // Solver
+        // Solver.java
         FXMLLoader solverLoader = new FXMLLoader(getClass().getResource("/fxml/SolverView.fxml"));
         try {
             solverPane = solverLoader.load();
