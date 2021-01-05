@@ -6,6 +6,13 @@ import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
 import cubeExplorer.cube.Cube;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,11 +83,12 @@ public class InteractionHandler implements MouseListener {
             // Check where the mouse was pressed
             pressedLayer[0] = 0;
             for (int i = 0; i < cube.getTotalCubies(); i++) {
-                Quaternion cubieQuat = cube.getCubieRotation(i);
-                // Load the cubie quaternions in actual quads
-                actualQuats.add(cubieQuat);
-                // Store the angles of the cube when the mouse was pressed in an quaternion
-                pressedQuats.add(new Quaternion(cubieQuat));
+                intersectTriangle(cube.getCubieBoundingBox(i));
+//                Quaternion cubieQuat = cube.getCubieRotation(i);
+//                // Load the cubie quaternions in actual quads
+//                actualQuats.add(cubieQuat);
+//                // Store the angles of the cube when the mouse was pressed in an quaternion
+//                pressedQuats.add(new Quaternion(cubieQuat));
             }
         }
     }
@@ -242,6 +250,16 @@ public class InteractionHandler implements MouseListener {
         return intersects0 || intersects1;
     }
 
+    private boolean cubieWasPressed(float[] boundingBoxVertices) {
+        for (int i = 0; i < 12; i++) {
+            for (int j = 0; j < 3; j++) {
+                float[] triangle = new float[3];
+                System.arraycopy(boundingBoxVertices, i*9, triangle, 0, 3);
+                intersectTriangle(triangle);
+            }
+        }
+    }
+
     /**
      * Calculates a ray from the camera through the mouse.
      * @return The normalized direction of the ray.
@@ -268,6 +286,9 @@ public class InteractionHandler implements MouseListener {
     }
 
     private boolean intersectTriangle(float[] vert0, float[] vert1, float[] vert2) {
+        float[] vert0 =
+        float[] vert1
+        float[] vert2
         float[] edge1 = new float[3];
         float[] edge2 = new float[3];
         float[] tvec = new float[3];

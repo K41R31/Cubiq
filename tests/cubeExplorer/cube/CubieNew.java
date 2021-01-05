@@ -1,15 +1,12 @@
 package cubeExplorer.cube;
 
 import com.jogamp.opengl.math.Quaternion;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.jogamp.opengl.math.VectorUtil;
 
 public class CubieNew {
 
     private final float CUBIE_SIZE = 1;
-    private final float[] CUBIE_COLOR = {0.1f, 0.1f, 0.1f};
+    private final float[] CUBIE_COLOR = {0.01f, 0.01f, 0.01f};
     private float[] verticesPosColor, verticesPos, translation, localPos;
     private int[] indices;
     private Quaternion rotation;
@@ -17,8 +14,9 @@ public class CubieNew {
 
     public CubieNew(float x, float y, float z) {
         translation = new float[] {x, y, z};
+        localPos = new float[] {x, y, z};
         rotation = new Quaternion();
-        verticesPos = new float[42];
+        verticesPos = new float[24];
         createVertices();
         createIndices();
         getBoundingBox();
@@ -37,37 +35,36 @@ public class CubieNew {
         }
     }
 
-
     public float[] getBoundingBox() {
         float[] boundingBoxVertices = new float[108];
+        // Orient the vertices to match the actual translation of the cubie
+        float[] orientedVertices = new float[24];
+        for (int i = 0; i < 8; i++) {
+            float[] vec = new float[3];
+            rotation.rotateVector(vec, 0, verticesPos, i*3);
+            VectorUtil.addVec3(vec, vec, translation);
+            System.arraycopy(vec, 0, orientedVertices, i*3, 3);
+        }
+        // Triangle strip to triangles
         for (int i = 0, counter = 0; i < indices.length - 2; i++) {
             for (int j = 0; j < 3; j++, counter++) {
-                System.out.println(indices[i + j]);
-                System.arraycopy(verticesPos, indices[i + j], boundingBoxVertices, counter * 3, 3);
+                System.arraycopy(orientedVertices, indices[i] + j, boundingBoxVertices, counter * 3, 3);
             }
         }
         return boundingBoxVertices;
     }
-/*
-    public float[] getBoundingBox() {
-//        float[][] boundingBoxVertices = new float[36][3];
-        List<float[]> boundingBoxVertices = new ArrayList<>();
-        for (int i = 0; i < indices.length; i++) {
-            // First triangle
-            float[] triangle = new float[3];
-            for (int j = 0; j < 3; j++) {
-                triangle[j] =
-            }
-            boundingBoxVertices.add(indices[i + j]);
-//            System.arraycopy(verticesPos, i * 3, pos, indices[i] * 3, 3);
-        }
-        System.out.println(Arrays.toString(verticesPos));
-        return verticesPos;
-    }
-*/
+
 
     private void createIndices() {
         indices = new int[] {4, 6, 5, 7, 3, 6, 2, 4, 0, 5, 1, 3, 0, 2};
+    }
+
+    public float[] getVerticesPosColor() {
+        return verticesPosColor;
+    }
+
+    public int[] getIndices() {
+        return indices;
     }
 
     public void rotateToQuat(Quaternion rotation) {
