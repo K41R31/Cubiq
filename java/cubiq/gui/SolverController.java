@@ -57,50 +57,9 @@ public class SolverController implements Observer {
         }
     }
 
-//  TODO Generell:
-//          Die Duration gibt nicht an wie lange ein Keyframe dauert, sondern wann er in der Timeline getriggert werden soll.
-//       Problem:
-//          Der Interpolator kann die insets anscheinend nicht interpolieren, da sie keine direkten numerischen Werte sind.
-//          Deswegen springt die Timeline von einem zum anderem Keyframe ohne zwischen ihnen zu interpolieren.
-//       Spoiler:
-//          Eine Lösung wäre, die Werte manuell zu Interpolieren. Unten bin ich pro Timeline Durchlauf immer einen Pixel weiter gegangen.
-
     @FXML
     private void startSolution() {
-
-        cycles = solution.size();
-
-        // Inner
-
-        Timeline startSolutionAnimation = new Timeline();
-        Timeline sleepTimer = new Timeline();
-        startSolutionAnimation.getKeyFrames().addAll(
-               new KeyFrame(new Duration(0), e -> {
-                   easeOut();
-                   solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
-                   currentCycle++;
-               }),
-               new KeyFrame(new Duration(2.5), e -> solvePaneOffset -= 0.5)
-        );
-        startSolutionAnimation.setCycleCount(298);
-                new KeyFrame(new Duration(0), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset))),
-                new KeyFrame(new Duration(3), e -> solvePaneOffset -= 1)
-        );
-        startSolutionAnimation.setCycleCount(149);
-        startSolutionAnimation.setRate(1);
         solveIconPane.setVisible(true);
-        startSolutionAnimation.setOnFinished(e -> {
-            if (cycles < 0) {
-                sleepTimer.play();
-            } else {
-                startSolutionAnimation.stop();
-            }
-            System.out.println(cycles);
-            cycles--;
-        });
-
-        solveIconPane.setVisible(true);
-
 
         Timeline innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().addAll(
@@ -115,22 +74,8 @@ public class SolverController implements Observer {
                 new KeyFrame(new Duration(0), e -> innerTimeline.play()),
                 new KeyFrame(new Duration(1500))
         );
-
-        outerTimeline.setRate(1);
-        solveIconPane.setVisible(true);
-        startSolutionAnimation.setOnFinished(e -> {
-            System.out.println("Penis");
-        });
-        startSolutionAnimation.play();
-        sleepTimer.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0)),
-                new KeyFrame(new Duration(1500), e -> startSolutionAnimation.play())
-                );
-        sleepTimer.setCycleCount(solution.size());
-
         outerTimeline.setCycleCount(2);
         outerTimeline.play();
-
     }
 
     class SolveIcon extends ImageView {
