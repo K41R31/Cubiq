@@ -7,17 +7,12 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
-
-import java.security.Key;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.TimeUnit;
 
 public class SolverController implements Observer {
      //TODO: Bilderbezeichnung noch ändern, aktuell 2R, ändern auf R2... usw.!!!!
@@ -29,6 +24,7 @@ public class SolverController implements Observer {
     @FXML
     private Button startButton;
     private float solvePaneOffset = 0;
+    private int cycles;
 
     public SolverController() {
         imagePath = "/assets/solveIcons/";
@@ -69,25 +65,31 @@ public class SolverController implements Observer {
 
     @FXML
     private void startSolution() {
-
+        cycles = solution.size();
         Timeline startSolutionAnimation = new Timeline();
         Timeline sleepTimer = new Timeline();
         startSolutionAnimation.getKeyFrames().addAll(
                 new KeyFrame(new Duration(0), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset))),
-                new KeyFrame(new Duration(13), e -> solvePaneOffset -= 1)
+                new KeyFrame(new Duration(3), e -> solvePaneOffset -= 1)
         );
         startSolutionAnimation.setCycleCount(149);
         startSolutionAnimation.setRate(1);
         solveIconPane.setVisible(true);
         startSolutionAnimation.setOnFinished(e -> {
-            sleepTimer.play();
+            if (cycles < 0) {
+                sleepTimer.play();
+            } else {
+                startSolutionAnimation.stop();
+            }
+            System.out.println(cycles);
+            cycles--;
         });
-        startSolutionAnimation.play();
 
         sleepTimer.getKeyFrames().addAll(
                 new KeyFrame(new Duration(0)),
                 new KeyFrame(new Duration(1500), e -> startSolutionAnimation.play())
                 );
+        sleepTimer.setCycleCount(solution.size());
     }
 
     class SolveIcon extends ImageView {
