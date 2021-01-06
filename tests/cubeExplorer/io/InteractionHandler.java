@@ -73,21 +73,13 @@ public class InteractionHandler implements MouseListener {
             actualQuats.clear();
 
             // Check where the mouse was pressed
-            int pressedCubie = -1;
-            float shortestDistance = 1000000;
-            for (int i = 0; i < cube.getTotalCubies(); i++) {
-                float cubiePressedDistance = cubieWasPressedDistance(cube.getCubieBoundingBox(i));
-                if (cubiePressedDistance < shortestDistance) {
-                    shortestDistance = cubiePressedDistance;
-                    pressedCubie = i;
-                }
-//                Quaternion cubieQuat = cube.getCubieRotation(i);
-//                // Load the cubie quaternions in actual quads
-//                actualQuats.add(cubieQuat);
-//                // Store the angles of the cube when the mouse was pressed in an quaternion
-//                pressedQuats.add(new Quaternion(cubieQuat));
-            }
-            System.out.println(pressedCubie);
+            System.out.println(cubiePressedDistance(cube.getCubieBoundingBox(0)));
+//          Quaternion cubieQuat = cube.getCubieRotation(i);
+//          // Load the cubie quaternions in actual quads
+//          actualQuats.add(cubieQuat);
+//          // Store the angles of the cube when the mouse was pressed in an quaternion
+//          pressedQuats.add(new Quaternion(cubieQuat));
+//            System.out.println("shortest: " + Math.round(shortestDistance));
         }
     }
 
@@ -230,18 +222,16 @@ public class InteractionHandler implements MouseListener {
         return c*(t*t*t + 1) + b;
     }
 
-    private float cubieWasPressedDistance(float[] boundingBoxVertices) {
-        float shortestDistance = 1000000;
+    private float cubiePressedDistance(float[] boundingBoxVertices) {
         for (int i = 0; i < 12; i++) {
             float[][] triangle = new float[3][3];
             for (int j = 0; j < 3; j++) {
                 System.arraycopy(boundingBoxVertices, i*9+j*3, triangle[j], 0, 3);
             }
             float triangleDistance = intersectTriangle(triangle);
-            if (triangleDistance < shortestDistance)
-                shortestDistance = triangleDistance;
+            System.out.println(triangleDistance);
         }
-        return shortestDistance;
+        return 0;
     }
 
     /**

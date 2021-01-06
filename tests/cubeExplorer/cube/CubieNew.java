@@ -3,10 +3,12 @@ package cubeExplorer.cube;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
 
+import java.util.Arrays;
+
 public class CubieNew {
 
     private final float CUBIE_SIZE = 1;
-    private final float[] CUBIE_COLOR = {0.01f, 0.01f, 0.01f};
+    private float[] CUBIE_COLOR = {0.01f, 0.01f, 0.01f};
     private float[] verticesPosColor, verticesPos, translation, localPos;
     private int[] indices;
     private Quaternion rotation;
@@ -17,9 +19,10 @@ public class CubieNew {
         localPos = new float[] {x, y, z};
         rotation = new Quaternion();
         verticesPos = new float[24];
+        if (Arrays.equals(this.localPos, new float[]{-1, -1, -1}))
+            CUBIE_COLOR = new float[] {1f, 1f, 1f};
         createVertices();
         createIndices();
-        getBoundingBox();
     }
 
     private void createVertices() {

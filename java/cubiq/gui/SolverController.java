@@ -67,6 +67,7 @@ public class SolverController implements Observer {
 
     @FXML
     private void startSolution() {
+
         cycles = solution.size();
 
         // Inner
@@ -98,11 +99,23 @@ public class SolverController implements Observer {
             cycles--;
         });
 
-        // Outer
+        solveIconPane.setVisible(true);
+
+
+        Timeline innerTimeline = new Timeline();
+        innerTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(0), e -> solvePaneOffset -= 0.5),
+                new KeyFrame(new Duration(1), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset)))
+
+        );
+        innerTimeline.setCycleCount(298);
+
         Timeline outerTimeline = new Timeline();
         outerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(200), e -> startSolutionAnimation.play())
+                new KeyFrame(new Duration(0), e -> innerTimeline.play()),
+                new KeyFrame(new Duration(1500))
         );
+
         outerTimeline.setRate(1);
         solveIconPane.setVisible(true);
         startSolutionAnimation.setOnFinished(e -> {
@@ -114,6 +127,10 @@ public class SolverController implements Observer {
                 new KeyFrame(new Duration(1500), e -> startSolutionAnimation.play())
                 );
         sleepTimer.setCycleCount(solution.size());
+
+        outerTimeline.setCycleCount(2);
+        outerTimeline.play();
+
     }
 
     class SolveIcon extends ImageView {
@@ -126,7 +143,7 @@ public class SolverController implements Observer {
     }
 
     /**
-     * Function to calculate a ease out animation
+     * Function to calculate a ease in/out animation
      * Source: http://gizma.com/easing/
      * @param t current time
      * @param b start value
@@ -134,10 +151,11 @@ public class SolverController implements Observer {
      * @param d duration
      * @return Eased value
      */
-    private float easeOut(float t, float b, float c, float d) {
-        t /= d;
-        t--;
-        return c*(t*t*t + 1) + b;
+    private float easeInOut(float t, float b, float c, float d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t*t + b;
+        t -= 2;
+        return c/2*(t*t*t + 2) + b;
     }
 
     @Override
