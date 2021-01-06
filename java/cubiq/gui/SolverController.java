@@ -9,8 +9,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
-
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -25,6 +23,7 @@ public class SolverController implements Observer {
     private HBox solveIconPane;
     @FXML
     private Button startButton;
+    private float solvePaneOffset = 0;
 
     public SolverController() {
         imagePath = "/assets/solveIcons/";
@@ -54,14 +53,26 @@ public class SolverController implements Observer {
             solveIconPane.getChildren().add(new SolveIcon(solution.get(i)));
         }
     }
+
+//  TODO Generell:
+//          Die Duration gibt nicht an wie lange ein Keyframe dauert, sondern wann er in der Timeline getriggert werden soll.
+//       Problem:
+//          Der Interpolator kann die insets anscheinend nicht interpolieren, da sie keine direkten numerischen Werte sind.
+//          Deswegen springt die Timeline von einem zum anderem Keyframe ohne zwischen ihnen zu interpolieren.
+//       Spoiler:
+//          Eine Lösung wäre, die Werte manuell zu Interpolieren. Unten bin ich pro Timeline Durchlauf immer einen Pixel weiter gegangen.
+
     @FXML
     private void startSolution() {
         Timeline startSolutionAnimation = new Timeline();
-        startSolutionAnimation.getKeyFrames().addAll(                                                       // O     R     U     L
-                new KeyFrame(new Duration(10), new KeyValue(solveIconPane.paddingProperty(), new Insets(0 ,0,0,0), Interpolator.EASE_BOTH)),
-                new KeyFrame(new Duration(10), new KeyValue(solveIconPane.paddingProperty(), new Insets(0 ,0,0, -149), Interpolator.EASE_BOTH))
+        startSolutionAnimation.getKeyFrames().addAll(
+                new KeyFrame(new Duration(100), new KeyValue(solveIconPane.paddingProperty(), new Insets(0 ,0,0,0), Interpolator.EASE_BOTH)),
+                new KeyFrame(new Duration(500), new KeyValue(solveIconPane.paddingProperty(), new Insets(0 ,0,0, -149), Interpolator.EASE_BOTH))
+// TODO               new KeyFrame(new Duration(0), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset))),
+// TODO               new KeyFrame(new Duration(5), e -> solvePaneOffset -= 1)
         );
         startSolutionAnimation.setCycleCount(solution.size());
+// TODO       startSolutionAnimation.setCycleCount(149);
         startSolutionAnimation.setRate(1);
         solveIconPane.setVisible(true);
         startSolutionAnimation.setOnFinished(e -> {
