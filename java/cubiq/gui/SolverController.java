@@ -10,11 +10,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.util.Duration;
 import javafx.scene.shape.Polygon;
-
 import java.security.Key;
+import javafx.util.Duration;
+import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -28,12 +27,17 @@ public class SolverController implements Observer {
 
     private int currentCycle = 0;
     private float startOffset = 0;
+    private float startValue;
 
     @FXML
     private HBox solveIconPane, buttonPane;
     @FXML
     private Button startButton;
     private float solvePaneOffset = 0;
+
+    public SolverController() {
+        imagePath = "/assets/solveIcons/";
+    }
 
     private GuiModel guiModel;
 
@@ -63,6 +67,8 @@ public class SolverController implements Observer {
 
     private void solveStringConverter() {
         String solveString = guiModel.getSolveString();
+        Polygon polygon = new Polygon();
+        polygon.setViewOrder(0);
         int idx = 0;
         while (true) {
             int idxNew;
@@ -83,6 +89,34 @@ public class SolverController implements Observer {
         for(int i = 0; i < solution.size(); i++) {
             solveIconPane.getChildren().add(new SolveIcon(solution.get(i)));
         }
+    }
+
+    @FXML
+    private void startSolution() {
+        solveIconPane.setVisible(true);
+
+        Timeline innerTimeline = new Timeline();
+        innerTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(0), e -> {
+                    solvePaneOffset = easeInOut(currentCycle, startValue, -1,149);
+                    currentCycle++;
+                }),
+                new KeyFrame(new Duration(1), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset)))
+
+        );
+        innerTimeline.setCycleCount(149);
+
+        Timeline outerTimeline = new Timeline();
+        outerTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(0), e -> {
+                    startValue = solvePaneOffset;
+                    innerTimeline.play();
+                }),
+                new KeyFrame(new Duration(1500))
+        );
+        outerTimeline.setCycleCount(3);
+        outerTimeline.setCycleCount(solution.size()-1);
+        outerTimeline.play();
     }
 
     class SolveIcon extends ImageView {
