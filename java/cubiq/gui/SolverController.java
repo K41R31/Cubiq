@@ -5,10 +5,14 @@ import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import javafx.scene.shape.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -22,19 +26,19 @@ public class SolverController implements Observer {
     private float startOffset = 0;
 
     @FXML
-    private HBox solveIconPane;
+    private HBox solveIconPane, buttonPane;
     @FXML
     private Button startButton;
     private float solvePaneOffset = 0;
-    private int cycles;
-
-    public SolverController() {
-        imagePath = "/assets/solveIcons/";
-    }
 
     private GuiModel guiModel;
 
     private List<String> solution = new ArrayList<>();
+
+    private void initializeSolverController() {
+        imagePath = "/assets/solveIcons/";
+        buttonPane.getChildren().add(new ControlPane());
+    }
 
     private void solveStringConverter() {
         String solveString = guiModel.getSolveString();
@@ -49,6 +53,9 @@ public class SolverController implements Observer {
                 break;
             }
         }
+    }
+
+    private void openSpeedSlider() {
     }
 
     private void loadCubeIcons() {
@@ -74,7 +81,7 @@ public class SolverController implements Observer {
                 new KeyFrame(new Duration(0), e -> innerTimeline.play()),
                 new KeyFrame(new Duration(1500))
         );
-        outerTimeline.setCycleCount(2);
+        outerTimeline.setCycleCount(solution.size()-1);
         outerTimeline.play();
     }
 
@@ -103,10 +110,66 @@ public class SolverController implements Observer {
         return c/2*(t*t*t + 2) + b;
     }
 
+    class ControlPane extends AnchorPane {
+        ImageView buttonLIcon, buttonMIcon, buttonRIcon;
+
+        ControlPane() {
+            initializeRootPane();
+            Polygon polygonLeft = generatePolygones(new Double[]{0.0, 0.0, 63.0, 63.0, 193.0, 63.0, 130.0, 0.0}, 0);
+            Polygon polygonMiddle = generatePolygones(new Double[]{0.0, 0.0, 63.0, 63.0, 158.0, 63.0, 220.0, 0.0}, 1);
+            Polygon polygonRight = generatePolygones(new Double[]{0.0, 0.0, -63.0, 63.0, 70.0, 63.0, 130.0, 0.0}, 2);
+            getChildren().addAll(polygonLeft, polygonMiddle, polygonRight);
+            polygonMiddle.setViewOrder(-1);
+        }
+
+        private void initializeRootPane() {
+            this.minWidth(USE_PREF_SIZE);
+            this.minHeight(USE_PREF_SIZE);
+            this.prefWidth(480);
+            this.prefHeight(63);
+            this.maxWidth(USE_PREF_SIZE);
+            this.maxHeight(USE_PREF_SIZE);
+            this.setStyle("-fx-background-color: #000000");
+
+        }
+
+        private Polygon generatePolygones(Double[] polygonPoints, int id) {
+            Polygon polygon = new Polygon();
+            polygon.getPoints().addAll(polygonPoints);
+            polygon.setFill(Color.web("#3f464f"));
+            polygon.setStrokeWidth(0);
+            polygon.setEffect(new DropShadow());
+
+            setTopAnchor(polygon, 0.0);
+            setBottomAnchor(polygon, 0.0);
+
+            polygon.setOnMouseEntered(e -> polygon.setFill(Color.web("#e4e4e4")));
+            polygon.setOnMouseExited(e -> polygon.setFill(Color.web("#3f464f")));
+            switch (id) {
+                case 0:
+                    polygon.setOnMousePressed(e -> guiModel.callObservers("resetAnimationTime"));
+                    setLeftAnchor(polygon, 0.0);
+                    break;
+
+                case 1:
+                    polygon.setOnMousePressed(e -> guiModel.callObservers("startStopAnimation"));
+                    setLeftAnchor(polygon, 130.0);
+                    break;
+
+                case 2:
+                    polygon.setOnMousePressed(e -> openSpeedSlider());
+                    setRightAnchor(polygon, 0.0
+                    );
+            }
+            return polygon;
+        }
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
             case "startSolver":
+                initializeSolverController();
                 solveStringConverter();
                 loadCubeIcons();
                 break;
