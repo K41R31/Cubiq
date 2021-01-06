@@ -18,6 +18,8 @@ public class SolverController implements Observer {
      //TODO: Bilderbezeichnung noch ändern, aktuell 2R, ändern auf R2... usw.!!!!
 
     private String imagePath;
+    private int currentCycle = 0;
+    private float startOffset = 0;
 
     @FXML
     private HBox solveIconPane;
@@ -64,16 +66,30 @@ public class SolverController implements Observer {
 
     @FXML
     private void startSolution() {
+        // Inner
         Timeline startSolutionAnimation = new Timeline();
         startSolutionAnimation.getKeyFrames().addAll(
-                new KeyFrame(new Duration(100), new KeyValue(solveIconPane.paddingProperty(), new Insets(0 ,0,0,0), Interpolator.EASE_BOTH)),
-                new KeyFrame(new Duration(500), new KeyValue(solveIconPane.paddingProperty(), new Insets(0 ,0,0, -149), Interpolator.EASE_BOTH))
-// TODO               new KeyFrame(new Duration(0), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset))),
-// TODO               new KeyFrame(new Duration(5), e -> solvePaneOffset -= 1)
+               new KeyFrame(new Duration(0), e -> {
+                   easeOut();
+                   solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
+                   currentCycle++;
+               }),
+               new KeyFrame(new Duration(2.5), e -> solvePaneOffset -= 0.5)
         );
-        startSolutionAnimation.setCycleCount(solution.size());
-// TODO       startSolutionAnimation.setCycleCount(149);
+        startSolutionAnimation.setCycleCount(298);
         startSolutionAnimation.setRate(1);
+        solveIconPane.setVisible(true);
+        startSolutionAnimation.setOnFinished(e -> {
+            System.out.println("Penis");
+        });
+        startSolutionAnimation.play();
+
+        // Outer
+        Timeline outerTimeline = new Timeline();
+        outerTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(200), e -> startSolutionAnimation.play())
+        );
+        outerTimeline.setRate(1);
         solveIconPane.setVisible(true);
         startSolutionAnimation.setOnFinished(e -> {
             System.out.println("Penis");
@@ -88,6 +104,21 @@ public class SolverController implements Observer {
             this.setFitHeight(144);
             this.setImage(image);
         }
+    }
+
+    /**
+     * Function to calculate a ease out animation
+     * Source: http://gizma.com/easing/
+     * @param t current time
+     * @param b start value
+     * @param c change in value
+     * @param d duration
+     * @return Eased value
+     */
+    private float easeOut(float t, float b, float c, float d) {
+        t /= d;
+        t--;
+        return c*(t*t*t + 1) + b;
     }
 
     @Override

@@ -6,15 +6,9 @@ import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
 import cubeExplorer.cube.Cube;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.geometry.Insets;
-import javafx.scene.layout.HBox;
-import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InteractionHandler implements MouseListener {
@@ -30,7 +24,6 @@ public class InteractionHandler implements MouseListener {
     private final float deviceWidth;
     private final float deviceHeight;
     private List<Quaternion> actualQuats, pressedQuats, snapToQuats, releasedQuats;
-    private final int[] pressedLayer; // [0] -> side, [1] -> rotation axis, [2] -> layer (1, 0, 0) = every cubie on layer
     private int mousePressedX, mousePressedY, windowWidth, pressedFrameCount, pressedFrame;
     private float rotatedSincePress, snapBackDiff;
     private boolean swingingBack, mousePressed;
@@ -48,7 +41,6 @@ public class InteractionHandler implements MouseListener {
         releasedQuats = new ArrayList<>();
         snapBackFrameCount = 0;
         mouseDraggedDirection = -1;
-        pressedLayer = new int[3];
         this.camPos = camPos;
         this.deviceWidth = deviceWidth;
         this.deviceHeight = deviceHeight;
@@ -81,15 +73,21 @@ public class InteractionHandler implements MouseListener {
             actualQuats.clear();
 
             // Check where the mouse was pressed
-            pressedLayer[0] = 0;
+            int pressedCubie = -1;
+            float shortestDistance = 1000000;
             for (int i = 0; i < cube.getTotalCubies(); i++) {
-                cubieWasPressed(cube.getCubieBoundingBox(i));
+                float cubiePressedDistance = cubieWasPressedDistance(cube.getCubieBoundingBox(i));
+                if (cubiePressedDistance < shortestDistance) {
+                    shortestDistance = cubiePressedDistance;
+                    pressedCubie = i;
+                }
 //                Quaternion cubieQuat = cube.getCubieRotation(i);
 //                // Load the cubie quaternions in actual quads
 //                actualQuats.add(cubieQuat);
 //                // Store the angles of the cube when the mouse was pressed in an quaternion
 //                pressedQuats.add(new Quaternion(cubieQuat));
             }
+            System.out.println(pressedCubie);
         }
     }
 
@@ -232,15 +230,18 @@ public class InteractionHandler implements MouseListener {
         return c*(t*t*t + 1) + b;
     }
 
-    private boolean cubieWasPressed(float[] boundingBoxVertices) {
+    private float cubieWasPressedDistance(float[] boundingBoxVertices) {
+        float shortestDistance = 1000000;
         for (int i = 0; i < 12; i++) {
             float[][] triangle = new float[3][3];
             for (int j = 0; j < 3; j++) {
                 System.arraycopy(boundingBoxVertices, i*9+j*3, triangle[j], 0, 3);
             }
-            float distance = intersectTriangle(triangle);
+            float triangleDistance = intersectTriangle(triangle);
+            if (triangleDistance < shortestDistance)
+                shortestDistance = triangleDistance;
         }
-        return false;
+        return shortestDistance;
     }
 
     /**
