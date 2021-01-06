@@ -13,6 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.scene.shape.Polygon;
+
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -22,6 +24,8 @@ public class SolverController implements Observer {
      //TODO: Bilderbezeichnung noch ändern, aktuell 2R, ändern auf R2... usw.!!!!
 
     private String imagePath;
+    private boolean isAnimating = false;
+
     private int currentCycle = 0;
     private float startOffset = 0;
 
@@ -34,10 +38,27 @@ public class SolverController implements Observer {
     private GuiModel guiModel;
 
     private List<String> solution = new ArrayList<>();
+    private Timeline innerTimeline, outerTimeline;
 
     private void initializeSolverController() {
         imagePath = "/assets/solveIcons/";
         buttonPane.getChildren().add(new ControlPane());
+
+        solveIconPane.setVisible(true);
+
+        innerTimeline = new Timeline();
+        innerTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(0), e -> solvePaneOffset -= 0.5),
+                new KeyFrame(new Duration(1), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset)))
+        );
+        innerTimeline.setCycleCount(298);
+
+        outerTimeline = new Timeline();
+
+        outerTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(1000), e -> { innerTimeline.play(); System.out.println(outerTimeline.getCycleCount());})
+        );
+        outerTimeline.setCycleCount(solution.size()-1);
     }
 
     private void solveStringConverter() {
@@ -62,27 +83,6 @@ public class SolverController implements Observer {
         for(int i = 0; i < solution.size(); i++) {
             solveIconPane.getChildren().add(new SolveIcon(solution.get(i)));
         }
-    }
-
-    @FXML
-    private void startSolution() {
-        solveIconPane.setVisible(true);
-
-        Timeline innerTimeline = new Timeline();
-        innerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0), e -> solvePaneOffset -= 0.5),
-                new KeyFrame(new Duration(1), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset)))
-
-        );
-        innerTimeline.setCycleCount(298);
-
-        Timeline outerTimeline = new Timeline();
-        outerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0), e -> innerTimeline.play()),
-                new KeyFrame(new Duration(1500))
-        );
-        outerTimeline.setCycleCount(solution.size()-1);
-        outerTimeline.play();
     }
 
     class SolveIcon extends ImageView {
@@ -129,8 +129,6 @@ public class SolverController implements Observer {
             this.prefHeight(63);
             this.maxWidth(USE_PREF_SIZE);
             this.maxHeight(USE_PREF_SIZE);
-            this.setStyle("-fx-background-color: #000000");
-
         }
 
         private Polygon generatePolygones(Double[] polygonPoints, int id) {
@@ -146,20 +144,31 @@ public class SolverController implements Observer {
             polygon.setOnMouseEntered(e -> polygon.setFill(Color.web("#e4e4e4")));
             polygon.setOnMouseExited(e -> polygon.setFill(Color.web("#3f464f")));
             switch (id) {
-                case 0:
-                    polygon.setOnMousePressed(e -> guiModel.callObservers("resetAnimationTime"));
+                case 0: // Restart iteration
+                    polygon.setOnMousePressed(e -> {
+                        outerTimeline.stop();
+                        innerTimeline.stop();
+                        solvePaneOffset = 0;
+                        solveIconPane.setPadding(new Insets(0));
+                    });
+
                     setLeftAnchor(polygon, 0.0);
                     break;
 
-                case 1:
-                    polygon.setOnMousePressed(e -> guiModel.callObservers("startStopAnimation"));
+                case 1: // Play/Pause
+                    polygon.setOnMousePressed(e -> {
+                        System.out.println(outerTimeline.getStatus());
+                        if(outerTimeline.getStatus() != Animation.Status.RUNNING)
+                        outerTimeline.play();
+                        else
+                            outerTimeline.pause();
+                    });
                     setLeftAnchor(polygon, 130.0);
                     break;
 
-                case 2:
+                case 2: // Set speed
                     polygon.setOnMousePressed(e -> openSpeedSlider());
-                    setRightAnchor(polygon, 0.0
-                    );
+                    setLeftAnchor(polygon, 288.0);
             }
             return polygon;
         }
@@ -169,8 +178,8 @@ public class SolverController implements Observer {
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
             case "startSolver":
-                initializeSolverController();
                 solveStringConverter();
+                initializeSolverController();
                 loadCubeIcons();
                 break;
         }

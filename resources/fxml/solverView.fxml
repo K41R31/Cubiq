@@ -34,13 +34,10 @@
             </VBox>
             <VBox maxHeight="-Infinity" maxWidth="2052.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="307.0" prefWidth="1920.0" style="-fx-background-color: #3e454e;">
                <children>
-                  <HBox fx:id="buttonPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="2052.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="63.0" prefWidth="1920.0" style="-fx-background-color: #E05C74;">
+                  <HBox fx:id="buttonPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="63.0" prefWidth="1920.0">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
-                     <children>
-                        <AnchorPane prefHeight="63.0" prefWidth="483.0" />
-                     </children>
                   </HBox>
                   <StackPane prefHeight="150.0" prefWidth="200.0">
                      <children>
