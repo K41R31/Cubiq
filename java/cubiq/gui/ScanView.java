@@ -236,10 +236,8 @@ public class ScanView extends AnchorPane implements Observer {
         private Polyline newGlowLine() {
             Polyline polyLine = new Polyline();
             Double[] linePoints;
-            if (title.equals("leftItem")) {
+            if (title.equals("leftItem"))
                 linePoints = Arrays.copyOfRange(points, 0, 10);
-
-            }
             else linePoints = Arrays.copyOfRange(points, 0, 6);
             polyLine.getPoints().addAll(linePoints);
 
