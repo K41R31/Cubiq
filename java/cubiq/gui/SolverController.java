@@ -68,6 +68,7 @@ public class SolverController implements Observer {
     private void startSolution() {
         // Inner
         Timeline startSolutionAnimation = new Timeline();
+        Timeline sleepTimer = new Timeline();
         startSolutionAnimation.getKeyFrames().addAll(
                new KeyFrame(new Duration(0), e -> {
                    easeOut();
@@ -77,10 +78,14 @@ public class SolverController implements Observer {
                new KeyFrame(new Duration(2.5), e -> solvePaneOffset -= 0.5)
         );
         startSolutionAnimation.setCycleCount(298);
+                new KeyFrame(new Duration(0), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset))),
+                new KeyFrame(new Duration(13), e -> solvePaneOffset -= 1)
+        );
+        startSolutionAnimation.setCycleCount(149);
         startSolutionAnimation.setRate(1);
         solveIconPane.setVisible(true);
         startSolutionAnimation.setOnFinished(e -> {
-            System.out.println("Penis");
+            sleepTimer.play();
         });
         startSolutionAnimation.play();
 
@@ -95,6 +100,10 @@ public class SolverController implements Observer {
             System.out.println("Penis");
         });
         startSolutionAnimation.play();
+        sleepTimer.getKeyFrames().addAll(
+                new KeyFrame(new Duration(0)),
+                new KeyFrame(new Duration(1500), e -> startSolutionAnimation.play())
+                );
     }
 
     class SolveIcon extends ImageView {
