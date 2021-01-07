@@ -1,18 +1,26 @@
-.closeButton {
-    -fx-image: url("../../../../resources/cubiq/assets/closeButton.png");
+.speedSlider .thumb{
+    -fx-background-color: #eeeeee;
+    -fx-background-radius: 0;
+    -fx-background-insets: 9;
+    -fx-border-color: TRANSPARENT;
+    -fx-border-width: 3;
+    -fx-pref-height: 22;
+    -fx-pref-width: 27;
 }
-.closeButton:hover {
-    -fx-image: url("../../../../resources/cubiq/assets/closeButtonHover.png");
+
+.speedSlider .track{
+    -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 0;
+
 }
-.minmaxButton {
-    -fx-image: url("../../../../resources/cubiq/assets/minmaxButton.png");
+
+.speedProgressBar .track {
+    -fx-background-color: #838798;
+    -fx-background-radius: 0;
+
 }
-.minmaxButton:hover {
-    -fx-image: url("../../../../resources/cubiq/assets/minmaxButtonHover.png");
-}
-.minimizeButton {
-    -fx-image: url("../../../../resources/cubiq/assets/minimizeButton.png");
-}
-.minimizeButton:hover {
-    -fx-image: url("../../../../resources/cubiq/assets/minimizeButtonHover.png");
+.speedProgressBar .bar{
+    -fx-background-color: #eaeaea;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0 0 0 0;
 }

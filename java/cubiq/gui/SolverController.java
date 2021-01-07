@@ -5,14 +5,20 @@ import cubiq.processing.MathUtils;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.FontSmoothingType;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.scene.paint.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -22,28 +28,44 @@ public class SolverController implements Observer {
      //TODO: Bilderbezeichnung noch ändern, aktuell 2R, ändern auf R2... usw.!!!!
 
     private final float ANIMATION_JUMP_SPEED = 1f;
-    private final float ANIMATION_DELAY_SPEED = 3.5f;
     private GuiModel guiModel;
     private String imagePath;
-    private int currentCycle, animationResetCycles;
+    private int currentCycle, animationResetCycles, cycleCounter;
     private float startOffset, solvePaneOffset;
     private List<String> solution;
     private List<SolveIcon> solveIcons;
     private Timeline innerTimeline, outerTimeline, resetAnimationTimeline;
+
     @FXML
     private HBox solveIconPane, buttonPane;
+    @FXML
+    private VBox speedSliderPane;
+    @FXML
+    private Slider speedSlider;
+    @FXML
+    private Text typoSlow, typoFast;
+    @FXML
+    private ProgressBar speedProgressBar;
 
 
     private void initializeSolverController() {
         solution = new ArrayList<>();
         solveIcons = new ArrayList<>();
-
         imagePath = "/assets/solveIcons/";
         buttonPane.getChildren().add(new ControlPane());
 
         solveStringConverter();
 
         solveIconPane.setVisible(true);
+        cycleCounter = solution.size() - 1;
+        speedSliderPane.setViewOrder(-1);
+        speedSlider.setViewOrder(-2);
+        typoSlow.setFont(guiModel.getKiona());
+        typoSlow.setStyle("-fx-font-size: 12");
+        typoSlow.setFontSmoothingType(FontSmoothingType.GRAY);
+        typoFast.setFont(guiModel.getKiona());
+        typoFast.setStyle("-fx-font-size: 12");
+        typoSlow.setFontSmoothingType(FontSmoothingType.LCD);
 
         innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().add(
@@ -56,11 +78,13 @@ public class SolverController implements Observer {
         innerTimeline.setCycleCount(Math.round(400 / ANIMATION_JUMP_SPEED));
 
         outerTimeline = new Timeline();
+        outerTimeline.setRate(1);
         outerTimeline.getKeyFrames().add(
-                new KeyFrame(new Duration(1800 / ANIMATION_DELAY_SPEED), e -> {
+                new KeyFrame(new Duration(1800), e -> {
                     currentCycle = 0;
                     solvePaneOffset = Math.round(solvePaneOffset/ 149) * 149;
                     startOffset = solvePaneOffset;
+                    cycleCounter--;
                     innerTimeline.play();
                 })
         );
@@ -81,6 +105,11 @@ public class SolverController implements Observer {
             solveIcons.add(solveIcon);
             solveIconPane.getChildren().add(solveIcon);
         }
+            speedSlider.valueProperty().addListener((ov, oldVl, newVl) -> {
+            float value = newVl.floatValue();
+            speedProgressBar.setProgress((value) * (1f / 3.2f));
+            outerTimeline.setRate(value + 0.8f);
+        });
     }
 
     private void solveStringConverter() {
@@ -148,6 +177,7 @@ public class SolverController implements Observer {
                     polygon.setOnMousePressed(e -> {
                         outerTimeline.stop();
                         innerTimeline.stop();
+                        cycleCounter = solution.size()-1;
                         currentCycle = 0;
                         startOffset = solvePaneOffset;
                         animationResetCycles = Math.round(Math.abs(solvePaneOffset / 3));
@@ -160,7 +190,7 @@ public class SolverController implements Observer {
 
                 case 1: // Play/Pause
                     polygon.setOnMousePressed(e -> {
-                        if (outerTimeline.getStatus() != Animation.Status.RUNNING)
+                        if (outerTimeline.getStatus() != Animation.Status.RUNNING && cycleCounter > 0)
                             outerTimeline.play();
                         else
                             outerTimeline.pause();
