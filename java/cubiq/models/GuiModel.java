@@ -1,5 +1,6 @@
 package cubiq.models;
 
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
@@ -19,6 +20,7 @@ public class GuiModel extends Observable {
     private Font bender;
     private Mat originalFrame;
     private Mat[] loadedImages;
+    private AnchorPane rendererPane;
     private boolean debug = false;
     private boolean mirrorWebcam = false;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
@@ -55,7 +57,14 @@ public class GuiModel extends Observable {
         this.solveString = solveString;
     }
 
+    // Render pane------------------------------------------------------------------------------------------------------
+    public AnchorPane getRendererPane() {
+        return rendererPane;
+    }
 
+    public void setRendererPane(AnchorPane rendererPane) {
+        this.rendererPane = rendererPane;
+    }
 
     // Kiona------------------------------------------------------------------------------------------------------------
 

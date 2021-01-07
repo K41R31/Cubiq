@@ -4,6 +4,7 @@ import cubiq.gui.*;
 import cubiq.io.FileChooser;
 import cubiq.models.GuiModel;
 import cubiq.processing.ScanCube;
+import cubiq.renderer.CubeExplorerRenderer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -39,6 +40,11 @@ public class Start extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.initModel(guiModel);
         guiModel.addObserver(fileChooser);
+
+        // Init CubeExplorerRenderer
+        CubeExplorerRenderer cubeExplorerRenderer = new CubeExplorerRenderer();
+        cubeExplorerRenderer.initModel(guiModel);
+        guiModel.addObserver(cubeExplorerRenderer);
 
 
         // Init ScreenInformation---------------------------------------------------------------------------------------

@@ -1,12 +1,11 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
+import cubiq.processing.MathUtils;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.effect.Bloom;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -49,7 +48,7 @@ public class SolverController implements Observer {
         innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
-                    solvePaneOffset = easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
+                    solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
                     currentCycle++;
                     solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
                 })
@@ -70,7 +69,7 @@ public class SolverController implements Observer {
         resetTimeline = new Timeline();
         resetTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
-                    solvePaneOffset = easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
+                    solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
                     currentCycle++;
                     solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
                 })
@@ -116,9 +115,9 @@ public class SolverController implements Observer {
 
         ControlPane() {
             initializeRootPane();
-            Polygon polygonLeft = generatePolygones(new Double[]{0.0, 0.0, 63.0, 63.0, 193.0, 63.0, 130.0, 0.0}, 0);
-            Polygon polygonMiddle = generatePolygones(new Double[]{0.0, 0.0, 63.0, 63.0, 158.0, 63.0, 220.0, 0.0}, 1);
-            Polygon polygonRight = generatePolygones(new Double[]{0.0, 0.0, -63.0, 63.0, 70.0, 63.0, 130.0, 0.0}, 2);
+            Polygon polygonLeft = generatePolygons(new Double[]{0.0, 0.0, 63.0, 63.0, 193.0, 63.0, 130.0, 0.0}, 0);
+            Polygon polygonMiddle = generatePolygons(new Double[]{0.0, 0.0, 63.0, 63.0, 158.0, 63.0, 220.0, 0.0}, 1);
+            Polygon polygonRight = generatePolygons(new Double[]{0.0, 0.0, -63.0, 63.0, 70.0, 63.0, 130.0, 0.0}, 2);
             getChildren().addAll(polygonLeft, polygonMiddle, polygonRight);
             polygonMiddle.setViewOrder(-1);
         }
@@ -132,7 +131,7 @@ public class SolverController implements Observer {
             this.maxHeight(USE_PREF_SIZE);
         }
 
-        private Polygon generatePolygones(Double[] polygonPoints, int id) {
+        private Polygon generatePolygons(Double[] polygonPoints, int id) {
             Polygon polygon = new Polygon();
             polygon.getPoints().addAll(polygonPoints);
             polygon.setFill(Color.web("#3f464f"));
@@ -177,26 +176,10 @@ public class SolverController implements Observer {
         }
     }
 
-    /**
-     * Function to calculate a ease in/out animation
-     * Source: http://gizma.com/easing/
-     * @param t current time
-     * @param b start value
-     * @param c change in value
-     * @param d duration
-     * @return Eased value
-     */
-    private float easeInOut(float t, float b, float c, float d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t*t + b;
-        t -= 2;
-        return c/2*(t*t*t + 2) + b;
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
-            case "startSolver":
+            case "showSolver":
                 initializeSolverController();
                 break;
         }

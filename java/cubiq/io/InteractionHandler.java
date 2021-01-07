@@ -23,7 +23,6 @@ public class InteractionHandler implements MouseListener {
     private final float deviceWidth;
     private final float deviceHeight;
     private List<Quaternion> actualQuats, pressedQuats, snapToQuats, releasedQuats;
-    private final int[] pressedLayer; // [0] -> side, [1] -> rotation axis, [2] -> layer (1, 0, 0) = every cubie on layer
     private int mousePressedX, mousePressedY, windowWidth, pressedFrameCount, pressedFrame;
     private float rotatedSincePress, snapBackDiff;
     private boolean swingingBack, mousePressed;
@@ -41,7 +40,6 @@ public class InteractionHandler implements MouseListener {
         releasedQuats = new ArrayList<>();
         snapBackFrameCount = 0;
         mouseDraggedDirection = -1;
-        pressedLayer = new int[3];
         this.camPos = camPos;
         this.deviceWidth = deviceWidth;
         this.deviceHeight = deviceHeight;
@@ -74,14 +72,13 @@ public class InteractionHandler implements MouseListener {
             actualQuats.clear();
 
             // Check where the mouse was pressed
-            pressedLayer[0] = 0;
-            for (int i = 0; i < cube.getTotalCubies(); i++) {
-                Quaternion cubieQuat = cube.getCubieRotation(i);
-                // Load the cubie quaternions in actual quads
-                actualQuats.add(cubieQuat);
-                // Store the angles of the cube when the mouse was pressed in an quaternion
-                pressedQuats.add(new Quaternion(cubieQuat));
-            }
+            System.out.println(cubiePressedDistance(cube.getCubieBoundingBox(0)));
+//          Quaternion cubieQuat = cube.getCubieRotation(i);
+//          // Load the cubie quaternions in actual quads
+//          actualQuats.add(cubieQuat);
+//          // Store the angles of the cube when the mouse was pressed in an quaternion
+//          pressedQuats.add(new Quaternion(cubieQuat));
+//            System.out.println("shortest: " + Math.round(shortestDistance));
         }
     }
 
@@ -122,7 +119,7 @@ public class InteractionHandler implements MouseListener {
                 releasedQuats.add(new Quaternion(actualQuats.get(i)));
             }
             // Update every local cubie location
-            cube.updateLocalPos();
+//            cube.updateLocalPos();
 
             // Reset the direction
             mouseDraggedDirection = -1;
@@ -224,22 +221,16 @@ public class InteractionHandler implements MouseListener {
         return c*(t*t*t + 1) + b;
     }
 
-    private boolean mousePressedOnXSide() {
-        boolean intersects0 = intersectTriangle(new float[] {-1.5f, 1.5f, 1.5f}, new float[] {-1.5f, 1.5f, -1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
-        boolean intersects1 = intersectTriangle(new float[] {-1.5f, 1.5f, -1.5f}, new float[] {-1.5f, -1.5f, -1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
-        return intersects0 || intersects1;
-    }
-
-    private boolean mousePressedOnYSide() {
-        boolean intersects0 = intersectTriangle(new float[] {1.5f, 1.5f, -1.5f}, new float[] {-1.5f, 1.5f, -1.5f}, new float[] {1.5f, 1.5f, 1.5f});
-        boolean intersects1 = intersectTriangle(new float[] {-1.5f, 1.5f, -1.5f}, new float[] {-1.5f, 1.5f, 1.5f}, new float[] {1.5f, 1.5f, 1.5f});
-        return intersects0 || intersects1;
-    }
-
-    private boolean mousePressedOnZSide() {
-        boolean intersects0 = intersectTriangle(new float[] {-1.5f, 1.5f, 1.5f}, new float[] {1.5f, 1.5f, 1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
-        boolean intersects1 = intersectTriangle(new float[] {1.5f, 1.5f, 1.5f}, new float[] {1.5f, -1.5f, 1.5f}, new float[] {-1.5f, -1.5f, 1.5f});
-        return intersects0 || intersects1;
+    private float cubiePressedDistance(float[] boundingBoxVertices) {
+        for (int i = 0; i < 12; i++) {
+            float[][] triangle = new float[3][3];
+            for (int j = 0; j < 3; j++) {
+                System.arraycopy(boundingBoxVertices, i*9+j*3, triangle[j], 0, 3);
+            }
+            float triangleDistance = intersectTriangle(triangle);
+            System.out.println(triangleDistance);
+        }
+        return 0;
     }
 
     /**
@@ -267,7 +258,7 @@ public class InteractionHandler implements MouseListener {
         return VectorUtil.normalizeVec3(rayWorld);
     }
 
-    private boolean intersectTriangle(float[] vert0, float[] vert1, float[] vert2) {
+    private float intersectTriangle(float[][] triangle) {
         float[] edge1 = new float[3];
         float[] edge2 = new float[3];
         float[] tvec = new float[3];
@@ -277,8 +268,8 @@ public class InteractionHandler implements MouseListener {
         float[] rayDirection = rayThroughMouse();
 
         // Find vectors for two edges sharing vert0
-        VectorUtil.subVec3(edge1, vert1, vert0);
-        VectorUtil.subVec3(edge2, vert2, vert0);
+        VectorUtil.subVec3(edge1, triangle[1], triangle[0]);
+        VectorUtil.subVec3(edge2, triangle[2], triangle[0]);
 
         // Begin calculating determinant -- also used to calculate U parameter
         VectorUtil.crossVec3(pvec, rayDirection, edge2);
@@ -286,25 +277,27 @@ public class InteractionHandler implements MouseListener {
         // If determinant is near zero, ray lies in plane of triangle
         float det = VectorUtil.dotVec3(edge1, pvec);
         if (det > -INTERSECTION_EPSILON && det < INTERSECTION_EPSILON)
-            return false;
+            return 0;
 
         float invDet = 1.0f / det;
 
         // Calculate distance from vert0 to ray origin
-        VectorUtil.subVec3(tvec, camPos, vert0);
+        VectorUtil.subVec3(tvec, camPos, triangle[0]);
 
         // Calculate U parameter and test bounds
         float u = VectorUtil.dotVec3(tvec, pvec) * invDet;
         if (u < 0.0f || u > 1.0f)
-            return false;
+            return 0;
 
         // Prepare to test V parameter
         VectorUtil.crossVec3(qvec, tvec, edge1);
 
         // Calculate V parameter and test bounds
         float v = VectorUtil.dotVec3(rayDirection, qvec) * invDet;
+        if (v < 0.0f || (u + v) > 1.0f)
+            return 0;
 
-        return !(v < 0.0f) && !((u + v) > 1.0f);
+        return VectorUtil.dotVec3(edge1, qvec) * invDet;
     }
 
     public static float[] multMat4Vec4(float[] inMat, float[] inVec) {
