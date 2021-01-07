@@ -3,6 +3,7 @@ package cubiq.processing;
 import cubiq.io.DebugOutput;
 import cubiq.io.WebcamCapture;
 import cubiq.models.GuiModel;
+import javafx.application.Platform;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ScanCube implements Observer {
 
-    private GuiModel model;
+    private GuiModel guiModel;
     private WebcamCapture webcamCapture;
     private ScheduledExecutorService timer;
     private final List<int[][]> scannedCubeSides = new ArrayList<>();
@@ -31,6 +32,7 @@ public class ScanCube implements Observer {
         // Create a loop, that repeats "processFrames" at the same speed as the framerate of the webcam
         timer = Executors.newSingleThreadScheduledExecutor();
         timer.scheduleAtFixedRate(this::webcamLoop, 0, 1000 / webcamCapture.getFramerate(), TimeUnit.MILLISECONDS);
+//        timer.scheduleAtFixedRate(this::webcamLoop, 0, 1000 / 30, TimeUnit.MILLISECONDS);
     }
 
     private void webcamLoop() {
@@ -40,21 +42,21 @@ public class ScanCube implements Observer {
     }
 
     private void startLoadedImagesLoop() {
-        model.callObservers("loadImage");
+        guiModel.callObservers("loadImage");
         for (int i = 0; i < 6; i++)
-           processFrame(model.getLoadedImages()[i]);
+           processFrame(guiModel.getLoadedImages()[i]);
     }
 
     private void processFrame(Mat frame) {
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
-        model.setOriginalFrame(frame);
+        guiModel.setOriginalFrame(frame);
 
         // Get the position of the stickers
         List<Point> centers = cubeBoundarys(frame);
 
         // If no or less than 8 stickers were found, show the unprocessed image
         if (centers == null || centers.size() < 8) {
-            model.callObservers("updateImageView");
+            guiModel.callObservers("updateImageView");
             return;
         }
 
@@ -63,7 +65,7 @@ public class ScanCube implements Observer {
 
         // Check if the boundingRect is a square. If not, show the unprocessed image
         if (!boundingRectIsSquare(boundingRect)) {
-            model.callObservers("updateImageView");
+            guiModel.callObservers("updateImageView");
             return;
         }
 
@@ -87,8 +89,8 @@ public class ScanCube implements Observer {
                 if (sameSideCounter > 10) {
                     scannedCubeSides.add(colorMatrix);
                     centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
-                    model.setTotalCubeSideFound(scannedCubeSides.size());
-                    model.callObservers("newCubeSideFound");
+                    guiModel.setTotalCubeSideFound(scannedCubeSides.size());
+                    guiModel.callObservers("newCubeSideFound");
                     new DebugOutput().printImage(frame.clone(), scannedCubeSides.size());
                     // Reset counter and same side variable
                     foundCubeSide = null;
@@ -100,11 +102,13 @@ public class ScanCube implements Observer {
 
         // If all 6 sides were scanned, stop the loop
         if (scannedCubeSides.size() == 6) {
+            shutdownScan();
+            Platform.runLater(() -> guiModel.callObservers("showSolver"));
             logoCorrection();
 
             // Build the cube with the given color faces
-            new BuildCube(scannedCubeSides);
-            model.callObservers("shutdown");
+            BuildCube buildCube = new BuildCube(scannedCubeSides);
+            guiModel.setSolveString(buildCube.alignCubeSides());
         }
 
         // Draw the found contours in the unprocessed image
@@ -125,8 +129,8 @@ public class ScanCube implements Observer {
         //Imgproc.cvtColor(contourMat, contourMat, Imgproc.COLOR_BGR2HSV);
 
         // Show processedMat
-        model.setOriginalFrame(contourMat);
-        model.callObservers("updateImageView");
+        guiModel.setOriginalFrame(contourMat);
+        guiModel.callObservers("updateImageView");
     }
 
     private List<Point> cubeBoundarys(Mat frame) {
@@ -137,15 +141,16 @@ public class ScanCube implements Observer {
         Mat processedMat = splittedMat.get(2);
 
         // Add gaussian blur
-        Imgproc.GaussianBlur(processedMat, processedMat, new Size(2 * model.getBlurThreshold() + 1, 2 * model.getBlurThreshold() + 1), 0);
+        Imgproc.GaussianBlur(processedMat, processedMat, new Size(2 * guiModel.getBlurThreshold() + 1, 2 * guiModel.getBlurThreshold() + 1), 0);
 
         // Add Canny
-        Imgproc.Canny(processedMat, processedMat, model.getCannyThreshold1(), model.getCannyThreshold2());
+        Imgproc.Canny(processedMat, processedMat, guiModel.getCannyThreshold1(), guiModel.getCannyThreshold2());
 
-//        model.setWebcamFrame(processedMat);
+//        model.setOriginalFrame(processedMat);
+//        model.callObservers("updateImageView");
 
         // Make the lines thicker
-        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2 * model.getDilateKernel() + 1, 2 * model.getDilateKernel() + 1));
+        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2 * guiModel.getDilateKernel() + 1, 2 * guiModel.getDilateKernel() + 1));
         Imgproc.dilate(processedMat, processedMat, dilateKernel);
 
         // Find contours
@@ -158,6 +163,7 @@ public class ScanCube implements Observer {
             approximations.add(new MatOfPoint2f());
             Imgproc.approxPolyDP(new MatOfPoint2f(foundContours.get(i).toArray()), approximations.get(i), 0.1 * Imgproc.arcLength(new MatOfPoint2f(foundContours.get(i).toArray()), true), true);
         }
+
         // Find the cube squares and their centers
         List<Point> centers = new ArrayList<>();
         List<MatOfPoint2f> cubeSquares = new ArrayList<>();
@@ -210,9 +216,9 @@ public class ScanCube implements Observer {
         double distanceLeft = distanceBetweenTwoPoints(corners[3], corners[0]);
         double[] distances = new double[] {distanceTop, distanceRight, distanceBottom, distanceLeft};
 
-        // Calculate the threshold for the rectangle
+        // Calculate the threshold for the rectangles
         double maxDistance = getMax(distances);
-        double minDistance = maxDistance * model.getSideLengthThreshold();
+        double minDistance = maxDistance * guiModel.getSideLengthThreshold();
 
         // If any side is much smaller than the given threshold or is generally very short or long, return false
         for (double distance : distances) {
@@ -221,16 +227,16 @@ public class ScanCube implements Observer {
                 return false;
             }
             // Check for sides that are shorter than 2% of the image width
-            if (distance < model.getOriginalFrame().width() * 0.02)
+            if (distance < guiModel.getOriginalFrame().width() * 0.02)
                 return false;
             // Check for sides that are longer than 15% of the image width
-            if (distance > model.getOriginalFrame().width() * 0.15)
+            if (distance > guiModel.getOriginalFrame().width() * 0.15)
                 return false;
         }
 
         // The angles of all four corners must not be outside the threshold
-        double minAngle = 90 - model.getAngleThreshold();
-        double maxAngle = 90 + model.getAngleThreshold();
+        double minAngle = 90 - guiModel.getAngleThreshold();
+        double maxAngle = 90 + guiModel.getAngleThreshold();
 
         double angleTopLeft = getAngle(corners[3], corners[1], corners[0]);
         if (angleTopLeft < minAngle || angleTopLeft > maxAngle)
@@ -258,12 +264,12 @@ public class ScanCube implements Observer {
 
         if (corners[0].y > corners[1].y) {
             double angleRight = getAngle(corners[0], boundingRectTopLeft, corners[1]);
-            return !(angleRight > model.getRotationThreshold());
+            return !(angleRight > guiModel.getRotationThreshold());
         }
 
         else {
             double angleLeft = getAngle(corners[1], boundingRectTopRight, corners[0]);
-            return !(angleLeft > model.getRotationThreshold());
+            return !(angleLeft > guiModel.getRotationThreshold());
         }
     }
 
@@ -408,7 +414,7 @@ public class ScanCube implements Observer {
      * 5 = yellow
      */
     private Scalar[][] meanHSVAtScanpoints(Point[][] scanpoints, Mat frame) {
-        double scanAreaHalf = model.getScanAreaSize() / 2;
+        double scanAreaHalf = guiModel.getScanAreaSize() / 2;
         Scalar[][] colors = new Scalar[3][3];
         double hue, sat, val;
         double[] readColor;
@@ -440,16 +446,16 @@ public class ScanCube implements Observer {
                     }
                 }
                 // Get the mean of both unit vectors
-                unitVectorX /= Math.pow(model.getScanAreaSize(), 2);
-                unitVectorY /= Math.pow(model.getScanAreaSize(), 2);
+                unitVectorX /= Math.pow(guiModel.getScanAreaSize(), 2);
+                unitVectorY /= Math.pow(guiModel.getScanAreaSize(), 2);
                 // Convert the calculated unit vector to an angle that can be used as a hue value
                 hue = Math.toDegrees(Math.atan2(unitVectorY, unitVectorX));
                 // Because the hue value is a circle, negative angles should be increased by 360°
                 if (hue < 0) hue += 360;
                 // Normalise the hue to the Open Cv range, that uses hue values between 0 - 179
                 hue /= 2;
-                sat /= Math.pow(model.getScanAreaSize(), 2);
-                val /= Math.pow(model.getScanAreaSize(), 2);
+                sat /= Math.pow(guiModel.getScanAreaSize(), 2);
+                val /= Math.pow(guiModel.getScanAreaSize(), 2);
 
                 colors[x][y] = new Scalar(hue, sat, val);
             }
@@ -466,14 +472,14 @@ public class ScanCube implements Observer {
                 double val = scalars[x][y].val[2];
 
                 if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) normalizedColors[x][y] = 0; // white
-                else if (hue < 5) normalizedColors[x][y] = 2; // red
+                else if (hue < 2) normalizedColors[x][y] = 2; // red
                 else if (hue < 20) normalizedColors[x][y] = 3; // orange
                 else if (hue < 45 || hue < 60 && sat < 155) normalizedColors[x][y] = 5; // yellow
                 else if (hue < 90) normalizedColors[x][y] = 1; // green
                 else if (hue < 140) normalizedColors[x][y] = 4; // blue
                 else if (hue <= 180) normalizedColors[x][y] = 2; // red
 
-                if (model.isDebug()) System.out.println("x: " + x + ", y: " + y + " -> " + hue + ", " + sat + ", " + val + " ->> " + normalizedColors[x][y]);
+                if (guiModel.isDebug()) System.out.println("x: " + x + ", y: " + y + " -> " + hue + ", " + sat + ", " + val + " ->> " + normalizedColors[x][y]);
             }
         }
         return normalizedColors;
@@ -574,6 +580,13 @@ public class ScanCube implements Observer {
         return max;
     }
 
+    private void shutdownScan() {
+        if (webcamCapture != null) {
+            webcamCapture.getVideoCapture().release();
+            timer.shutdownNow();
+        }
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
@@ -584,16 +597,13 @@ public class ScanCube implements Observer {
                 startLoadedImagesLoop();
                 break;
             case "shutdown":
-                if (webcamCapture != null) {
-                    webcamCapture.getVideoCapture().release();
-                    timer.shutdownNow();
-                }
+                shutdownScan();
                 System.exit(0);
                 break;
         }
     }
 
     public void initModel(GuiModel model) {
-        this.model = model;
+        this.guiModel = model;
     }
 }
