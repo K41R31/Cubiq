@@ -5,6 +5,7 @@ import cubiq.processing.EaseUtils;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
@@ -12,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.FontSmoothingType;
@@ -19,10 +21,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 public class SolverController implements Observer {
      //TODO: Bilderbezeichnung noch ändern, aktuell 2R, ändern auf R2... usw.!!!!
@@ -51,7 +50,8 @@ public class SolverController implements Observer {
     private void initializeSolverController() {
         solution = new ArrayList<>();
         solveIcons = new ArrayList<>();
-        imagePath = "/assets/solveIcons/";
+        imagePath = "/assets/";
+
         buttonPane.getChildren().add(new ControlPane());
 
         solveIconPane.setVisible(true);
@@ -136,7 +136,7 @@ public class SolverController implements Observer {
 
     class SolveIcon extends ImageView {
         public SolveIcon(String solveString) {
-            Image image = new Image(getClass().getResourceAsStream(imagePath+solveString+".png"));
+            Image image = new Image(getClass().getResourceAsStream(imagePath+"/solveIcons/"+solveString+".png"));
             this.setFitWidth(97);
             this.setFitHeight(144);
             this.setImage(image);
@@ -151,8 +151,36 @@ public class SolverController implements Observer {
             Polygon polygonLeft = generatePolygons(new Double[]{0.0, 0.0, 63.0, 63.0, 193.0, 63.0, 130.0, 0.0}, 0);
             Polygon polygonMiddle = generatePolygons(new Double[]{0.0, 0.0, 63.0, 63.0, 158.0, 63.0, 220.0, 0.0}, 1);
             Polygon polygonRight = generatePolygons(new Double[]{0.0, 0.0, -63.0, 63.0, 70.0, 63.0, 130.0, 0.0}, 2);
+            loadImages();
             getChildren().addAll(polygonLeft, polygonMiddle, polygonRight);
+            getChildren().addAll(buttonLIcon, buttonMIcon, buttonRIcon);
+            AnchorPane.setLeftAnchor(buttonLIcon, 87d);
+            AnchorPane.setTopAnchor(buttonLIcon,16d);
+            AnchorPane.setLeftAnchor(buttonMIcon, 235d);
+            AnchorPane.setTopAnchor(buttonMIcon, 16d);
+            AnchorPane.setRightAnchor(buttonRIcon, 84d);
+            AnchorPane.setTopAnchor(buttonRIcon, 16d);
+            buttonLIcon.setMouseTransparent(true);
+            buttonMIcon.setMouseTransparent(true);
+            buttonRIcon.setMouseTransparent(true);
+            buttonMIcon.setViewOrder(-2);
             polygonMiddle.setViewOrder(-1);
+        }
+
+        private void loadImages() {
+            buttonLIcon = new ImageView();
+            buttonLIcon.setFitHeight(30);
+            buttonLIcon.setFitWidth(26);
+            buttonMIcon = new ImageView();
+            buttonMIcon.setFitHeight(30);
+            buttonMIcon.setFitWidth(18);
+            buttonRIcon = new ImageView();
+            buttonRIcon.setFitHeight(30);
+            buttonRIcon.setFitWidth(35);
+
+            buttonLIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "restartButton.png")));
+            buttonMIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "startButton.png")));
+            buttonRIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "speedButton.png")));
         }
 
         private void initializeRootPane() {
@@ -194,11 +222,13 @@ public class SolverController implements Observer {
 
                 case 1: // Play/Pause
                     polygon.setOnMousePressed(e -> {
-                        if (outerTimeline.getStatus() != Animation.Status.RUNNING && cycleCounter > 0)
+                        if (outerTimeline.getStatus() != Animation.Status.RUNNING && cycleCounter > 0) {
                             outerTimeline.play();
-                        else
+                            buttonMIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "pauseButton.png")));
+                    } else {
                             outerTimeline.pause();
-                    });
+                            buttonMIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "startButton.png")));
+                    }});
                     setLeftAnchor(polygon, 130.0);
                     break;
 
