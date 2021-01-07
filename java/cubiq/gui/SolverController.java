@@ -35,10 +35,6 @@ public class SolverController implements Observer {
     private Button startButton;
     private float solvePaneOffset = 0;
 
-    public SolverController() {
-        imagePath = "/assets/solveIcons/";
-    }
-
     private GuiModel guiModel;
 
     private List<String> solution = new ArrayList<>();
@@ -60,15 +56,13 @@ public class SolverController implements Observer {
         outerTimeline = new Timeline();
 
         outerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(1000), e -> { innerTimeline.play(); System.out.println(outerTimeline.getCycleCount());})
+                new KeyFrame(new Duration(2000), e -> { innerTimeline.play(); System.out.println(outerTimeline.getCycleCount());})
         );
         outerTimeline.setCycleCount(solution.size()-1);
     }
 
     private void solveStringConverter() {
         String solveString = guiModel.getSolveString();
-        Polygon polygon = new Polygon();
-        polygon.setViewOrder(0);
         int idx = 0;
         while (true) {
             int idxNew;
@@ -89,34 +83,6 @@ public class SolverController implements Observer {
         for(int i = 0; i < solution.size(); i++) {
             solveIconPane.getChildren().add(new SolveIcon(solution.get(i)));
         }
-    }
-
-    @FXML
-    private void startSolution() {
-        solveIconPane.setVisible(true);
-
-        Timeline innerTimeline = new Timeline();
-        innerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0), e -> {
-                    solvePaneOffset = easeInOut(currentCycle, startValue, -1,149);
-                    currentCycle++;
-                }),
-                new KeyFrame(new Duration(1), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset)))
-
-        );
-        innerTimeline.setCycleCount(149);
-
-        Timeline outerTimeline = new Timeline();
-        outerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0), e -> {
-                    startValue = solvePaneOffset;
-                    innerTimeline.play();
-                }),
-                new KeyFrame(new Duration(1500))
-        );
-        outerTimeline.setCycleCount(3);
-        outerTimeline.setCycleCount(solution.size()-1);
-        outerTimeline.play();
     }
 
     class SolveIcon extends ImageView {
