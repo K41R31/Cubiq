@@ -1,7 +1,7 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
-import cubiq.processing.MathUtils;
+import cubiq.processing.EaseUtils;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -73,7 +73,7 @@ public class SolverController implements Observer {
         innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
-                    solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
+                    solvePaneOffset = EaseUtils.easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
                     currentCycle++;
                     solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
                 })
@@ -96,7 +96,7 @@ public class SolverController implements Observer {
         resetAnimationTimeline = new Timeline();
         resetAnimationTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
-                    solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
+                    solvePaneOffset = EaseUtils.easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
                     currentCycle++;
                     solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
                 })
@@ -212,7 +212,7 @@ public class SolverController implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
-            case "showSolver":
+            case "initGuiElements":
                 initializeSolverController();
                 break;
         }

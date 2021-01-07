@@ -110,7 +110,8 @@ public class GuiController extends AnchorPane implements Observer {
         guiModel.setSavedSceneX(guiModel.getScreenWidth() / 2 - guiModel.getSavedSceneWidth() / 2);
         guiModel.setSavedSceneY(guiModel.getScreenHeight() / 2 - guiModel.getSavedSceneHeight() / 2);
 
-//        guiModel.callObservers("startWebcamLoop");
+//        guiModel.callObservers("startLoadedImagesLoop");
+        guiModel.callObservers("startScan");
     }
 
     private void showSolver() {
@@ -119,7 +120,7 @@ public class GuiController extends AnchorPane implements Observer {
         this.getChildren().add(headerPane);
         this.getChildren().add(resizeFrame);
 
-        guiModel.callObservers("toggleFullScreen");
+//        guiModel.callObservers("toggleFullScreen");
 
         // Set the size the stage get set to when minimized
         guiModel.setSavedSceneWidth(guiModel.getScreenWidth() * 0.8);

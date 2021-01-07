@@ -19,7 +19,9 @@ public class BuildCube {
         }
 
         sortedScheme = sortScheme(inputScheme);
+    }
 
+    public String alignCubeSides() {
         Combinations combinations = new Combinations();
 
         // TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
@@ -126,14 +128,14 @@ public class BuildCube {
                             new DebugOutput().printSchemes(orientedScheme, "scheme");
                             String solvableString = generateSolvableString(orientedScheme);
                             // TODO Braucht aus irgendeinem Grund 1.5 Minuten
-                            String solution = Search.solution(solvableString, 21, 5, false);
-                            System.out.println(solution);
+                            return Search.solution(solvableString, 21, 5, false);
                         }
                     }
                     // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
                 }
             }
         }
+        return "";
     }
 
     /**

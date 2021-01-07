@@ -6,6 +6,7 @@ import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
 import cubiq.cube.Cube;
+import cubiq.processing.EaseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,7 +196,7 @@ public class InteractionHandler implements MouseListener {
 
         if (animationLength != 0 && snapBackFrameCount < animationLength) {
             for (int i = 0; i < actualQuats.size(); i++) {
-                actualQuats.get(i).setSlerp(releasedQuats.get(i), snapToQuats.get(i), easeOut(snapBackFrameCount, 0, 1, animationLength));
+                actualQuats.get(i).setSlerp(releasedQuats.get(i), snapToQuats.get(i), EaseUtils.easeOut(snapBackFrameCount, 0, 1, animationLength));
             }
         }
         else {
@@ -204,21 +205,6 @@ public class InteractionHandler implements MouseListener {
             }
             swingingBack = false;
         }
-    }
-
-    /**
-     * Function to calculate a ease out animation
-     * Source: http://gizma.com/easing/
-     * @param t current time
-     * @param b start value
-     * @param c change in value
-     * @param d duration
-     * @return Eased value
-     */
-    private float easeOut(float t, float b, float c, float d) {
-        t /= d;
-        t--;
-        return c*(t*t*t + 1) + b;
     }
 
     private float cubiePressedDistance(float[] boundingBoxVertices) {

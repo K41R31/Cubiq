@@ -105,7 +105,7 @@ public class ScanView extends AnchorPane implements Observer {
 
         menuItemCubeDepth.setOnMouseClicked(event -> guiModel.callObservers("menuItemCubeDepthActive"));
         menuItemSettings.setOnMouseClicked(event -> guiModel.callObservers("menuItemSettingsActive"));
-        menuItemHelp.setOnMouseClicked(event -> guiModel.callObservers("menuItemHelpActive"));
+        menuItemHelp.setOnMouseClicked(event -> guiModel.callObservers("showSolver"));
 
         footerItemContainer.getChildren().addAll(menuItemHelp, menuItemSettings, menuItemCubeDepth, footerMenuItemLeft);
 
