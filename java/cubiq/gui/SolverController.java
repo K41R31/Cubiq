@@ -62,10 +62,13 @@ public class SolverController implements Observer {
         speedSlider.setViewOrder(-2);
         typoSlow.setFont(guiModel.getKiona());
         typoSlow.setStyle("-fx-font-size: 12");
-        typoSlow.setFontSmoothingType(FontSmoothingType.GRAY);
+        typoSlow.setFontSmoothingType(FontSmoothingType.LCD);
+        typoSlow.setFill(Color.web("#eaeaea"));
         typoFast.setFont(guiModel.getKiona());
         typoFast.setStyle("-fx-font-size: 12");
-        typoSlow.setFontSmoothingType(FontSmoothingType.LCD);
+        typoFast.setFontSmoothingType(FontSmoothingType.LCD);
+        typoFast.setFill(Color.web("#eaeaea"));
+
 
         innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().add(

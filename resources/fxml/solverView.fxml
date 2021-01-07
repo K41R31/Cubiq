@@ -4,6 +4,8 @@
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.effect.Glow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -11,6 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Text?>
 
@@ -19,7 +22,7 @@
       <AnchorPane id="inputField" fx:id="renderer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <VBox alignment="CENTER" prefHeight="340.0" prefWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <VBox fx:id="speedSliderPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="384.0">
+            <VBox fx:id="speedSliderPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="384.0" translateY="-10.0">
                <children>
                   <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="384.0">
                      <children>
@@ -36,6 +39,39 @@
                   </StackPane>
                </children>
             </VBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Line endX="720.0" fill="#2dccbc00" stroke="#2bccbd" strokeWidth="2.0">
+                           <effect>
+                              <GaussianBlur radius="15.0" />
+                           </effect>
+                        </Line>
+                        <Line endX="720.0" fill="#2dccbc00" stroke="#2bccbd">
+                           <effect>
+                              <Glow level="1.0" />
+                           </effect>
+                        </Line>
+                     </children>
+                  </StackPane>
+                  <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Line endX="720.0" fill="#2dccbc00" stroke="#2bccbd" strokeWidth="2.0">
+                           <effect>
+                              <GaussianBlur radius="15.0" />
+                           </effect>
+                        </Line>
+                        <Line endX="720.0" stroke="#2bccbd">
+                           <effect>
+                              <Glow />
+                           </effect>
+                        </Line>
+                     </children>
+                  </StackPane>
+               </children>
+            </HBox>
             <StackPane prefHeight="150.0" prefWidth="200.0">
                <children>
                   <Rectangle fill="#3e454e" height="307.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="1920.0" />
@@ -49,14 +85,14 @@
                   </ImageView>
                   <VBox maxHeight="-Infinity" maxWidth="2052.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="307.0" prefWidth="1920.0">
                      <children>
-                        <HBox fx:id="buttonPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="63.0" prefWidth="1920.0">
+                        <HBox fx:id="buttonPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="63.0" prefWidth="1920.0" translateY="-1.0">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>
                         </HBox>
                         <StackPane prefHeight="150.0" prefWidth="200.0">
                            <children>
-                              <HBox fx:id="solveIconPane" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="144.0" prefWidth="97.0" spacing="52.0" />
+                              <HBox fx:id="solveIconPane" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="144.0" prefWidth="97.0" spacing="52.0" translateY="10.0" />
                            </children>
                            <VBox.margin>
                               <Insets />
