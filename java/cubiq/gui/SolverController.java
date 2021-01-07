@@ -12,6 +12,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Polygon;
 import java.security.Key;
+
+import javafx.scene.shape.Polyline;
 import javafx.util.Duration;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class SolverController implements Observer {
 
     private void initializeSolverController() {
         imagePath = "/assets/solveIcons/";
+        currentCycle = solution.size() - 1;
         buttonPane.getChildren().add(new ControlPane());
 
         solveIconPane.setVisible(true);
@@ -56,7 +59,7 @@ public class SolverController implements Observer {
         outerTimeline = new Timeline();
 
         outerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(2000), e -> { innerTimeline.play(); System.out.println(outerTimeline.getCycleCount());})
+                new KeyFrame(new Duration(2000), e -> { innerTimeline.play(); currentCycle--; System.out.println(currentCycle); })
         );
         outerTimeline.setCycleCount(solution.size()-1);
     }
@@ -148,6 +151,7 @@ public class SolverController implements Observer {
                     polygon.setOnMousePressed(e -> {
                         outerTimeline.stop();
                         innerTimeline.stop();
+                        currentCycle = solution.size() - 1;
                         solvePaneOffset = 0;
                         solveIconPane.setPadding(new Insets(0));
                     });
@@ -158,7 +162,7 @@ public class SolverController implements Observer {
                 case 1: // Play/Pause
                     polygon.setOnMousePressed(e -> {
                         System.out.println(outerTimeline.getStatus());
-                        if(outerTimeline.getStatus() != Animation.Status.RUNNING)
+                        if(outerTimeline.getStatus() != Animation.Status.RUNNING && currentCycle > 0)
                         outerTimeline.play();
                         else
                             outerTimeline.pause();
