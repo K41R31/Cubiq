@@ -23,6 +23,7 @@ public class ScanCube implements Observer {
     private final List<Double> centerColorSaturations = new ArrayList<>();
     private int sameSideCounter = 0;
     private int[][] foundCubeSide;
+    private String solveString;
 
 
     private void startWebcamLoop() {
@@ -103,12 +104,12 @@ public class ScanCube implements Observer {
         // If all 6 sides were scanned, stop the loop
         if (scannedCubeSides.size() == 6) {
             shutdownScan();
-            Platform.runLater(() -> guiModel.callObservers("showSolver"));
             logoCorrection();
+            Platform.runLater(() -> guiModel.callObservers("showSolver"));
 
-            // Build the cube with the given color faces
-            BuildCube buildCube = new BuildCube(scannedCubeSides);
-            guiModel.setSolveString(buildCube.alignCubeSides());
+            // Tell the class BuildCube to build the cube with the given scheme
+            guiModel.setColorScheme(scannedCubeSides);
+            guiModel.callObservers("cubeFound");
         }
 
         // Draw the found contours in the unprocessed image

@@ -1,27 +1,26 @@
 package cubiq.processing;
 
 import cubiq.io.DebugOutput;
+import cubiq.models.GuiModel;
 import org.kociemba.twophase.Search;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class BuildCube {
+public class BuildCube implements Observer {
 
+    GuiModel guiModel;
     private List<int[][]> sortedScheme;
+    String string;
 
 
-    public BuildCube(List<int[][]> inputScheme) {
+    private void buildCube() {
+        List<int[][]> inputScheme = guiModel.getColorScheme();
         if (!colorsExistsNineTimes(inputScheme)) {
             System.err.println("WRONG COLOR SCHEME: There are not exactly nine stickers of each color");
             return;
         }
 
         sortedScheme = sortScheme(inputScheme);
-    }
-
-    public String alignCubeSides() {
         Combinations combinations = new Combinations();
 
         // TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
@@ -127,15 +126,15 @@ public class BuildCube {
                         if (isPossibleFinalCombination(orientedScheme)) {
                             new DebugOutput().printSchemes(orientedScheme, "scheme");
                             String solvableString = generateSolvableString(orientedScheme);
-                            // TODO Braucht aus irgendeinem Grund 1.5 Minuten
-                            return Search.solution(solvableString, 21, 5, false);
+                            String string = Search.solution(solvableString, 21, 5, false);
+                            guiModel.setSolveString(string);
+                            guiModel.callObservers("solutionFound");
                         }
                     }
                     // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht
                 }
             }
         }
-        return "";
     }
 
     /**
@@ -567,5 +566,18 @@ public class BuildCube {
 
     public int[][] get(int index) {
         return sortedScheme.get(index);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        switch ((String)arg) {
+            case "cubeFound":
+                buildCube();
+                break;
+        }
+    }
+
+    public void initModel(GuiModel guimodel) {
+        this.guiModel = guimodel;
     }
 }

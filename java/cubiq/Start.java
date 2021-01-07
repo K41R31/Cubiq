@@ -3,6 +3,7 @@ package cubiq;
 import cubiq.gui.*;
 import cubiq.io.FileChooser;
 import cubiq.models.GuiModel;
+import cubiq.processing.BuildCube;
 import cubiq.processing.ScanCube;
 import cubiq.renderer.CubeExplorerRenderer;
 import javafx.application.Application;
@@ -12,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.kociemba.twophase.Search;
 import org.opencv.core.Core;
 
 public class Start extends Application {
@@ -41,11 +43,15 @@ public class Start extends Application {
         fileChooser.initModel(guiModel);
         guiModel.addObserver(fileChooser);
 
+        // Init BuildCube
+        BuildCube buildCube = new BuildCube();
+        buildCube.initModel(guiModel);
+        guiModel.addObserver(buildCube);
+
         // Init CubeExplorerRenderer
         CubeExplorerRenderer cubeExplorerRenderer = new CubeExplorerRenderer();
         cubeExplorerRenderer.initModel(guiModel);
         guiModel.addObserver(cubeExplorerRenderer);
-
 
         // Init ScreenInformation---------------------------------------------------------------------------------------
 //        screenInformationModel.callObservers("initStageSize");
