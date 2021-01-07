@@ -4,14 +4,14 @@ import cubiq.models.GuiModel;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
+import javafx.scene.effect.Bloom;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Polygon;
-import java.security.Key;
 import javafx.util.Duration;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -22,43 +22,66 @@ import java.util.Observer;
 public class SolverController implements Observer {
      //TODO: Bilderbezeichnung noch ändern, aktuell 2R, ändern auf R2... usw.!!!!
 
+    private final float ANIMATION_JUMP_SPEED = 1f;
+    private final float ANIMATION_DELAY_SPEED = 3.5f;
+    private GuiModel guiModel;
     private String imagePath;
-    private boolean isAnimating = false;
-
-    private int currentCycle = 0;
-    private float startOffset = 0;
-    private float startValue;
-
+    private int currentCycle, animationResetCycles;
+    private float startOffset, solvePaneOffset;
+    private List<String> solution;
+    private List<SolveIcon> solveIcons;
+    private Timeline innerTimeline, outerTimeline, resetTimeline;
     @FXML
     private HBox solveIconPane, buttonPane;
-    @FXML
-    private Button startButton;
-    private float solvePaneOffset = 0;
 
-    private GuiModel guiModel;
-
-    private List<String> solution = new ArrayList<>();
-    private Timeline innerTimeline, outerTimeline;
 
     private void initializeSolverController() {
+        solution = new ArrayList<>();
+        solveIcons = new ArrayList<>();
+
         imagePath = "/assets/solveIcons/";
         buttonPane.getChildren().add(new ControlPane());
+
+        solveStringConverter();
 
         solveIconPane.setVisible(true);
 
         innerTimeline = new Timeline();
-        innerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0), e -> solvePaneOffset -= 0.5),
-                new KeyFrame(new Duration(1), e -> solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset)))
+        innerTimeline.getKeyFrames().add(
+                new KeyFrame(new Duration(1), e -> {
+                    solvePaneOffset = easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
+                    currentCycle++;
+                    solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
+                })
         );
-        innerTimeline.setCycleCount(298);
+        innerTimeline.setCycleCount(Math.round(400 / ANIMATION_JUMP_SPEED));
 
         outerTimeline = new Timeline();
-
-        outerTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(2000), e -> { innerTimeline.play(); System.out.println(outerTimeline.getCycleCount());})
+        outerTimeline.getKeyFrames().add(
+                new KeyFrame(new Duration(1800 / ANIMATION_DELAY_SPEED), e -> {
+                    currentCycle = 0;
+                    solvePaneOffset = Math.round(solvePaneOffset/ 149) * 149;
+                    startOffset = solvePaneOffset;
+                    innerTimeline.play();
+                })
         );
         outerTimeline.setCycleCount(solution.size()-1);
+
+        resetTimeline = new Timeline();
+        resetTimeline.getKeyFrames().add(
+                new KeyFrame(new Duration(1), e -> {
+                    solvePaneOffset = easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
+                    currentCycle++;
+                    solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
+                })
+        );
+
+        // Load cube icons
+        for (String s : solution) {
+            SolveIcon solveIcon = new SolveIcon(s);
+            solveIcons.add(solveIcon);
+            solveIconPane.getChildren().add(solveIcon);
+        }
     }
 
     private void solveStringConverter() {
@@ -79,12 +102,6 @@ public class SolverController implements Observer {
     private void openSpeedSlider() {
     }
 
-    private void loadCubeIcons() {
-        for(int i = 0; i < solution.size(); i++) {
-            solveIconPane.getChildren().add(new SolveIcon(solution.get(i)));
-        }
-    }
-
     class SolveIcon extends ImageView {
         public SolveIcon(String solveString) {
             Image image = new Image(getClass().getResourceAsStream(imagePath+solveString+".png"));
@@ -92,22 +109,6 @@ public class SolverController implements Observer {
             this.setFitHeight(144);
             this.setImage(image);
         }
-    }
-
-    /**
-     * Function to calculate a ease in/out animation
-     * Source: http://gizma.com/easing/
-     * @param t current time
-     * @param b start value
-     * @param c change in value
-     * @param d duration
-     * @return Eased value
-     */
-    private float easeInOut(float t, float b, float c, float d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t*t + b;
-        t -= 2;
-        return c/2*(t*t*t + 2) + b;
     }
 
     class ControlPane extends AnchorPane {
@@ -148,8 +149,11 @@ public class SolverController implements Observer {
                     polygon.setOnMousePressed(e -> {
                         outerTimeline.stop();
                         innerTimeline.stop();
-                        solvePaneOffset = 0;
-                        solveIconPane.setPadding(new Insets(0));
+                        currentCycle = 0;
+                        startOffset = solvePaneOffset;
+                        animationResetCycles = Math.round(Math.abs(solvePaneOffset / 3));
+                        resetTimeline.setCycleCount(animationResetCycles);
+                        resetTimeline.play();
                     });
 
                     setLeftAnchor(polygon, 0.0);
@@ -157,9 +161,8 @@ public class SolverController implements Observer {
 
                 case 1: // Play/Pause
                     polygon.setOnMousePressed(e -> {
-                        System.out.println(outerTimeline.getStatus());
-                        if(outerTimeline.getStatus() != Animation.Status.RUNNING)
-                        outerTimeline.play();
+                        if (outerTimeline.getStatus() != Animation.Status.RUNNING)
+                            outerTimeline.play();
                         else
                             outerTimeline.pause();
                     });
@@ -174,13 +177,27 @@ public class SolverController implements Observer {
         }
     }
 
+    /**
+     * Function to calculate a ease in/out animation
+     * Source: http://gizma.com/easing/
+     * @param t current time
+     * @param b start value
+     * @param c change in value
+     * @param d duration
+     * @return Eased value
+     */
+    private float easeInOut(float t, float b, float c, float d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t*t + b;
+        t -= 2;
+        return c/2*(t*t*t + 2) + b;
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
             case "startSolver":
-                solveStringConverter();
                 initializeSolverController();
-                loadCubeIcons();
                 break;
         }
     }
