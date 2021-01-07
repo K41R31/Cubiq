@@ -1,4 +1,4 @@
-package cubeExplorer.processing; /**
+package cubiq.renderer; /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are

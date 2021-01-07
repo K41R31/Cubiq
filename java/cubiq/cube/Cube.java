@@ -1,27 +1,22 @@
 package cubiq.cube;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.math.Quaternion;
-
-import java.util.Arrays;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class Cube {
 
-    private final float CUBIE_SIZE = 1;
-    private final float[] CUBIE_COLOR = {0, 0, 0};
     private final int cubeLayersCount;
     private Cubie[] cubies;
-    private float[] cubieVertices;
-    private int[] cubieIndices;
     private int totalCubies;
 
     public Cube(int cubeLayersCount) {
         this.cubeLayersCount = cubeLayersCount;
-        createCubieVertices();
-        createCubieIndices();
-        initCubies();
     }
 
-    private void initCubies() {
+    public void initCubies(GL3 gl, int[] vaoName, int[] vboName, int[] iboName) {
         totalCubies = (int)Math.pow(cubeLayersCount, 3);
         cubies = new Cubie[totalCubies];
         // Offset, to center the cube in the scene
@@ -30,26 +25,20 @@ public class Cube {
             for (int y = 0; y < cubeLayersCount; y++) {
                 for (int z = 0; z < cubeLayersCount; z++, c++) {
                     cubies[c] = new Cubie(x - cubePosOffset, y - cubePosOffset, z - cubePosOffset);
+                    gl.glBindVertexArray(vaoName[c]);
+                    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[c]);
+                    gl.glBufferData(GL.GL_ARRAY_BUFFER, cubies[c].getVerticesPosColor().length * 4L,
+                            FloatBuffer.wrap(cubies[c].getVerticesPosColor()), GL.GL_STATIC_DRAW);
+                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[c]);
+                    gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubies[c].getIndices().length * 4L,
+                            IntBuffer.wrap(cubies[c].getIndices()), GL.GL_STATIC_DRAW);
+                    gl.glEnableVertexAttribArray(0);
+                    gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
+                    gl.glEnableVertexAttribArray(1);
+                    gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
                 }
             }
         }
-    }
-
-    private void createCubieVertices() {
-        cubieVertices = new float[48];
-        float[] a = {CUBIE_SIZE / 2, CUBIE_SIZE / 2, CUBIE_SIZE / 2};
-        for (int i = 0; i < 8; i++) {
-            System.arraycopy(a, 0, cubieVertices, i * 6, 3);
-            System.arraycopy(CUBIE_COLOR, 0, cubieVertices, i * 6 + 3, 3);
-            if (i % 2 != 0) a[0] *= -1;
-            if (i == 3) a[1] *= -1;
-            a[2] *= -1;
-        }
-        System.out.println(Arrays.toString(cubieVertices));
-    }
-
-    private void createCubieIndices() {
-        cubieIndices = new int[] {4, 6, 5, 7, 3, 6, 2, 4, 0, 5, 1, 3, 0, 2};
     }
 
     public void updateLocalPos() {
@@ -60,16 +49,16 @@ public class Cube {
 
     public void rotateCubeTo(Quaternion rotation) {
         for (Cubie qb: cubies) {
-            qb.rotateTo(rotation);
+            qb.rotateToQuat(rotation);
         }
     }
 
-    public float[] getCubieVertices() {
-        return cubieVertices;
+    public float[] getCubieBoundingBox(int index) {
+        return cubies[index].getBoundingBox();
     }
 
-    public int[] getCubieIndices() {
-        return cubieIndices;
+    public int[] getCubieIndices(int index) {
+        return cubies[index].getIndices();
     }
 
     public int getCubeLayersCount() {
@@ -77,7 +66,7 @@ public class Cube {
     }
 
     public float[] getCubiePosition(int qbIndex) {
-        return cubies[qbIndex].getPosition();
+        return cubies[qbIndex].getLocalPosition();
     }
 
     public float[] getCubieTranslation(int qbIndex) {
@@ -85,7 +74,7 @@ public class Cube {
     }
 
     public Quaternion getCubieRotation(int qbIndex) {
-        return cubies[qbIndex].getRotation();
+        return cubies[qbIndex].getRotationQuat();
     }
 
     public int getTotalCubies() {

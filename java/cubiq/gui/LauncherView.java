@@ -74,7 +74,7 @@ public class LauncherView extends AnchorPane implements Observer {
 
         // TODO DEBUG BUTTON--------------------------------------------------------------------------------------------
         Button debugButton = new Button("START SOLVER");
-        debugButton.setOnAction(e -> guiModel.callObservers("startSolver"));
+        debugButton.setOnAction(e -> guiModel.callObservers("showSolver"));
         AnchorPane.setBottomAnchor(debugButton, 0d);
         AnchorPane.setLeftAnchor(debugButton, 0d);
         this.getChildren().add(debugButton);
@@ -131,13 +131,13 @@ public class LauncherView extends AnchorPane implements Observer {
 
             switch (name) {
                 case "solver":
-                    polyBorder.setOnMouseClicked(e -> guiModel.callObservers("startScan"));
+                    polyBorder.setOnMouseClicked(e -> guiModel.callObservers("showScan"));
                     break;
                 case "explorer":
-                    polyBorder.setOnMouseClicked(e -> guiModel.callObservers("startExplorer"));
+                    polyBorder.setOnMouseClicked(e -> guiModel.callObservers("showExplorer"));
                     break;
                 case "timer":
-                    polyBorder.setOnMouseClicked(e -> guiModel.callObservers("startTimer"));
+                    polyBorder.setOnMouseClicked(e -> guiModel.callObservers("showTimer"));
                     break;
             }
 

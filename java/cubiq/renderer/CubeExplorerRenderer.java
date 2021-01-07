@@ -1,4 +1,4 @@
-package cubeExplorer.processing;
+package cubiq.renderer;
 
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
@@ -8,9 +8,9 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
-import cubeExplorer.cube.Cube;
-import cubeExplorer.io.InteractionHandler;
-import cubeExplorer.model.Model;
+import cubiq.cube.Cube;
+import cubiq.io.InteractionHandler;
+import cubiq.models.GuiModel;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -18,14 +18,14 @@ import java.util.Observer;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 
-public class Renderer implements GLEventListener, Observer {
+public class CubeExplorerRenderer implements GLEventListener, Observer {
 
-    private Model model;
+    private GuiModel guiModel;
     private final GLWindow glWindow;
     private Cube cube;
     private InteractionHandler interactionHandler;
-    private final int DEVICE_WIDTH = 700;
-    private final int DEVICE_HEIGHT = 700;
+    private final int DEVICE_WIDTH = 900;
+    private final int DEVICE_HEIGHT = 900;
     private final float[] CAM_POS = new float[] {-9.5f, 6.1f, 9.5f};
 
     private ShaderProgram shaderProgram;
@@ -39,7 +39,7 @@ public class Renderer implements GLEventListener, Observer {
     PMVMatrix pmvMatrix;
 
 
-    public Renderer() {
+    public CubeExplorerRenderer() {
         Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
         Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
@@ -56,7 +56,7 @@ public class Renderer implements GLEventListener, Observer {
 
         glCanvas.setWidth(DEVICE_WIDTH);
         glCanvas.setHeight(DEVICE_HEIGHT);
-        model.getRendererPane().getChildren().add(glCanvas);
+        guiModel.getRendererPane().getChildren().add(glCanvas);
 
         FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
         animator.start();
@@ -230,13 +230,13 @@ public class Renderer implements GLEventListener, Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "startRenderer":
+            case "renderExplorerCube":
                 startRenderer();
                 break;
         }
     }
 
-    public void initModel(Model model) {
-        this.model = model;
+    public void initModel(GuiModel guiModel) {
+        this.guiModel = guiModel;
     }
 }

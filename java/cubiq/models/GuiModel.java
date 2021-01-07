@@ -1,5 +1,6 @@
 package cubiq.models;
 
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
@@ -19,6 +20,7 @@ public class GuiModel extends Observable {
     private Font bender;
     private Mat originalFrame;
     private Mat[] loadedImages;
+    private AnchorPane rendererPane;
     private boolean debug = false;
     private boolean mirrorWebcam = false;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
@@ -34,8 +36,7 @@ public class GuiModel extends Observable {
     private double screenWidth, screenHeight;
     private int headerHeight = 23;
     private int taskbarHeight = 40;
-//    private int[] minWindowSize = new int[] {1484, 716};
-    private int[] minWindowSize = new int[] {1368, 716};
+    private int[] minWindowSize = new int[] {1484, 716};
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
 
 
@@ -55,7 +56,14 @@ public class GuiModel extends Observable {
         this.solveString = solveString;
     }
 
+    // Render pane------------------------------------------------------------------------------------------------------
+    public AnchorPane getRendererPane() {
+        return rendererPane;
+    }
 
+    public void setRendererPane(AnchorPane rendererPane) {
+        this.rendererPane = rendererPane;
+    }
 
     // Kiona------------------------------------------------------------------------------------------------------------
 
@@ -205,12 +213,12 @@ public class GuiModel extends Observable {
         this.screenWidth = screenWidth;
     }
 
-    public void setScreenHeight(double screenHeight) {
-        this.screenHeight = screenHeight;
-    }
-
     public double getScreenWidth() {
         return screenWidth;
+    }
+
+    public void setScreenHeight(double screenHeight) {
+        this.screenHeight = screenHeight;
     }
 
     public double getScreenHeight() {
