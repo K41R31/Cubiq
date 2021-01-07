@@ -29,7 +29,7 @@ public class SolverController implements Observer {
     private float startOffset, solvePaneOffset;
     private List<String> solution;
     private List<SolveIcon> solveIcons;
-    private Timeline innerTimeline, outerTimeline, resetTimeline;
+    private Timeline innerTimeline, outerTimeline, resetAnimationTimeline;
     @FXML
     private HBox solveIconPane, buttonPane;
 
@@ -66,8 +66,8 @@ public class SolverController implements Observer {
         );
         outerTimeline.setCycleCount(solution.size()-1);
 
-        resetTimeline = new Timeline();
-        resetTimeline.getKeyFrames().add(
+        resetAnimationTimeline = new Timeline();
+        resetAnimationTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
                     solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
                     currentCycle++;
@@ -151,8 +151,8 @@ public class SolverController implements Observer {
                         currentCycle = 0;
                         startOffset = solvePaneOffset;
                         animationResetCycles = Math.round(Math.abs(solvePaneOffset / 3));
-                        resetTimeline.setCycleCount(animationResetCycles);
-                        resetTimeline.play();
+                        resetAnimationTimeline.setCycleCount(animationResetCycles);
+                        resetAnimationTimeline.play();
                     });
 
                     setLeftAnchor(polygon, 0.0);

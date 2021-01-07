@@ -36,8 +36,7 @@ public class GuiModel extends Observable {
     private double screenWidth, screenHeight;
     private int headerHeight = 23;
     private int taskbarHeight = 40;
-//    private int[] minWindowSize = new int[] {1484, 716};
-    private int[] minWindowSize = new int[] {1368, 716};
+    private int[] minWindowSize = new int[] {1484, 716};
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
 
 
@@ -214,12 +213,12 @@ public class GuiModel extends Observable {
         this.screenWidth = screenWidth;
     }
 
-    public void setScreenHeight(double screenHeight) {
-        this.screenHeight = screenHeight;
-    }
-
     public double getScreenWidth() {
         return screenWidth;
+    }
+
+    public void setScreenHeight(double screenHeight) {
+        this.screenHeight = screenHeight;
     }
 
     public double getScreenHeight() {
