@@ -21,6 +21,7 @@ public class Cube {
     int ROTATION_SPEED = 1;
     int currentCycle = 0;
     int totalAmount = 0;
+    float lastAmount;
 
     public Cube(int cubeLayersCount, List<int[][]> colorScheme) {
         /*
@@ -68,6 +69,14 @@ public class Cube {
         }
     }
 
+    public void updateVerticesBuffer(GL3 gl, int[] vboName) {
+        for (int i = 0; i < totalCubies; i++) {
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
+            gl.glBufferData(GL.GL_ARRAY_BUFFER, cubies[i].getVerticesPosColor().length * 4L,
+                    FloatBuffer.wrap(cubies[i].getVerticesPosColor()), GL.GL_STATIC_DRAW);
+        }
+    }
+
     private List<int[][]> generateDefaultScheme() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -79,46 +88,35 @@ public class Cube {
 
     public void rotateLayer(String rotation) {
         String layer = rotation.substring(0, 1);
-        int amount = 90;
+        float amount = (float)(Math.PI/2);
         if (rotation.contains("'"))
-            amount *= -1;
+            amount *= -1f;
         if (rotation.contains("2"))
             amount *= 2;
         switch (layer) {
             case "U":
-                for (int i = 0; i < totalCubies; i++) {
-                    animate(amount, new int[] {1, 1}, new float[] {0, 1, 0});
-                }
+                animate(amount, new int[] {1, 1}, new float[] {0, 1, 0});
                 break;
             case "D":
-                for (int i = 0; i < totalCubies; i++) {
-                    animate(-amount, new int[] {1, -1}, new float[] {0, 1, 0});
-                }
+                animate(-amount, new int[] {1, -1}, new float[] {0, 1, 0});
                 break;
             case "L":
-                for (int i = 0; i < totalCubies; i++) {
-                    animate(-amount, new int[] {0, -1}, new float[] {1, 0, 0});
-                }
+                animate(-amount, new int[] {0, -1}, new float[] {1, 0, 0});
                 break;
             case "R":
-                for (int i = 0; i < totalCubies; i++) {
-                    animate(amount, new int[] {0, 1}, new float[] {1, 0, 0});
-                }
+                animate(amount, new int[] {0, 1}, new float[] {1, 0, 0});
                 break;
             case "F":
-                for (int i = 0; i < totalCubies; i++) {
-                    animate(amount, new int[] {2, 1}, new float[] {0, 0, 1});
-                }
+                animate(amount, new int[] {2, 1}, new float[] {0, 0, 1});
                 break;
             case "B":
-                for (int i = 0; i < totalCubies; i++) {
-                    animate(-amount, new int[] {2, -1}, new float[] {0, 0, 1});
-                }
+                animate(-amount, new int[] {2, -1}, new float[] {0, 0, 1});
                 break;
         }
     }
 
-    private void animate(int amount, int[] layer, float[] axis) {
+    private void animate(float amount, int[] layer, float[] axis) {
+        lastAmount = 0;
         currentCycle = 0;
         totalAmount = 0;
         List<Cubie> rotateCubiesList = new ArrayList<>();
@@ -129,15 +127,15 @@ public class Cube {
 
         Timeline timeline = new Timeline();
         timeline.getKeyFrames().add(
-                new KeyFrame(new Duration(1), e -> {
-                    float frameAmount = MathUtils.easeInOut(currentCycle, 0, amount, Math.round(300f / ROTATION_SPEED));
-                    totalAmount += frameAmount;
+                new KeyFrame(new Duration(5), e -> {
+                    float frameAmount = MathUtils.easeInOut(currentCycle, 0, amount, 100);
                     for (Cubie cubie: rotateCubiesList) {
-                        cubie.rotateAroundAxis(totalAmount - frameAmount, axis);
+                        cubie.rotateAroundAxis(frameAmount - lastAmount, axis);
                     }
+                    lastAmount = frameAmount;
                     currentCycle++;
                 }));
-        timeline.setCycleCount(300 / ROTATION_SPEED);
+        timeline.setCycleCount(100);
         timeline.play();
     }
 

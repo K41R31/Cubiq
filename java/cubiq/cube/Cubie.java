@@ -3,6 +3,8 @@ package cubiq.cube;
 import com.jogamp.opengl.math.VectorUtil;
 import cubiq.processing.MathUtils;
 
+import java.util.Arrays;
+
 public class Cubie {
 
     private final float CUBIE_SIZE = 1;
@@ -50,11 +52,10 @@ public class Cubie {
     }
 
     public void rotateAroundAxis(float amount, float[] axis) {
-        System.out.println(amount);
         float[] vertex = new float[3];
         float[] rotatedVertex;
         // Update local position
-        MathUtils.rotateVector(localPos, axis, amount);
+        localPos = MathUtils.rotateVector(localPos, axis, amount);
         // Rotate all vertexes
         for (int i = 0; i < 8; i++) {
             System.arraycopy(verticesPos, i*3, vertex, 0, 3);
@@ -67,8 +68,9 @@ public class Cubie {
     private void translateVertices(float[] translation) {
         for (int i = 0; i < 8; i++) {
             float[] temp = new float[3];
-            System.arraycopy(verticesPos, i*3, temp, i, 3);
-            VectorUtil.addVec3(verticesPos, verticesPos, translation);
+            System.arraycopy(verticesPos, i*3, temp, 0, 3);
+            VectorUtil.addVec3(temp, temp, translation);
+            System.arraycopy(temp, 0, verticesPos, i*3, 3);
         }
         updateVerticesPosColor();
     }
