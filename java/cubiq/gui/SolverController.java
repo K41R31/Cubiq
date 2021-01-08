@@ -19,7 +19,6 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.scene.paint.Color;
-
 import java.util.*;
 
 public class SolverController implements Observer {

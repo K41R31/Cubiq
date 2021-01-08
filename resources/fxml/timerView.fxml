@@ -1,14 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fxml.TimerView"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.TimerView">
+   <children>
+      <VBox alignment="BOTTOM_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane fx:id="topAnchorPane" prefHeight="505.0" prefWidth="1920.0" style="-fx-background-color: #191b1d; -fx-view-order: -1;">
+               <children>
+                  <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="200.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                     </children>
+                  </StackPane>
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="550.0" prefWidth="1920.0" style="-fx-background-color: #191b1d;">
+               <children>
+                  <StackPane alignment="CENTER_LEFT" prefHeight="1.0" prefWidth="200.0" stylesheets="@../css/TimerStyle.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Line endX="1700.0" stroke="#2bccbd" strokeWidth="8.0" translateX="-100.0" visible="false">
+                           <effect>
+                              <GaussianBlur radius="54.0" />
+                           </effect>
+                        </Line>
+                        <Line endX="1700.0" stroke="#2bccbd" strokeWidth="8.0" translateX="-100.0" visible="false">
+                           <effect>
+                              <GaussianBlur radius="54.0" />
+                           </effect>
+                        </Line>
+                        <Line endX="1920.0" stroke="WHITE" strokeWidth="2.0" translateY="-3.0" visible="false" />
+                        <ProgressBar id="progressGlowBar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2.0" prefWidth="1920.0" progress="0.64" styleClass="progressGlowBar" translateY="-3.0" />
+                     </children>
+                  </StackPane>
+                  <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="22.0">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Text fill="#2bccbd" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Besttime" />
+                              <Text fill="#2bccbd" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+                                 <HBox.margin>
+                                    <Insets left="8.0" />
+                                 </HBox.margin>
+                              </Text>
+                           </children>
+                        </HBox>
+                     </children>
+                  </StackPane>
+               </children>
+            </AnchorPane>
+         </children>
+      </VBox>
+   </children>
 </AnchorPane>

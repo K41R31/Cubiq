@@ -1,0 +1,11 @@
+.progressGlowBar .track {
+    -fx-background-color: #2bccbd;
+    -fx-effect: GaussianBlur;
+    -fx-background-radius: 3;
+
+}
+.progressGlowBar .bar{
+    -fx-background-color: #eaeaea;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0 0 0 0;
+}
