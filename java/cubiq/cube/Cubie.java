@@ -1,26 +1,21 @@
 package cubiq.cube;
 
-import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
-import java.util.Arrays;
+import cubiq.processing.MathUtils;
 
 public class Cubie {
 
     private final float CUBIE_SIZE = 1;
     private float[] CUBIE_COLOR = {0.01f, 0.01f, 0.01f};
-    private float[] verticesPosColor, verticesPos, translation, localPos;
+    private float[] verticesPosColor, verticesPos, localPos;
     private int[] indices;
-    private Quaternion rotation;
 
 
     public Cubie(float x, float y, float z) {
-        translation = new float[] {x, y, z};
         localPos = new float[] {x, y, z};
-        rotation = new Quaternion();
         verticesPos = new float[24];
-        if (Arrays.equals(this.localPos, new float[]{-1, -1, -1}))
-            CUBIE_COLOR = new float[] {1f, 1f, 1f};
         createVertices();
+        translateVertices(new float[] {x, y, z});
         createIndices();
     }
 
@@ -37,38 +32,45 @@ public class Cubie {
         }
     }
 
+    private void updateVerticesPosColor() {
+        for (int i = 0; i < 8; i++) {
+            System.arraycopy(verticesPos, i*3, verticesPosColor, i * 6, 3);
+        }
+    }
+
     public float[] getBoundingBox() {
         float[] boundingBoxVertices = new float[108];
-        // Orient the vertices to match the actual translation of the cubie
-        float[] orientedVertices = new float[24];
-        for (int i = 0; i < 8; i++) {
-            float[] vec = new float[3];
-            rotation.rotateVector(vec, 0, verticesPos, i*3);
-            VectorUtil.addVec3(vec, vec, translation);
-            System.arraycopy(vec, 0, orientedVertices, i*3, 3);
-        }
         // Triangle strip to triangles
         for (int i = 0, counter = 0; i < indices.length - 2; i++) {
             for (int j = 0; j < 3; j++, counter++) {
-                System.arraycopy(orientedVertices, indices[i] + j, boundingBoxVertices, counter * 3, 3);
+                System.arraycopy(verticesPos, indices[i] + j, boundingBoxVertices, counter * 3, 3);
             }
         }
         return boundingBoxVertices;
     }
 
-
-    public void updateLocalPos() {
-        rotation.rotateVector(localPos, 0, localPos, 0);
+    public void rotateAroundAxis(float amount, float[] axis) {
+        System.out.println(amount);
+        float[] vertex = new float[3];
+        float[] rotatedVertex;
+        // Update local position
+        MathUtils.rotateVector(localPos, axis, amount);
+        // Rotate all vertexes
+        for (int i = 0; i < 8; i++) {
+            System.arraycopy(verticesPos, i*3, vertex, 0, 3);
+            rotatedVertex = MathUtils.rotateVector(vertex, axis, amount);
+            System.arraycopy(rotatedVertex, 0, verticesPos, i*3, 3);
+        }
+        updateVerticesPosColor();
     }
 
-    public void rotateWithQuat(Quaternion inputQuat) {
-        this.rotation.mult(inputQuat);
-        updateLocalPos();
-    }
-
-    public void rotateToQuat(Quaternion rotation) {
-        rotation.set(rotation);
-        updateLocalPos();
+    private void translateVertices(float[] translation) {
+        for (int i = 0; i < 8; i++) {
+            float[] temp = new float[3];
+            System.arraycopy(verticesPos, i*3, temp, i, 3);
+            VectorUtil.addVec3(verticesPos, verticesPos, translation);
+        }
+        updateVerticesPosColor();
     }
 
     private void createIndices() {
@@ -85,18 +87,5 @@ public class Cubie {
 
     public float[] getLocalPosition() {
         return localPos;
-    }
-
-    public Quaternion getRotationQuat() {
-        return rotation;
-    }
-
-    public void setRotationQuat(Quaternion rotation) {
-        this.rotation = rotation;
-        updateLocalPos();
-    }
-
-    public float[] getTranslation() {
-        return translation;
     }
 }

@@ -2,9 +2,14 @@ package cubiq.cube;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.math.Quaternion;
+import cubiq.processing.MathUtils;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Cube {
@@ -13,7 +18,9 @@ public class Cube {
     private Cubie[] cubies;
     private int totalCubies;
     private List<int[][]> colorScheme;
-
+    int ROTATION_SPEED = 1;
+    int currentCycle = 0;
+    int totalAmount = 0;
 
     public Cube(int cubeLayersCount, List<int[][]> colorScheme) {
         /*
@@ -70,56 +77,68 @@ public class Cube {
         return null;
     }
 
-    public void updateLocalPos() {
-        for (Cubie qb : cubies) {
-            qb.updateLocalPos();
+    public void rotateLayer(String rotation) {
+        String layer = rotation.substring(0, 1);
+        int amount = 90;
+        if (rotation.contains("'"))
+            amount *= -1;
+        if (rotation.contains("2"))
+            amount *= 2;
+        switch (layer) {
+            case "U":
+                for (int i = 0; i < totalCubies; i++) {
+                    animate(amount, new int[] {1, 1}, new float[] {0, 1, 0});
+                }
+                break;
+            case "D":
+                for (int i = 0; i < totalCubies; i++) {
+                    animate(-amount, new int[] {1, -1}, new float[] {0, 1, 0});
+                }
+                break;
+            case "L":
+                for (int i = 0; i < totalCubies; i++) {
+                    animate(-amount, new int[] {0, -1}, new float[] {1, 0, 0});
+                }
+                break;
+            case "R":
+                for (int i = 0; i < totalCubies; i++) {
+                    animate(amount, new int[] {0, 1}, new float[] {1, 0, 0});
+                }
+                break;
+            case "F":
+                for (int i = 0; i < totalCubies; i++) {
+                    animate(amount, new int[] {2, 1}, new float[] {0, 0, 1});
+                }
+                break;
+            case "B":
+                for (int i = 0; i < totalCubies; i++) {
+                    animate(-amount, new int[] {2, -1}, new float[] {0, 0, 1});
+                }
+                break;
         }
     }
 
-    public void rotateCubeTo(Quaternion rotation) {
-        for (Cubie qb: cubies) {
-            qb.rotateToQuat(rotation);
-        }
-    }
-
-    /**
-     * Float array values:
-     *              x  y  z
-     * [0] -> axis (0, 1, 2)
-     *
-     *               -1  1
-     * [1] -> layer (-1, 1)
-     *
-     * @param layer
-     * @param rotationFactor
-     */
-    public void rotateLayerWith(int[] layer, Quaternion rotationFactor) {
+    private void animate(int amount, int[] layer, float[] axis) {
+        currentCycle = 0;
+        totalAmount = 0;
+        List<Cubie> rotateCubiesList = new ArrayList<>();
         for (int i = 0; i < totalCubies; i++) {
-            Cubie cubie = cubies[i];
-            float[] localPos = cubie.getLocalPosition();
-            if (localPos[layer[0]] == layer[1])
-                cubie.rotateWithQuat(rotationFactor);
+            if (cubies[i].getLocalPosition()[layer[0]] == layer[1])
+                rotateCubiesList.add(cubies[i]);
         }
-    }
 
-    /**
-     * Float array values:
-     *              x  y  z
-     * [0] -> axis (0, 1, 2)
-     *
-     *               -1  1
-     * [1] -> layer (-1, 1)
-     *
-     * @param layer
-     * @param rotation
-     */
-    public void setLayerTo(int[] layer, Quaternion rotation) {
-        for (int i = 0; i < totalCubies; i++) {
-            Cubie cubie = cubies[i];
-            float[] localPos = cubie.getLocalPosition();
-            if (localPos[layer[0]] == layer[1])
-                cubie.setRotationQuat(rotation);
-        }
+        Timeline timeline = new Timeline();
+        timeline.getKeyFrames().add(
+                new KeyFrame(new Duration(1), e -> {
+                    float frameAmount = MathUtils.easeInOut(currentCycle, 0, amount, Math.round(300f / ROTATION_SPEED));
+                    totalAmount += frameAmount;
+                    for (Cubie cubie: rotateCubiesList) {
+                        cubie.rotateAroundAxis(totalAmount - frameAmount, axis);
+                    }
+                    currentCycle++;
+                }));
+        timeline.setCycleCount(300 / ROTATION_SPEED);
+        timeline.play();
     }
 
     public float[] getCubieBoundingBox(int index) {
@@ -136,14 +155,6 @@ public class Cube {
 
     public float[] getCubiePosition(int qbIndex) {
         return cubies[qbIndex].getLocalPosition();
-    }
-
-    public float[] getCubieTranslation(int qbIndex) {
-        return cubies[qbIndex].getTranslation();
-    }
-
-    public Quaternion getCubieRotation(int qbIndex) {
-        return cubies[qbIndex].getRotationQuat();
     }
 
     public int getTotalCubies() {

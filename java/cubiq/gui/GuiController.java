@@ -12,7 +12,7 @@ import java.util.Observer;
 
 public class GuiController extends AnchorPane implements Observer {
 
-    private AnchorPane headerPane, solverPane;
+    private AnchorPane headerPane, solverPane, timerPane;
     private LauncherView launcherView;
     private ResizeFrame resizeFrame;
     private ScanView scanView;
@@ -85,6 +85,22 @@ public class GuiController extends AnchorPane implements Observer {
         AnchorPane.setBottomAnchor(explorerView, 0d);
         explorerView.initModel(guiModel);
         guiModel.addObserver(explorerView);
+
+        // Timer
+        FXMLLoader timerLoader = new FXMLLoader(getClass().getResource("/fxml/timerView.fxml"));
+        try {
+            timerPane = timerLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        timerPane.getStylesheets().add("css/TimerStyle.css");
+        AnchorPane.setTopAnchor(timerPane, 23d);
+        AnchorPane.setTopAnchor(timerPane, 0d);
+        AnchorPane.setLeftAnchor(timerPane, 0d);
+        AnchorPane.setRightAnchor(timerPane, 0d);
+        TimerController timerController = timerLoader.getController();
+        timerController.initModel(guiModel);
+        guiModel.addObserver(timerController);
     }
 
     public void showLauncher() {
@@ -148,6 +164,7 @@ public class GuiController extends AnchorPane implements Observer {
 
     private void showTimer() {
         this.getChildren().clear();
+        this.getChildren().add(timerPane);
         this.getChildren().add(headerPane);
         this.getChildren().add(resizeFrame);
 
@@ -226,6 +243,9 @@ public class GuiController extends AnchorPane implements Observer {
                 break;
             case "showExplorer":
                 showExplorer();
+                break;
+            case "showTimer":
+                showTimer();
                 break;
         }
     }
