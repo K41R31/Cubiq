@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Observer;
 
 public class GuiController extends AnchorPane implements Observer {

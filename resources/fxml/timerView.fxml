@@ -2,15 +2,17 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.effect.BoxBlur?>
 <?import javafx.scene.effect.GaussianBlur?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.TimerView">
+<AnchorPane maxWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.TimerView">
    <children>
       <VBox alignment="BOTTOM_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -18,38 +20,72 @@
                <children>
                   <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="200.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                           <children>
+                              <Text fx:id="mm" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="M M">
+                                 <font>
+                                    <Font size="100.0" />
+                                 </font>
+                              </Text>
+                              <Text fx:id="sepA" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text=":">
+                                 <font>
+                                    <Font size="100.0" />
+                                 </font>
+                              </Text>
+                              <Text fx:id="ss" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="S S">
+                                 <font>
+                                    <Font size="100.0" />
+                                 </font>
+                              </Text>
+                              <Text fx:id="sepB" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text=":">
+                                 <font>
+                                    <Font size="100.0" />
+                                 </font>
+                              </Text>
+                              <Text fx:id="ms" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="M S">
+                                 <font>
+                                    <Font size="100.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </HBox>
                      </children>
                   </StackPane>
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="550.0" prefWidth="1920.0" style="-fx-background-color: #191b1d;">
                <children>
-                  <StackPane alignment="CENTER_LEFT" prefHeight="1.0" prefWidth="200.0" stylesheets="@../css/TimerStyle.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <StackPane alignment="CENTER_LEFT" prefHeight="1.0" prefWidth="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Line endX="1700.0" stroke="#2bccbd" strokeWidth="8.0" translateX="-100.0" visible="false">
+                        <Line endX="1920.0" stroke="WHITE" strokeWidth="2.0" translateY="-9.0" />
+                        <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="1920.0" progress="0.41" scaleX="1.2" styleClass="progressGlowBar" stylesheets="@../css/TimerStyle.css" translateY="-7.0">
                            <effect>
-                              <GaussianBlur radius="54.0" />
+                              <GaussianBlur radius="63.0" />
                            </effect>
-                        </Line>
-                        <Line endX="1700.0" stroke="#2bccbd" strokeWidth="8.0" translateX="-100.0" visible="false">
+                        </ProgressBar>
+                        <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="8.0" prefWidth="1920.0" progress="0.41" scaleX="1.2" styleClass="progressGlowBar" stylesheets="@../css/TimerStyle.css">
                            <effect>
-                              <GaussianBlur radius="54.0" />
+                              <BoxBlur height="98.88" iterations="2" width="60.71" />
                            </effect>
-                        </Line>
-                        <Line endX="1920.0" stroke="WHITE" strokeWidth="2.0" translateY="-3.0" visible="false" />
-                        <ProgressBar id="progressGlowBar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2.0" prefWidth="1920.0" progress="0.64" styleClass="progressGlowBar" translateY="-3.0" />
+                        </ProgressBar>
+                        <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2.0" prefWidth="1920.0" progress="0.41" scaleX="1.3" styleClass="progressBar" stylesheets="@../css/TimerStyle.css" translateY="-9.0" />
                      </children>
                   </StackPane>
                   <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="22.0">
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <Text fill="#2bccbd" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Besttime" />
-                              <Text fill="#2bccbd" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+                              <Text fx:id="bestTimeText" fill="#2bccbd" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Best Time">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font></Text>
+                              <Text fx:id="bestTime" fill="#2bccbd" strokeType="OUTSIDE" strokeWidth="0.0" text="MM : SS : MS">
                                  <HBox.margin>
                                     <Insets left="8.0" />
                                  </HBox.margin>
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
                               </Text>
                            </children>
                         </HBox>
