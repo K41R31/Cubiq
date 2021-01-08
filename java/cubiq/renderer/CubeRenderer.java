@@ -101,7 +101,7 @@ public class CubeRenderer implements GLEventListener, Observer {
             System.err.println("Error allocating index buffer object.");
         // END: Allocating vertex array objects and buffers for each object
 
-        // Initialize cubie TODO----------------------------------------------------------------------------------------
+        // Initialize cubie
         cube = new Cube(3, colorScheme);
         cube.initCubies(gl, vaoName, vboName, iboName);
 
@@ -194,6 +194,7 @@ public class CubeRenderer implements GLEventListener, Observer {
     }
 
     private void displayCubies(GL3 gl) {
+        cube.updateVerticesBuffer(gl, vboName);
         for (int i = 0; i < cube.getTotalCubies(); i++) {
             gl.glUseProgram(shaderProgram.getShaderProgramID());
             // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
