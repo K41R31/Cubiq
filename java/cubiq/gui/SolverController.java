@@ -70,6 +70,8 @@ public class SolverController implements Observer {
         speedSlider.valueProperty().addListener((ov, oldVl, newVl) -> {
             float value = newVl.floatValue();
             speedProgressBar.setProgress((value) * (1f / 3.2f));
+            float rate = value + 0.8f;
+            guiModel.setSolutionAnimationRate(rate);
             outerTimeline.setRate(value + 0.8f);
         });
     }

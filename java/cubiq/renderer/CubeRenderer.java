@@ -108,7 +108,7 @@ public class CubeRenderer implements GLEventListener, Observer {
         // Shader program
         shaderProgram = new ShaderProgram(gl);
         shaderProgram.loadShaderAndCreateProgram(
-                getClass().getResource("/cubeExplorer/shaders/").getPath().replace("%20", " "),
+                getClass().getResource("/shaders/").getPath().replace("%20", " "),
                 "O0_Basic.vert", "O0_Basic.frag");
 
         interactionHandler.setCube(cube);

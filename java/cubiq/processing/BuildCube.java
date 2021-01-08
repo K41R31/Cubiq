@@ -1,6 +1,5 @@
 package cubiq.processing;
 
-import cubiq.io.DebugOutput;
 import cubiq.models.GuiModel;
 import org.kociemba.twophase.Search;
 
@@ -123,7 +122,7 @@ public class BuildCube implements Observer {
                     if (layer == 0) {
                         List<int[][]> orientedScheme = orientScheme(combinations.getCombination(step, i), edgeOffset);
                         if (isPossibleFinalCombination(orientedScheme)) {
-                            new DebugOutput().printSchemes(orientedScheme, "scheme");
+//                            new DebugOutput().printSchemes(orientedScheme, "scheme");
                             guiModel.setColorScheme(orientedScheme);
                             String solvableString = generateSolvableString(orientedScheme);
                             String string = Search.solution(solvableString, 21, 5, false);

@@ -40,6 +40,7 @@ public class GuiModel extends Observable {
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
     private String solveString;
     private String actualSolveStep;
+    private float solutionAnimationRate;
 
 
     public void callObservers(String arg) {
@@ -324,5 +325,13 @@ public class GuiModel extends Observable {
 
     public void setActualSolveStep(String actualSolveStep) {
         this.actualSolveStep = actualSolveStep;
+    }
+
+    public float getSolutionAnimationRate() {
+        return solutionAnimationRate;
+    }
+
+    public void setSolutionAnimationRate(float solutionAnimationRate) {
+        this.solutionAnimationRate = solutionAnimationRate;
     }
 }

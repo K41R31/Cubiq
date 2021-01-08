@@ -6,7 +6,6 @@ import cubiq.processing.MathUtils;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
-
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -95,22 +94,22 @@ public class Cube {
             amount *= 2;
         switch (layer) {
             case "U":
-                animate(amount, new int[] {1, 1}, new float[] {0, 1, 0});
+                animate(-amount, new int[] {1, 1}, new float[] {0, 1, 0});
                 break;
             case "D":
-                animate(-amount, new int[] {1, -1}, new float[] {0, 1, 0});
+                animate(amount, new int[] {1, -1}, new float[] {0, 1, 0});
                 break;
             case "L":
-                animate(-amount, new int[] {0, -1}, new float[] {1, 0, 0});
+                animate(amount, new int[] {2, -1}, new float[] {0, 0, 1});
                 break;
             case "R":
-                animate(amount, new int[] {0, 1}, new float[] {1, 0, 0});
+                animate(-amount, new int[] {2, 1}, new float[] {0, 0, 1});
                 break;
             case "F":
-                animate(amount, new int[] {2, 1}, new float[] {0, 0, 1});
+                animate(amount, new int[] {0, -1}, new float[] {1, 0, 0});
                 break;
             case "B":
-                animate(-amount, new int[] {2, -1}, new float[] {0, 0, 1});
+                animate(-amount, new int[] {0, 1}, new float[] {1, 0, 0});
                 break;
         }
     }
@@ -121,13 +120,14 @@ public class Cube {
         totalAmount = 0;
         List<Cubie> rotateCubiesList = new ArrayList<>();
         for (int i = 0; i < totalCubies; i++) {
-            if (cubies[i].getLocalPosition()[layer[0]] == layer[1])
+            if (cubies[i].getLocalPosition()[layer[0]] == layer[1]) {
                 rotateCubiesList.add(cubies[i]);
+            }
         }
 
         Timeline timeline = new Timeline();
         timeline.getKeyFrames().add(
-                new KeyFrame(new Duration(5), e -> {
+                new KeyFrame(new Duration(4), e -> {
                     float frameAmount = MathUtils.easeInOut(currentCycle, 0, amount, 100);
                     for (Cubie cubie: rotateCubiesList) {
                         cubie.rotateAroundAxis(frameAmount - lastAmount, axis);
@@ -136,6 +136,11 @@ public class Cube {
                     currentCycle++;
                 }));
         timeline.setCycleCount(100);
+        timeline.setOnFinished(e -> {
+            for (Cubie cubie: rotateCubiesList) {
+                cubie.updateLocalAxis(amount, axis);
+            }
+        });
         timeline.play();
     }
 

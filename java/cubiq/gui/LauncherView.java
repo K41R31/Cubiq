@@ -2,7 +2,6 @@ package cubiq.gui;
 
 import cubiq.models.GuiModel;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.effect.Glow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -71,14 +70,6 @@ public class LauncherView extends AnchorPane implements Observer {
         setBottomAnchor(buildInfo, 10d);
         setRightAnchor(buildInfo, 10d);
         getChildren().add(buildInfo);
-
-        // TODO DEBUG BUTTON--------------------------------------------------------------------------------------------
-        Button debugButton = new Button("START SOLVER");
-        debugButton.setOnAction(e -> guiModel.callObservers("showSolver"));
-        AnchorPane.setBottomAnchor(debugButton, 0d);
-        AnchorPane.setLeftAnchor(debugButton, 0d);
-        this.getChildren().add(debugButton);
-        // TODO DEBUG BUTTON--------------------------------------------------------------------------------------------
 
         getChildren().add(new ExitButton());
     }

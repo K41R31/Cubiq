@@ -1,6 +1,5 @@
 package cubiq.processing;
 
-import cubiq.io.DebugOutput;
 import cubiq.io.WebcamCapture;
 import cubiq.models.GuiModel;
 import javafx.application.Platform;
@@ -92,7 +91,7 @@ public class ScanCube implements Observer {
                     centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
                     guiModel.setTotalCubeSideFound(scannedCubeSides.size());
                     guiModel.callObservers("newCubeSideFound");
-                    new DebugOutput().printImage(frame.clone(), scannedCubeSides.size());
+//                    new DebugOutput().printImage(frame.clone(), scannedCubeSides.size());
                     // Reset counter and same side variable
                     foundCubeSide = null;
                     sameSideCounter = 0;

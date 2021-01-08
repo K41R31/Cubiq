@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.IOException;
-import java.sql.Time;
 import java.util.Observer;
 
 public class GuiController extends AnchorPane implements Observer {
@@ -87,7 +86,7 @@ public class GuiController extends AnchorPane implements Observer {
         guiModel.addObserver(explorerView);
 
         // Timer
-        FXMLLoader timerLoader = new FXMLLoader(getClass().getResource("/fxml/timerView.fxml"));
+        FXMLLoader timerLoader = new FXMLLoader(getClass().getResource("/fxml/TimerView.fxml"));
         try {
             timerPane = timerLoader.load();
         } catch (IOException e) {

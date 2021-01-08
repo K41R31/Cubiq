@@ -74,13 +74,13 @@ public class InteractionHandler implements MouseListener {
 
             // Check where the mouse was pressed
 //            System.out.println(cubiePressedDistance(cube.getCubieBoundingBox(0)));
-            for (int i = 0; i < cube.getTotalCubies(); i++) {
+//            for (int i = 0; i < cube.getTotalCubies(); i++) {
 //                Quaternion cubieQuat = cube.getCubieRotation(i);
                 // Load the cubie quaternions in actual quads
 //                actualQuats.add(cubieQuat);
                 // Store the angles of the cube when the mouse was pressed in an quaternion
 //                pressedQuats.add(new Quaternion(cubieQuat));
-            }
+//            }
 //          Quaternion cubieQuat = cube.getCubieRotation(i);
 //          // Load the cubie quaternions in actual quads
 //          actualQuats.add(cubieQuat);

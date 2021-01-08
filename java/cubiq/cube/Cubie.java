@@ -11,9 +11,12 @@ public class Cubie {
     private float[] CUBIE_COLOR = {0.01f, 0.01f, 0.01f};
     private float[] verticesPosColor, verticesPos, localPos;
     private int[] indices;
+    private boolean debugCubie = false;
 
 
     public Cubie(float x, float y, float z) {
+        if (x == -1 && y == -1 && z == -1)
+            debugCubie = true;
         localPos = new float[] {x, y, z};
         verticesPos = new float[24];
         createVertices();
@@ -51,11 +54,16 @@ public class Cubie {
         return boundingBoxVertices;
     }
 
+    public void updateLocalAxis(float amount, float[] axis) {
+        localPos = MathUtils.rotateVector(localPos, axis, amount);
+        for (int i = 0; i < 3; i++) {
+            localPos[i] = Math.round(localPos[i]);
+        }
+    }
+
     public void rotateAroundAxis(float amount, float[] axis) {
         float[] vertex = new float[3];
         float[] rotatedVertex;
-        // Update local position
-        localPos = MathUtils.rotateVector(localPos, axis, amount);
         // Rotate all vertexes
         for (int i = 0; i < 8; i++) {
             System.arraycopy(verticesPos, i*3, vertex, 0, 3);

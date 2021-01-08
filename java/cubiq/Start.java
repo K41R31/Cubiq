@@ -6,6 +6,7 @@ import cubiq.models.GuiModel;
 import cubiq.processing.BuildCube;
 import cubiq.processing.ScanCube;
 import cubiq.renderer.CubeRenderer;
+import cubiq.rendererScene.SceneRenderer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -51,6 +52,11 @@ public class Start extends Application {
         CubeRenderer cubeRenderer = new CubeRenderer();
         cubeRenderer.initModel(guiModel);
         guiModel.addObserver(cubeRenderer);
+
+        // Init SceneRenderer
+        SceneRenderer sceneRenderer = new SceneRenderer();
+        sceneRenderer.initModel(guiModel);
+        guiModel.addObserver(sceneRenderer);
 
         // Init ScreenInformation---------------------------------------------------------------------------------------
 //        screenInformationModel.callObservers("initStageSize");
