@@ -123,14 +123,10 @@ public class SolverController implements Observer {
             }
         }
         // Load cube icons
-        for (int i = 0; i < solution.size(); i++) {
-            System.out.println(1);
-            SolveIcon solveIcon = new SolveIcon(solution.get(i));
-            System.out.println(2);
+        for (String s : solution) {
+            SolveIcon solveIcon = new SolveIcon(s);
             solveIcons.add(solveIcon);
-            System.out.println(3);
-            Platform.runLater(() ->solveIconPane.getChildren().add(solveIcon));
-            System.out.println(4);
+            Platform.runLater(() -> solveIconPane.getChildren().add(solveIcon));
         }
         initTimelines();
     }
