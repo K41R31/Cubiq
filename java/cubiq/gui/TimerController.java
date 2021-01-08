@@ -2,9 +2,11 @@ package cubiq.gui;
 
 import cubiq.models.GuiModel;
 import javafx.fxml.FXML;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 
+import javax.swing.*;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -13,6 +15,9 @@ public class TimerController implements Observer {
 
     @FXML
     private Text mm, ss, ms, sepA, sepB, bestTimeText, bestTime;
+
+    @FXML
+    private ProgressBar progBarGauss, progBarBlur, progBar;
 
     private GuiModel guiModel;
 
@@ -46,6 +51,10 @@ public class TimerController implements Observer {
         bestTime.setStyle("-fx-font-size: 15");
         bestTime.setFontSmoothingType(FontSmoothingType.LCD);
 
+        double bT = 60.0;
+        progBar.setProgress(elapsedTime-(bT / 100));
+        progBarBlur = progBar;
+        progBarGauss = progBar;
     }
 
     private void start() {
