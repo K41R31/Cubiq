@@ -39,6 +39,7 @@ public class GuiModel extends Observable {
     private int[] minWindowSize = new int[] {1484, 716};
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
     private String solveString;
+    private String actualSolveStep;
 
 
     public void callObservers(String arg) {
@@ -313,5 +314,15 @@ public class GuiModel extends Observable {
 
     public void setSavedSceneHeight(double savedSceneHeight) {
         this.savedSceneHeight = savedSceneHeight;
+    }
+
+    // Actual solveStep-------------------------------------------------------------------------------------------------
+
+    public String getActualSolveStep() {
+        return actualSolveStep;
+    }
+
+    public void setActualSolveStep(String actualSolveStep) {
+        this.actualSolveStep = actualSolveStep;
     }
 }

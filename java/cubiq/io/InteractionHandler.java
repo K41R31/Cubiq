@@ -6,7 +6,7 @@ import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
 import cubiq.cube.Cube;
-import cubiq.processing.EaseUtils;
+import cubiq.processing.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,11 +75,11 @@ public class InteractionHandler implements MouseListener {
             // Check where the mouse was pressed
 //            System.out.println(cubiePressedDistance(cube.getCubieBoundingBox(0)));
             for (int i = 0; i < cube.getTotalCubies(); i++) {
-                Quaternion cubieQuat = cube.getCubieRotation(i);
+//                Quaternion cubieQuat = cube.getCubieRotation(i);
                 // Load the cubie quaternions in actual quads
-                actualQuats.add(cubieQuat);
+//                actualQuats.add(cubieQuat);
                 // Store the angles of the cube when the mouse was pressed in an quaternion
-                pressedQuats.add(new Quaternion(cubieQuat));
+//                pressedQuats.add(new Quaternion(cubieQuat));
             }
 //          Quaternion cubieQuat = cube.getCubieRotation(i);
 //          // Load the cubie quaternions in actual quads
@@ -178,7 +178,6 @@ public class InteractionHandler implements MouseListener {
                     else
                         stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{1, 0, 0});
                 }
-                cube.setLayerTo(new int[] {0, -1}, stepRotQuat);
             }
         }
     }
@@ -201,7 +200,7 @@ public class InteractionHandler implements MouseListener {
 
         if (animationLength != 0 && snapBackFrameCount < animationLength) {
             for (int i = 0; i < actualQuats.size(); i++) {
-                actualQuats.get(i).setSlerp(releasedQuats.get(i), snapToQuats.get(i), EaseUtils.easeOut(snapBackFrameCount, 0, 1, animationLength));
+                actualQuats.get(i).setSlerp(releasedQuats.get(i), snapToQuats.get(i), MathUtils.easeOut(snapBackFrameCount, 0, 1, animationLength));
             }
         }
         else {

@@ -195,13 +195,6 @@ public class CubeRenderer implements GLEventListener, Observer {
 
     private void displayCubies(GL3 gl) {
         for (int i = 0; i < cube.getTotalCubies(); i++) {
-            pmvMatrix.glPushMatrix();
-            // Cubie rotation
-            pmvMatrix.glRotate(cube.getCubieRotation(i));
-            // Cubie translation
-            float[] qbTransl = cube.getCubieTranslation(i);
-            pmvMatrix.glTranslatef(qbTransl[0], qbTransl[1], qbTransl[2]);
-
             gl.glUseProgram(shaderProgram.getShaderProgramID());
             // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
             gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
@@ -210,8 +203,6 @@ public class CubeRenderer implements GLEventListener, Observer {
 
             // Draws the elements in the order defined by the index buffer object (IBO)
             gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices(i).length, GL.GL_UNSIGNED_INT, 0);
-
-            pmvMatrix.glPopMatrix();
         }
     }
 
@@ -251,6 +242,8 @@ public class CubeRenderer implements GLEventListener, Observer {
                 fovy = 20f;
                 startRenderer(guiModel.getRendererPaneSolver(), guiModel.getColorScheme());
                 break;
+            case "nextSolveStep":
+                cube.rotateLayer(guiModel.getActualSolveStep());
         }
     }
 

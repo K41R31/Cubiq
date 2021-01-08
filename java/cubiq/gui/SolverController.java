@@ -1,7 +1,7 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
-import cubiq.processing.EaseUtils;
+import cubiq.processing.MathUtils;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -76,11 +76,11 @@ public class SolverController implements Observer {
     }
 
     private void initTimelines() {
-        cycleCounter = solution.size() - 1;
+        cycleCounter = 0;
         innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
-                    solvePaneOffset = EaseUtils.easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
+                    solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, -149, Math.round(400 / ANIMATION_JUMP_SPEED));
                     currentCycle++;
                     solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
                 })
@@ -94,7 +94,9 @@ public class SolverController implements Observer {
                     currentCycle = 0;
                     solvePaneOffset = Math.round(solvePaneOffset/ 149) * 149;
                     startOffset = solvePaneOffset;
-                    cycleCounter--;
+                    guiModel.setActualSolveStep(solution.get(cycleCounter));
+                    guiModel.callObservers("nextSolveStep");
+                    cycleCounter++;
                     innerTimeline.play();
                 })
         );
@@ -103,7 +105,7 @@ public class SolverController implements Observer {
         resetAnimationTimeline = new Timeline();
         resetAnimationTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
-                    solvePaneOffset = EaseUtils.easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
+                    solvePaneOffset = MathUtils.easeInOut(currentCycle, startOffset, startOffset*-1, animationResetCycles);
                     currentCycle++;
                     solveIconPane.setPadding(new Insets(0, 0, 0, solvePaneOffset));
                 })
@@ -211,7 +213,7 @@ public class SolverController implements Observer {
                         outerTimeline.stop();
                         innerTimeline.stop();
                         buttonMIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "startButton.png")));
-                        cycleCounter = solution.size()-1;
+                        cycleCounter = 0;
                         currentCycle = 0;
                         startOffset = solvePaneOffset;
                         animationResetCycles = Math.round(Math.abs(solvePaneOffset / 3));
@@ -224,7 +226,7 @@ public class SolverController implements Observer {
 
                 case 1: // Play/Pause
                     polygon.setOnMousePressed(e -> {
-                        if (outerTimeline.getStatus() != Animation.Status.RUNNING && cycleCounter > 0) {
+                        if (outerTimeline.getStatus() != Animation.Status.RUNNING && cycleCounter < solution.size() - 1) {
                             outerTimeline.play();
                             buttonMIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "pauseButton.png")));
                     } else {
