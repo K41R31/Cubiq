@@ -1,30 +1,36 @@
 package cubiq.gui;
 
 import cubiq.models.GuiModel;
+import cubiq.processing.MathUtils;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+import org.opencv.core.Mat;
 
 import javax.swing.*;
+import java.sql.Time;
 import java.util.Observable;
 import java.util.Observer;
 
 
 public class TimerController implements Observer {
 
+    private GuiModel guiModel;
+
+    private long before, after;
+    private boolean isRunning = false;
+    private Timeline stopTimeline;
+
     @FXML
     private Text mm, ss, ms, sepA, sepB, bestTimeText, bestTime;
 
     @FXML
     private ProgressBar progBarGauss, progBarBlur, progBar;
-
-    private GuiModel guiModel;
-
-    private long startTime;
-    private long stopTime;
-    private long elapsedTime;
-    private boolean isRunning = false;
 
     private void initializeTimerController() {
 
@@ -52,37 +58,43 @@ public class TimerController implements Observer {
         bestTime.setFontSmoothingType(FontSmoothingType.LCD);
 
         double bT = 60.0;
-        progBar.setProgress(elapsedTime-(bT / 100));
+       // progBar.setProgress(elapsedTime-(bT / 100));
         progBarBlur = progBar;
         progBarGauss = progBar;
     }
 
-    private void start() {
-        this.startTime = System.nanoTime();
-        this.isRunning = true;
+    private void initStopwatchAnimation() {
+        stopTimeline = new Timeline();
+        stopTimeline.setCycleCount(Timeline.INDEFINITE);
+        stopTimeline.getKeyFrames().addAll(
+                new KeyFrame(new Duration(0), e -> {
+                    before = System.nanoTime();
+                }),
+                new KeyFrame(new Duration(100), e -> {
+                    double msFrame, ssFrame, mFrame;
+                    after = System.nanoTime();
+                    Math.floor(msFrame = (after - before) / 1e6d);
+                    ssFrame = (msFrame / 1000);
+                    mFrame = (ssFrame / 60);
+
+                    int milli = (int) msFrame;
+                    int sec = (int) ssFrame;
+                    int min = (int) mFrame;
+
+                    ms.setText(String.valueOf(milli));
+                    ss.setText(String.valueOf(sec));
+                    mm.setText(String.valueOf(min));
+                    })
+        );
+        stopTimeline.play();
     }
-
-    private void stop() {
-        this.stopTime = System.nanoTime();
-        this.isRunning = false;
-    }
-
-    private long getElapsedTimeMs() {
-        if (isRunning) {
-            elapsedTime = ((System.nanoTime() - startTime) / 1000);
-        } else {
-            elapsedTime = ((stopTime - startTime) / 1000);
-        }
-        return elapsedTime;
-    }
-
-
 
     @Override
     public void update(Observable o, Object arg) {
         switch ((String) arg) {
             case "initGuiElements":
                 initializeTimerController();
+                initStopwatchAnimation();
                 break;
         }
     }
