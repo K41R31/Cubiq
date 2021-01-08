@@ -99,6 +99,7 @@ public class ScanCube implements Observer {
                 }
                 else sameSideCounter++;
             }
+            else sameSideCounter = 0;
         }
 
         // If all 6 sides were scanned, stop the loop

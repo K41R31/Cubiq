@@ -5,18 +5,38 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.math.Quaternion;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
 
 public class Cube {
 
     private final int cubeLayersCount;
     private Cubie[] cubies;
     private int totalCubies;
+    private List<int[][]> colorScheme;
 
-    public Cube(int cubeLayersCount) {
+
+    public Cube(int cubeLayersCount, List<int[][]> colorScheme) {
+        /*
+        for (int i = 0; i < colorScheme.size(); i++) {
+            for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    System.out.print(colorScheme.get(i)[x][y]);
+                    if (x < 2) System.out.print(", ");
+                }
+                if (y < 2) System.out.print("\n");
+            }
+            if (i < 5) System.out.print("\n\n");
+        }
+        System.out.println();
+
+         */
         this.cubeLayersCount = cubeLayersCount;
+        this.colorScheme = colorScheme;
     }
 
     public void initCubies(GL3 gl, int[] vaoName, int[] vboName, int[] iboName) {
+        if (colorScheme == null) {
+        }
         totalCubies = (int)Math.pow(cubeLayersCount, 3);
         cubies = new Cubie[totalCubies];
         // Offset, to center the cube in the scene
@@ -41,6 +61,15 @@ public class Cube {
         }
     }
 
+    private List<int[][]> generateDefaultScheme() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+
+            }
+        }
+        return null;
+    }
+
     public void updateLocalPos() {
         for (Cubie qb : cubies) {
             qb.updateLocalPos();
@@ -50,6 +79,46 @@ public class Cube {
     public void rotateCubeTo(Quaternion rotation) {
         for (Cubie qb: cubies) {
             qb.rotateToQuat(rotation);
+        }
+    }
+
+    /**
+     * Float array values:
+     *              x  y  z
+     * [0] -> axis (0, 1, 2)
+     *
+     *               -1  1
+     * [1] -> layer (-1, 1)
+     *
+     * @param layer
+     * @param rotationFactor
+     */
+    public void rotateLayerWith(int[] layer, Quaternion rotationFactor) {
+        for (int i = 0; i < totalCubies; i++) {
+            Cubie cubie = cubies[i];
+            float[] localPos = cubie.getLocalPosition();
+            if (localPos[layer[0]] == layer[1])
+                cubie.rotateWithQuat(rotationFactor);
+        }
+    }
+
+    /**
+     * Float array values:
+     *              x  y  z
+     * [0] -> axis (0, 1, 2)
+     *
+     *               -1  1
+     * [1] -> layer (-1, 1)
+     *
+     * @param layer
+     * @param rotation
+     */
+    public void setLayerTo(int[] layer, Quaternion rotation) {
+        for (int i = 0; i < totalCubies; i++) {
+            Cubie cubie = cubies[i];
+            float[] localPos = cubie.getLocalPosition();
+            if (localPos[layer[0]] == layer[1])
+                cubie.setRotationQuat(rotation);
         }
     }
 

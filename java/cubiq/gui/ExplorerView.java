@@ -18,7 +18,7 @@ public class ExplorerView extends StackPane implements Observer {
         rendererPane = new AnchorPane();
         this.getChildren().add(rendererPane);
         this.setStyle("-fx-background-color: #191b1d");
-        guiModel.setRendererPane(rendererPane);
+        guiModel.setRendererPaneExplorer(rendererPane);
         rendererPane.setLayoutX((1920f/2f) - (900f/2f));
         rendererPane.setLayoutY((1080f/2f) - (900f/2f));
     }

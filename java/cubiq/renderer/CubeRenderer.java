@@ -11,22 +11,27 @@ import com.jogamp.opengl.util.PMVMatrix;
 import cubiq.cube.Cube;
 import cubiq.io.InteractionHandler;
 import cubiq.models.GuiModel;
+import javafx.application.Platform;
+import javafx.scene.layout.AnchorPane;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 
-public class CubeExplorerRenderer implements GLEventListener, Observer {
+public class CubeRenderer implements GLEventListener, Observer {
 
     private GuiModel guiModel;
     private final GLWindow glWindow;
     private Cube cube;
     private InteractionHandler interactionHandler;
-    private final int DEVICE_WIDTH = 900;
-    private final int DEVICE_HEIGHT = 900;
-    private final float[] CAM_POS = new float[] {-9.5f, 6.1f, 9.5f};
+    private int deviceWidth;
+    private int deviceHeight;
+    private float[] camPos;
+    private List<int[][]> colorScheme;
+    private float fovy;
 
     private ShaderProgram shaderProgram;
 
@@ -39,7 +44,7 @@ public class CubeExplorerRenderer implements GLEventListener, Observer {
     PMVMatrix pmvMatrix;
 
 
-    public CubeExplorerRenderer() {
+    public CubeRenderer() {
         Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
         Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
@@ -51,17 +56,19 @@ public class CubeExplorerRenderer implements GLEventListener, Observer {
         glWindow = GLWindow.create(screen, caps);
     }
 
-    private void startRenderer() {
+    private void startRenderer(AnchorPane renderPane, List<int[][]> colorScheme) {
+        this.colorScheme = colorScheme;
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
 
-        glCanvas.setWidth(DEVICE_WIDTH);
-        glCanvas.setHeight(DEVICE_HEIGHT);
-        guiModel.getRendererPane().getChildren().add(glCanvas);
+        glCanvas.setWidth(deviceWidth);
+        glCanvas.setHeight(deviceHeight);
+        Platform.runLater(() -> {
+            renderPane.getChildren().add(glCanvas);
+            FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
+            animator.start();
+        });
 
-        FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
-        animator.start();
-
-        interactionHandler = new InteractionHandler(CAM_POS, DEVICE_WIDTH, DEVICE_HEIGHT);
+        interactionHandler = new InteractionHandler(camPos, deviceWidth, deviceHeight);
 
         glWindow.addMouseListener(interactionHandler);
         glWindow.addGLEventListener(this);
@@ -94,8 +101,8 @@ public class CubeExplorerRenderer implements GLEventListener, Observer {
             System.err.println("Error allocating index buffer object.");
         // END: Allocating vertex array objects and buffers for each object
 
-        // Initialize cubie
-        cube = new Cube(3);
+        // Initialize cubie TODO----------------------------------------------------------------------------------------
+        cube = new Cube(3, colorScheme);
         cube.initCubies(gl, vaoName, vboName, iboName);
 
         // Shader program
@@ -153,7 +160,7 @@ public class CubeExplorerRenderer implements GLEventListener, Observer {
         //          fovy (field of view), aspect ratio,
         //          zNear (near clipping plane), zFar (far clipping plane)
         float aspectRatio = (float)width / (float)height;
-        pmvMatrix.gluPerspective(30f, aspectRatio, 0.1f, 1000f);
+        pmvMatrix.gluPerspective(fovy, aspectRatio, 0.1f, 1000f);
 
         // Switch to model-view transform
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
@@ -172,7 +179,7 @@ public class CubeExplorerRenderer implements GLEventListener, Observer {
         // Apply view transform using the PMV-Tool
         // Camera positioning is steered by the interaction handler
         pmvMatrix.glLoadIdentity();
-        pmvMatrix.gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2], 0f, 0f, 0f, 0f, 1.0f, 0f);
+        pmvMatrix.gluLookAt(camPos[0], camPos[1], camPos[2], 0f, 0f, 0f, 0f, 1.0f, 0f);
 
         // Set matrices in the interaction handler
         float[] pMatrix = new float[16];
@@ -230,8 +237,19 @@ public class CubeExplorerRenderer implements GLEventListener, Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "renderExplorerCube":
-                startRenderer();
+            case "renderCubeExplorer":
+                deviceWidth = 1800;
+                deviceHeight = 900;
+                camPos = new float[] {-9.5f, 6.1f, 9.5f};
+                fovy = 30f;
+                startRenderer(guiModel.getRendererPaneExplorer(), null);
+                break;
+            case "renderCubeSolver":
+                deviceWidth = 1800;
+                deviceHeight = 600;
+                camPos = new float[] {-15f, 4.6f, 5f};
+                fovy = 20f;
+                startRenderer(guiModel.getRendererPaneSolver(), guiModel.getColorScheme());
                 break;
         }
     }

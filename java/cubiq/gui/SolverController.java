@@ -44,9 +44,12 @@ public class SolverController implements Observer {
     private Text typoSlow, typoFast;
     @FXML
     private ProgressBar speedProgressBar;
+    @FXML
+    private AnchorPane rendererPane;
 
 
     private void initializeSolverController() {
+        guiModel.setRendererPaneSolver(rendererPane);
         solution = new ArrayList<>();
         solveIcons = new ArrayList<>();
         imagePath = "/assets/";
@@ -54,7 +57,6 @@ public class SolverController implements Observer {
         buttonPane.getChildren().add(new ControlPane());
 
         solveIconPane.setVisible(true);
-        cycleCounter = solution.size() - 1;
         speedSliderPane.setViewOrder(-1);
         speedSlider.setViewOrder(-2);
         typoSlow.setFont(guiModel.getKiona());
@@ -74,6 +76,7 @@ public class SolverController implements Observer {
     }
 
     private void initTimelines() {
+        cycleCounter = solution.size() - 1;
         innerTimeline = new Timeline();
         innerTimeline.getKeyFrames().add(
                 new KeyFrame(new Duration(1), e -> {
@@ -247,6 +250,7 @@ public class SolverController implements Observer {
                 break;
             case "solutionFound":
                 loadSolutionIcons();
+                guiModel.callObservers("renderCubeSolver");
                 break;
         }
     }
