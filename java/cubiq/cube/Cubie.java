@@ -2,7 +2,6 @@ package cubiq.cube;
 
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.math.VectorUtil;
-
 import java.util.Arrays;
 
 public class Cubie {
@@ -58,6 +57,20 @@ public class Cubie {
     }
 
 
+    public void updateLocalPos() {
+        rotation.rotateVector(localPos, 0, localPos, 0);
+    }
+
+    public void rotateWithQuat(Quaternion inputQuat) {
+        this.rotation.mult(inputQuat);
+        updateLocalPos();
+    }
+
+    public void rotateToQuat(Quaternion rotation) {
+        rotation.set(rotation);
+        updateLocalPos();
+    }
+
     private void createIndices() {
         indices = new int[] {4, 6, 5, 7, 3, 6, 2, 4, 0, 5, 1, 3, 0, 2};
     }
@@ -70,14 +83,6 @@ public class Cubie {
         return indices;
     }
 
-    public void rotateToQuat(Quaternion rotation) {
-        rotation.set(rotation);
-    }
-
-    public void updateLocalPos() {
-        rotation.rotateVector(localPos, 0, localPos, 0);
-    }
-
     public float[] getLocalPosition() {
         return localPos;
     }
@@ -88,6 +93,7 @@ public class Cubie {
 
     public void setRotationQuat(Quaternion rotation) {
         this.rotation = rotation;
+        updateLocalPos();
     }
 
     public float[] getTranslation() {

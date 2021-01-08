@@ -20,7 +20,7 @@ public class GuiModel extends Observable {
     private Font bender;
     private Mat originalFrame;
     private Mat[] loadedImages;
-    private AnchorPane rendererPane;
+    private AnchorPane rendererPaneExplorer, rendererPaneSolver;
     private boolean debug = false;
     private boolean mirrorWebcam = false;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
@@ -38,7 +38,7 @@ public class GuiModel extends Observable {
     private int taskbarHeight = 40;
     private int[] minWindowSize = new int[] {1484, 716};
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
-    private String solveString = "B,D,";
+    private String solveString;
 
 
     public void callObservers(String arg) {
@@ -55,13 +55,21 @@ public class GuiModel extends Observable {
         this.solveString = solveString;
     }
 
-    // Render pane------------------------------------------------------------------------------------------------------
-    public AnchorPane getRendererPane() {
-        return rendererPane;
+    // Render panes-----------------------------------------------------------------------------------------------------
+    public AnchorPane getRendererPaneExplorer() {
+        return rendererPaneExplorer;
     }
 
-    public void setRendererPane(AnchorPane rendererPane) {
-        this.rendererPane = rendererPane;
+    public void setRendererPaneExplorer(AnchorPane rendererPaneExplorer) {
+        this.rendererPaneExplorer = rendererPaneExplorer;
+    }
+
+    public AnchorPane getRendererPaneSolver() {
+        return rendererPaneSolver;
+    }
+
+    public void setRendererPaneSolver(AnchorPane rendererPaneSolver) {
+        this.rendererPaneSolver = rendererPaneSolver;
     }
 
     // Kiona------------------------------------------------------------------------------------------------------------

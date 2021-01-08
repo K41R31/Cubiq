@@ -73,7 +73,14 @@ public class InteractionHandler implements MouseListener {
             actualQuats.clear();
 
             // Check where the mouse was pressed
-            System.out.println(cubiePressedDistance(cube.getCubieBoundingBox(0)));
+//            System.out.println(cubiePressedDistance(cube.getCubieBoundingBox(0)));
+            for (int i = 0; i < cube.getTotalCubies(); i++) {
+                Quaternion cubieQuat = cube.getCubieRotation(i);
+                // Load the cubie quaternions in actual quads
+                actualQuats.add(cubieQuat);
+                // Store the angles of the cube when the mouse was pressed in an quaternion
+                pressedQuats.add(new Quaternion(cubieQuat));
+            }
 //          Quaternion cubieQuat = cube.getCubieRotation(i);
 //          // Load the cubie quaternions in actual quads
 //          actualQuats.add(cubieQuat);
@@ -171,9 +178,7 @@ public class InteractionHandler implements MouseListener {
                     else
                         stepRotQuat.setFromAngleNormalAxis(rotatedSincePress, new float[]{1, 0, 0});
                 }
-                for (int i = 0; i < actualQuats.size(); i++) {
-                    actualQuats.get(i).set(stepRotQuat.mult(pressedQuats.get(i)));
-                }
+                cube.setLayerTo(new int[] {0, -1}, stepRotQuat);
             }
         }
     }
@@ -206,6 +211,26 @@ public class InteractionHandler implements MouseListener {
             swingingBack = false;
         }
     }
+/*
+    private void RotateSide() {
+        animationFrameCount++;
+
+        float animationLength = Math.round(Math.abs(Math.PI/2 * rotationSpeed));
+
+        if (animationLength != 0 && animationFrameCount < animationLength) {
+            for (int i = 0; i < actualQuats.size(); i++) {
+                actualQuats.get(i).setSlerp(releasedQuats.get(i), snapToQuats.get(i), EaseUtils.easeOut(animationFrameCount, 0, 1, animationLength));
+            }
+        }
+        else {
+            for (int i = 0; i < actualQuats.size(); i++) {
+                actualQuats.get(i).set(snapToQuats.get(i));
+            }
+            swingingBack = false;
+        }
+    }
+
+ */
 
     private float cubiePressedDistance(float[] boundingBoxVertices) {
         for (int i = 0; i < 12; i++) {

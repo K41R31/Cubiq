@@ -137,7 +137,7 @@ public class GuiController extends AnchorPane implements Observer {
         this.getChildren().add(resizeFrame);
 
         guiModel.callObservers("toggleFullScreen");
-        guiModel.callObservers("renderExplorerCube");
+        guiModel.callObservers("renderCubeExplorer");
 
         // Set the size the stage get set to when minimized
         guiModel.setSavedSceneWidth(guiModel.getScreenWidth() * 0.8);

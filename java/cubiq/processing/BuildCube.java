@@ -10,7 +10,6 @@ public class BuildCube implements Observer {
 
     GuiModel guiModel;
     private List<int[][]> sortedScheme;
-    String string;
 
 
     private void buildCube() {
@@ -125,8 +124,9 @@ public class BuildCube implements Observer {
                         List<int[][]> orientedScheme = orientScheme(combinations.getCombination(step, i), edgeOffset);
                         if (isPossibleFinalCombination(orientedScheme)) {
                             new DebugOutput().printSchemes(orientedScheme, "scheme");
+                            guiModel.setColorScheme(orientedScheme);
                             String solvableString = generateSolvableString(orientedScheme);
-                            String string = Search.solution(solvableString, 22, 5, false);
+                            String string = Search.solution(solvableString, 21, 5, false);
                             guiModel.setSolveString(string);
                             guiModel.callObservers("solutionFound");
                             return;
