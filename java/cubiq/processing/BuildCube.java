@@ -126,9 +126,10 @@ public class BuildCube implements Observer {
                         if (isPossibleFinalCombination(orientedScheme)) {
                             new DebugOutput().printSchemes(orientedScheme, "scheme");
                             String solvableString = generateSolvableString(orientedScheme);
-                            String string = Search.solution(solvableString, 21, 5, false);
+                            String string = Search.solution(solvableString, 22, 5, false);
                             guiModel.setSolveString(string);
                             guiModel.callObservers("solutionFound");
+                            return;
                         }
                     }
                     // TODO Komplett achsensymetrische Seiten ignorieren, da die Rotation hier keinen Unterschied macht

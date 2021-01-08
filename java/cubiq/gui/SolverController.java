@@ -3,6 +3,7 @@ package cubiq.gui;
 import cubiq.models.GuiModel;
 import cubiq.processing.EaseUtils;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -110,10 +111,10 @@ public class SolverController implements Observer {
 
     private void loadSolutionIcons() {
         String solveString = guiModel.getSolveString();
+        solveString = solveString.replace(" ", ",");
         int idx = 0;
         while (true) {
-            int idxNew;
-            idxNew = solveString.indexOf(",", idx);
+            int idxNew = solveString.indexOf(",", idx);
             if (idxNew != -1) {
                 solution.add((solveString.substring(idx, idxNew)));
                 idx = idxNew + 1;
@@ -122,13 +123,16 @@ public class SolverController implements Observer {
             }
         }
         // Load cube icons
-        for (String s : solution) {
-            SolveIcon solveIcon = new SolveIcon(s);
+        for (int i = 0; i < solution.size(); i++) {
+            System.out.println(1);
+            SolveIcon solveIcon = new SolveIcon(solution.get(i));
+            System.out.println(2);
             solveIcons.add(solveIcon);
-            solveIconPane.getChildren().add(solveIcon);
+            System.out.println(3);
+            Platform.runLater(() ->solveIconPane.getChildren().add(solveIcon));
+            System.out.println(4);
         }
         initTimelines();
-        System.out.println("TEST4");
     }
 
     private void openSpeedSlider() {
@@ -247,7 +251,6 @@ public class SolverController implements Observer {
                 initializeSolverController();
                 break;
             case "solutionFound":
-                System.out.println("TESTETESTSET");
                 loadSolutionIcons();
                 break;
         }
