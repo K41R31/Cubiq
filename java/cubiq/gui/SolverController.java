@@ -6,7 +6,6 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
@@ -14,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.FontSmoothingType;
@@ -209,6 +207,7 @@ public class SolverController implements Observer {
                     polygon.setOnMousePressed(e -> {
                         outerTimeline.stop();
                         innerTimeline.stop();
+                        buttonMIcon.setImage(new Image(getClass().getResourceAsStream(imagePath + "startButton.png")));
                         cycleCounter = solution.size()-1;
                         currentCycle = 0;
                         startOffset = solvePaneOffset;
