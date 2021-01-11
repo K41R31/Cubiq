@@ -17,32 +17,20 @@ public class Cube {
     private Cubie[] cubies;
     private int totalCubies;
     private List<int[][]> colorScheme;
-    int ROTATION_SPEED = 1;
+    private int[][][][] cubieStickers;
     int currentCycle = 0;
     int totalAmount = 0;
     float lastAmount;
 
     public Cube(int cubeLayersCount, List<int[][]> colorScheme) {
-        /*
-        for (int i = 0; i < colorScheme.size(); i++) {
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    System.out.print(colorScheme.get(i)[x][y]);
-                    if (x < 2) System.out.print(", ");
-                }
-                if (y < 2) System.out.print("\n");
-            }
-            if (i < 5) System.out.print("\n\n");
-        }
-        System.out.println();
-
-         */
         this.cubeLayersCount = cubeLayersCount;
         this.colorScheme = colorScheme;
+        assignStickerColors();
     }
 
     public void initCubies(GL3 gl, int[] vaoName, int[] vboName, int[] iboName) {
         if (colorScheme == null) {
+            // TODO Scene render handle
         }
         totalCubies = (int)Math.pow(cubeLayersCount, 3);
         cubies = new Cubie[totalCubies];
@@ -51,7 +39,9 @@ public class Cube {
         for (int x = 0, c = 0; x < cubeLayersCount; x++) {
             for (int y = 0; y < cubeLayersCount; y++) {
                 for (int z = 0; z < cubeLayersCount; z++, c++) {
-                    cubies[c] = new Cubie(x - cubePosOffset, y - cubePosOffset, z - cubePosOffset);
+                    Cubie cubie = new Cubie(x - cubePosOffset, y - cubePosOffset, z - cubePosOffset);
+//                    cubie.initStickers(cubieStickers[x][y][z], new int[] {x, y, z}, gl, vaoName, vboName, iboName);
+                    cubies[c] = cubie;
                     gl.glBindVertexArray(vaoName[c]);
                     gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[c]);
                     gl.glBufferData(GL.GL_ARRAY_BUFFER, cubies[c].getVerticesPosColor().length * 4L,
@@ -127,7 +117,7 @@ public class Cube {
 
         Timeline timeline = new Timeline();
         timeline.getKeyFrames().add(
-                new KeyFrame(new Duration(4), e -> {
+                new KeyFrame(new Duration(3), e -> {
                     float frameAmount = MathUtils.easeInOut(currentCycle, 0, amount, 100);
                     for (Cubie cubie: rotateCubiesList) {
                         cubie.rotateAroundAxis(frameAmount - lastAmount, axis);
@@ -142,6 +132,38 @@ public class Cube {
             }
         });
         timeline.play();
+    }
+
+    private void assignStickerColors() {
+        cubieStickers = new int[3][3][3][3];
+
+        cubieStickers[0][0][0] = new int[] {colorScheme.get(0)[0][2], colorScheme.get(3)[0][0], colorScheme.get(4)[2][2]};
+        cubieStickers[0][0][1] = new int[] {colorScheme.get(0)[1][2], colorScheme.get(3)[1][0]};
+        cubieStickers[0][0][2] = new int[] {colorScheme.get(0)[2][2], colorScheme.get(3)[2][0], colorScheme.get(2)[0][2]};
+        cubieStickers[0][1][0] = new int[] {colorScheme.get(0)[0][1],            0,             colorScheme.get(4)[2][1]};
+        cubieStickers[0][1][1] = new int[] {colorScheme.get(0)[1][1]};
+        cubieStickers[0][1][2] = new int[] {colorScheme.get(0)[2][1],            0,             colorScheme.get(2)[0][1]};
+        cubieStickers[0][2][0] = new int[] {colorScheme.get(0)[0][0], colorScheme.get(1)[0][2], colorScheme.get(4)[2][0]};
+        cubieStickers[0][2][1] = new int[] {colorScheme.get(0)[1][0], colorScheme.get(1)[1][2]};
+        cubieStickers[0][2][2] = new int[] {colorScheme.get(0)[2][0], colorScheme.get(1)[2][2], colorScheme.get(2)[0][0]};
+        cubieStickers[1][0][0] = new int[] {           0,             colorScheme.get(3)[0][1], colorScheme.get(4)[1][2]};
+        cubieStickers[1][0][1] = new int[] {           0,             colorScheme.get(3)[1][1]};
+        cubieStickers[1][0][2] = new int[] {           0,             colorScheme.get(3)[2][1], colorScheme.get(2)[1][2]};
+        cubieStickers[1][1][0] = new int[] {           0,                        0,             colorScheme.get(4)[1][1]};
+
+        cubieStickers[1][1][2] = new int[] {           0,                        0,             colorScheme.get(2)[1][1]};
+        cubieStickers[1][2][0] = new int[] {           0,             colorScheme.get(1)[0][1], colorScheme.get(4)[1][0]};
+        cubieStickers[1][2][1] = new int[] {           0,             colorScheme.get(1)[1][1]};
+        cubieStickers[1][2][2] = new int[] {           0,             colorScheme.get(1)[2][1], colorScheme.get(2)[1][0]};
+        cubieStickers[2][0][0] = new int[] {colorScheme.get(5)[2][2], colorScheme.get(3)[0][2], colorScheme.get(4)[0][2]};
+        cubieStickers[2][0][1] = new int[] {colorScheme.get(5)[1][2], colorScheme.get(3)[1][2]};
+        cubieStickers[2][0][2] = new int[] {colorScheme.get(5)[0][2], colorScheme.get(3)[2][2], colorScheme.get(2)[2][2]};
+        cubieStickers[2][1][0] = new int[] {colorScheme.get(5)[2][1],            0,             colorScheme.get(4)[0][1]};
+        cubieStickers[2][1][1] = new int[] {colorScheme.get(5)[1][1]};
+        cubieStickers[2][1][2] = new int[] {colorScheme.get(5)[0][1],            0,             colorScheme.get(2)[2][1]};
+        cubieStickers[2][2][0] = new int[] {colorScheme.get(5)[2][0], colorScheme.get(1)[0][0], colorScheme.get(4)[0][0]};
+        cubieStickers[2][2][1] = new int[] {colorScheme.get(5)[1][0], colorScheme.get(1)[1][0]};
+        cubieStickers[2][2][2] = new int[] {colorScheme.get(5)[0][0], colorScheme.get(1)[2][0], colorScheme.get(2)[2][0]};
     }
 
     public float[] getCubieBoundingBox(int index) {
@@ -162,5 +184,9 @@ public class Cube {
 
     public int getTotalCubies() {
         return totalCubies;
+    }
+
+    public Cubie getCubie(int i) {
+        return cubies[i];
     }
 }

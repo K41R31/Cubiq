@@ -1,5 +1,6 @@
 package cubiq.processing;
 
+import cubiq.io.DebugOutput;
 import cubiq.models.GuiModel;
 import org.kociemba.twophase.Search;
 
@@ -20,9 +21,6 @@ public class BuildCube implements Observer {
 
         sortedScheme = sortScheme(inputScheme);
         Combinations combinations = new Combinations();
-
-        // TODO Seiten auf Achsensymmetrie überprüfen (zB Schachbrettmuster oder gelöste Seiten)
-        // TODO Nebeneinander liegende Seiten auf centerfarben überprüfen. Grün nicht neben Balu,
 
         // Second side
         // Seiten, die oben an die weiße Seite passen
@@ -122,7 +120,7 @@ public class BuildCube implements Observer {
                     if (layer == 0) {
                         List<int[][]> orientedScheme = orientScheme(combinations.getCombination(step, i), edgeOffset);
                         if (isPossibleFinalCombination(orientedScheme)) {
-//                            new DebugOutput().printSchemes(orientedScheme, "scheme");
+                            new DebugOutput().printSchemes(orientedScheme, "scheme");
                             guiModel.setColorScheme(orientedScheme);
                             String solvableString = generateSolvableString(orientedScheme);
                             String string = Search.solution(solvableString, 21, 5, false);

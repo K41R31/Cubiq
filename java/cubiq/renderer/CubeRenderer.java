@@ -204,6 +204,17 @@ public class CubeRenderer implements GLEventListener, Observer {
 
             // Draws the elements in the order defined by the index buffer object (IBO)
             gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices(i).length, GL.GL_UNSIGNED_INT, 0);
+
+            for (int j = 0; j < cube.getCubie(i).getTotalStickers(); j++) {
+                gl.glUseProgram(shaderProgram.getShaderProgramID());
+                // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+                gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+                gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+                gl.glBindVertexArray(vaoName[j]);
+
+                // Draws the elements in the order defined by the index buffer object (IBO)
+                gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubie(i).getStickerIndices(j).length, GL.GL_UNSIGNED_INT, 0);
+            }
         }
     }
 

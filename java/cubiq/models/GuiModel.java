@@ -326,12 +326,4 @@ public class GuiModel extends Observable {
     public void setActualSolveStep(String actualSolveStep) {
         this.actualSolveStep = actualSolveStep;
     }
-
-    public float getSolutionAnimationRate() {
-        return solutionAnimationRate;
-    }
-
-    public void setSolutionAnimationRate(float solutionAnimationRate) {
-        this.solutionAnimationRate = solutionAnimationRate;
-    }
 }

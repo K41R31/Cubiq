@@ -1,9 +1,14 @@
 package cubiq.cube;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.math.VectorUtil;
 import cubiq.processing.MathUtils;
 
-import java.util.Arrays;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Cubie {
 
@@ -12,16 +17,33 @@ public class Cubie {
     private float[] verticesPosColor, verticesPos, localPos;
     private int[] indices;
     private boolean debugCubie = false;
+    private List<Sticker> stickers;
 
 
     public Cubie(float x, float y, float z) {
-        if (x == -1 && y == -1 && z == -1)
-            debugCubie = true;
         localPos = new float[] {x, y, z};
         verticesPos = new float[24];
+        stickers = new ArrayList<>();
         createVertices();
         translateVertices(new float[] {x, y, z});
         createIndices();
+    }
+
+    public void initStickers(int[] cubieStickers, int[] position, GL3 gl, int[] vaoName, int[] vboName, int[] iboName) {
+        for (int i = 0; i < cubieStickers.length; i++) {
+            stickers.add(new Sticker(cubieStickers[i], position, i));
+            gl.glBindVertexArray(vaoName[i]);
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
+            gl.glBufferData(GL.GL_ARRAY_BUFFER, stickers.get(i).getVerticesPosColor().length * 4L,
+                    FloatBuffer.wrap(stickers.get(i).getVerticesPosColor()), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[i]);
+            gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, stickers.get(i).getIndices().length * 4L,
+                    IntBuffer.wrap(stickers.get(i).getIndices()), GL.GL_STATIC_DRAW);
+            gl.glEnableVertexAttribArray(0);
+            gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
+            gl.glEnableVertexAttribArray(1);
+            gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
+        }
     }
 
     private void createVertices() {
@@ -83,6 +105,10 @@ public class Cubie {
         updateVerticesPosColor();
     }
 
+    public int getTotalStickers() {
+        return stickers.size();
+    }
+
     private void createIndices() {
         indices = new int[] {4, 6, 5, 7, 3, 6, 2, 4, 0, 5, 1, 3, 0, 2};
     }
@@ -97,5 +123,13 @@ public class Cubie {
 
     public float[] getLocalPosition() {
         return localPos;
+    }
+
+    public float[] getStickerVertices(int index) {
+        return stickers.get(index).getVerticesPosColor();
+    }
+
+    public int[] getStickerIndices(int index) {
+        return stickers.get(index).getIndices();
     }
 }
