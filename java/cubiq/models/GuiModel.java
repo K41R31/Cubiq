@@ -24,11 +24,11 @@ public class GuiModel extends Observable {
     private boolean debug = false;
     private boolean mirrorWebcam = false;
     private int cannyThreshold1 = 17, cannyThreshold2 = 23; //17, 23
-    private double sideLengthThreshold = 0.8; //0.8
-    private double angleThreshold = 50; //50
-    private double rotationThreshold = 20; //30
-    private double blurThreshold = 3; //3
-    private double dilateKernel = 1; //1
+    private double sideLengthThreshold = 0.72; // 0.7
+    private double angleThreshold = 50; // 50
+    private double rotationThreshold = 30; // 30
+    private double blurThreshold = 3; // 3
+    private double dilateKernel = 1; // 1
     private double scanAreaSize = 20;
     private List<int[][]> colorScheme;
     private int totalCubeSideFound = 0;
@@ -40,7 +40,10 @@ public class GuiModel extends Observable {
     private double savedSceneX, savedSceneY, savedSceneWidth, savedSceneHeight;
     private String solveString;
     private String actualSolveStep;
+    private boolean calibrating;
     private float solutionAnimationRate;
+    private float[][] scanCalibrationValues;
+    private float colorThreshold;
 
 
     public void callObservers(String arg) {
@@ -325,5 +328,31 @@ public class GuiModel extends Observable {
 
     public void setActualSolveStep(String actualSolveStep) {
         this.actualSolveStep = actualSolveStep;
+    }
+
+    // Calibrating------------------------------------------------------------------------------------------------------
+
+    public boolean getCalibrating() {
+        return calibrating;
+    }
+
+    public void setCalibrating(boolean calibrating) {
+        this.calibrating = calibrating;
+    }
+
+    public float[][] getScanCalibrationValues() {
+        return scanCalibrationValues;
+    }
+
+    public void setScanCalibrationValues(float[][] scanCalibrationValues) {
+        this.scanCalibrationValues = scanCalibrationValues;
+    }
+
+    public float getColorThreshold() {
+        return colorThreshold;
+    }
+
+    public void setColorThreshold(float colorThreshold) {
+        this.colorThreshold = colorThreshold;
     }
 }

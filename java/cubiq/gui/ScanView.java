@@ -100,11 +100,14 @@ public class ScanView extends AnchorPane implements Observer {
 
         footerMenuItemLeft = new FooterMenuItem(new Double[] {0d, 0d, 53d, 0d, 105d, 50d, 480d, 50d, 510d, 81d, 0d, 81d}, "leftItem");
         FooterMenuItem menuItemCubeDepth = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "3x3x3 Cube");
-        FooterMenuItem menuItemSettings = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "settings");
+        FooterMenuItem menuItemSettings = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "calibrate");
         FooterMenuItem menuItemHelp = new FooterMenuItem(new Double[] {0d, 0d, 480d, 0d, 510d, 31d, 30d, 31d}, "help");
 
         menuItemCubeDepth.setOnMouseClicked(event -> guiModel.callObservers("menuItemCubeDepthActive"));
-        menuItemSettings.setOnMouseClicked(event -> guiModel.callObservers("menuItemSettingsActive"));
+        menuItemSettings.setOnMouseClicked(event -> {
+            guiModel.setCalibrating(true);
+            guiModel.callObservers("calibrateColors");
+        });
         menuItemHelp.setOnMouseClicked(event -> guiModel.callObservers("showSolver"));
 
         footerItemContainer.getChildren().addAll(menuItemHelp, menuItemSettings, menuItemCubeDepth, footerMenuItemLeft);

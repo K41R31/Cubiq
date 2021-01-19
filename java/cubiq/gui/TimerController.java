@@ -28,10 +28,8 @@ public class TimerController implements Observer {
     private long before, after;
     private boolean isRunning = false;
     private Timeline stopTimeline;
-
     @FXML
     private Text actualTimeText, bestTimeText, bestTime;
-
     @FXML
     private ProgressBar progBarGauss, progBarBlur, progBar;
 

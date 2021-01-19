@@ -151,7 +151,10 @@ public class HeaderController implements Observer {
     private void hoverFrameControls(StackPane stackPane, boolean hovered) {
         if (hovered) {
             for (int i = 0; i < stackPane.getChildren().size(); i++) {
-                stackPane.getChildren().get(i).setStyle("-fx-stroke: #2bccbd");
+                if (stackPane.equals(sp_exitPane))
+                    stackPane.getChildren().get(i).setStyle("-fx-stroke: #cc2b2b");
+                else
+                    stackPane.getChildren().get(i).setStyle("-fx-stroke: #2bccbd");
             }
             stackPane.setEffect(new Glow(1));
         }

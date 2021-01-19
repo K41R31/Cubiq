@@ -81,24 +81,27 @@ public class ScanCube implements Observer {
         // If no cube was found in the last frame
         if (foundCubeSide == null) {
             // Check if the scanned color matrix is already stored. If not save it
-            if (isNewCubeSide(colorMatrix))
+            if (isNewCubeSide(colorMatrix) && guiModel.getCalibrating())
                 foundCubeSide = colorMatrix;
         }
         else {
             if (isSameCubeSide(foundCubeSide, colorMatrix)) {
                 if (sameSideCounter > 10) {
+//                    new DebugOutput().printImage(frame, scannedCubeSides.size());
                     scannedCubeSides.add(colorMatrix);
                     centerColorSaturations.add(meanHSVColorMatrix[1][1].val[1]);
                     guiModel.setTotalCubeSideFound(scannedCubeSides.size());
                     guiModel.callObservers("newCubeSideFound");
-//                    new DebugOutput().printImage(frame.clone(), scannedCubeSides.size());
                     // Reset counter and same side variable
                     foundCubeSide = null;
                     sameSideCounter = 0;
                 }
                 else sameSideCounter++;
             }
-            else sameSideCounter = 0;
+            else {
+                foundCubeSide = null;
+                sameSideCounter = 0;
+            }
         }
 
         // If all 6 sides were scanned, stop the loop
@@ -147,8 +150,8 @@ public class ScanCube implements Observer {
         // Add Canny
         Imgproc.Canny(processedMat, processedMat, guiModel.getCannyThreshold1(), guiModel.getCannyThreshold2());
 
-//        model.setOriginalFrame(processedMat);
-//        model.callObservers("updateImageView");
+//        guiModel.setOriginalFrame(processedMat);
+//        guiModel.callObservers("updateImageView");
 
         // Make the lines thicker
         Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2 * guiModel.getDilateKernel() + 1, 2 * guiModel.getDilateKernel() + 1));
@@ -466,14 +469,26 @@ public class ScanCube implements Observer {
 
     private int[][] normalizedColors(Scalar[][] scalars) {
         int[][] normalizedColors = new int[3][3];
+//        float[][] calibrationValues = guiModel.getScanCalibrationValues();
+        float[] calibrationValues = new float[] {5, 10, 30, 60, 120, 160};
+        float threshold = guiModel.getColorThreshold();
         for (int y  = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 double hue = scalars[x][y].val[0];
                 double sat = scalars[x][y].val[1];
                 double val = scalars[x][y].val[2];
 
+// Kai Werte
+//                if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) normalizedColors[x][y] = 0; // white
+//                else if (hue < 2) normalizedColors[x][y] = 2; // red
+//                else if (hue < 20) normalizedColors[x][y] = 3; // orange
+//                else if (hue < 45 || hue < 60 && sat < 155) normalizedColors[x][y] = 5; // yellow
+//                else if (hue < 90) normalizedColors[x][y] = 1; // green
+//                else if (hue < 140) normalizedColors[x][y] = 4; // blue
+//                else if (hue <= 180) normalizedColors[x][y] = 2; // red
+
                 if (!(hue > 20 && hue < 70) && sat < 102 && val > 100) normalizedColors[x][y] = 0; // white
-                else if (hue < 2) normalizedColors[x][y] = 2; // red
+                else if (hue > calibrationValues[1] && hue < calibrationValues[1]) normalizedColors[x][y] = 2; // red
                 else if (hue < 20) normalizedColors[x][y] = 3; // orange
                 else if (hue < 45 || hue < 60 && sat < 155) normalizedColors[x][y] = 5; // yellow
                 else if (hue < 90) normalizedColors[x][y] = 1; // green
@@ -596,6 +611,9 @@ public class ScanCube implements Observer {
                 break;
             case "startLoadedImagesLoop":
                 startLoadedImagesLoop();
+                break;
+            case "calibrateColors":
+
                 break;
             case "shutdown":
                 shutdownScan();
