@@ -19,8 +19,7 @@ public class Cube {
     private List<int[][]> colorScheme;
     private int[][][][] cubieStickers;
     int currentCycle = 0;
-    int totalAmount = 0;
-    float lastAmount;
+    float totalAmount = 0;
 
     public Cube(int cubeLayersCount, List<int[][]> colorScheme) {
         this.cubeLayersCount = cubeLayersCount;
@@ -105,7 +104,6 @@ public class Cube {
     }
 
     private void animate(float amount, int[] layer, float[] axis) {
-        lastAmount = 0;
         currentCycle = 0;
         totalAmount = 0;
         List<Cubie> rotateCubiesList = new ArrayList<>();
@@ -120,9 +118,9 @@ public class Cube {
                 new KeyFrame(new Duration(3), e -> {
                     float frameAmount = MathUtils.easeInOut(currentCycle, 0, amount, 100);
                     for (Cubie cubie: rotateCubiesList) {
-                        cubie.rotateAroundAxis(frameAmount - lastAmount, axis);
+                        cubie.rotateAroundAxis(frameAmount - totalAmount, axis);
                     }
-                    lastAmount = frameAmount;
+                    totalAmount = frameAmount;
                     currentCycle++;
                 }));
         timeline.setCycleCount(100);

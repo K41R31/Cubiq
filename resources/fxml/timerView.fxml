@@ -22,27 +22,7 @@
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                            <children>
-                              <Text fx:id="mm" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="M M">
-                                 <font>
-                                    <Font size="100.0" />
-                                 </font>
-                              </Text>
-                              <Text fx:id="sepA" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text=":">
-                                 <font>
-                                    <Font size="100.0" />
-                                 </font>
-                              </Text>
-                              <Text fx:id="ss" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="S S">
-                                 <font>
-                                    <Font size="100.0" />
-                                 </font>
-                              </Text>
-                              <Text fx:id="sepB" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text=":">
-                                 <font>
-                                    <Font size="100.0" />
-                                 </font>
-                              </Text>
-                              <Text fx:id="ms" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="M S">
+                              <Text fx:id="actualTimeText" fill="#e1e1e1" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="00:20.5" wrappingWidth="500.0">
                                  <font>
                                     <Font size="100.0" />
                                  </font>

@@ -14,6 +14,9 @@ import org.opencv.core.Mat;
 
 import javax.swing.*;
 import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -27,28 +30,16 @@ public class TimerController implements Observer {
     private Timeline stopTimeline;
 
     @FXML
-    private Text mm, ss, ms, sepA, sepB, bestTimeText, bestTime;
+    private Text actualTimeText, bestTimeText, bestTime;
 
     @FXML
     private ProgressBar progBarGauss, progBarBlur, progBar;
 
     private void initializeTimerController() {
 
-        mm.setFont(guiModel.getBender());
-        mm.setStyle("-fx-font-size: 100");
-        mm.setFontSmoothingType(FontSmoothingType.LCD);
-        ss.setFont(guiModel.getBender());
-        ss.setStyle("-fx-font-size: 100");
-        ss.setFontSmoothingType(FontSmoothingType.LCD);
-        ms.setFont(guiModel.getBender());
-        ms.setStyle("-fx-font-size: 100");
-        ms.setFontSmoothingType(FontSmoothingType.LCD);
-        sepA.setFont(guiModel.getBender());
-        sepA.setStyle("-fx-font-size: 100");
-        sepA.setFontSmoothingType(FontSmoothingType.LCD);
-        sepB.setFont(guiModel.getBender());
-        sepB.setStyle("-fx-font-size: 100");
-        sepB.setFontSmoothingType(FontSmoothingType.LCD);
+        actualTimeText.setFont(guiModel.getBender());
+        actualTimeText.setStyle("-fx-font-size: 100");
+        actualTimeText.setFontSmoothingType(FontSmoothingType.LCD);
 
         bestTimeText.setFont(guiModel.getBender());
         bestTimeText.setStyle("-fx-font-size: 15");
@@ -66,27 +57,17 @@ public class TimerController implements Observer {
     private void initStopwatchAnimation() {
         stopTimeline = new Timeline();
         stopTimeline.setCycleCount(Timeline.INDEFINITE);
-        stopTimeline.getKeyFrames().addAll(
-                new KeyFrame(new Duration(0), e -> {
-                    before = System.nanoTime();
-                }),
-                new KeyFrame(new Duration(100), e -> {
-                    double msFrame, ssFrame, mFrame;
-                    after = System.nanoTime();
-                    Math.floor(msFrame = (after - before) / 1e6d);
-                    ssFrame = (msFrame / 1000);
-                    mFrame = (ssFrame / 60);
-
-                    int milli = (int) msFrame;
-                    int sec = (int) ssFrame;
-                    int min = (int) mFrame;
-
-                    ms.setText(String.valueOf(milli));
-                    ss.setText(String.valueOf(sec));
-                    mm.setText(String.valueOf(min));
-                    })
+        long startTime = System.currentTimeMillis();
+        stopTimeline.getKeyFrames().add(
+                new KeyFrame(new Duration(50), e -> actualTimeText.setText(timeConverter(System.currentTimeMillis()-startTime)))
         );
         stopTimeline.play();
+    }
+
+    private String timeConverter(long time) {
+        Date date = new Date(time);
+        DateFormat dateFormat = new SimpleDateFormat("mm:ss.S");
+        return dateFormat.format(date).substring(0, 7);
     }
 
     @Override

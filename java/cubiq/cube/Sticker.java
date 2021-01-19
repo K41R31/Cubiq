@@ -84,7 +84,7 @@ public class Sticker {
         float[] output = new float[24];
         for (int i = 0; i < 4; i++) {
             System.arraycopy(input, i*3, output, i*3, 3);
-            System.arraycopy(color, 0, output, i*6, 3);
+            System.arraycopy(color, 0, output, i*3+3, 3);
         }
         return output;
     }

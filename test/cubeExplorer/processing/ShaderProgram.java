@@ -1,4 +1,4 @@
-package cubiq.rendererScene; /**
+package cubeExplorer.processing; /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
@@ -91,7 +91,6 @@ public class ShaderProgram {
         String vertexShaderString;
         int vertexShader;
         String vertexPathAndFileName = path + vertexShaderFileName;
-        System.out.println("Loading vertex shader from file: " + vertexPathAndFileName);
         vertexShaderString = loadFileToString(vertexPathAndFileName);
         vertexShader = compileShader(GL2ES2.GL_VERTEX_SHADER, vertexShaderString);
 
@@ -99,7 +98,6 @@ public class ShaderProgram {
         String fragmentShaderString;
         int fragmentShader;
         String fragmentPathAndFileName = path + fragmentShaderFileName;
-        System.out.println("Loading fragment shader from file: " + fragmentPathAndFileName);
         fragmentShaderString = loadFileToString(fragmentPathAndFileName);
         fragmentShader = compileShader(GL2ES2.GL_FRAGMENT_SHADER, fragmentShaderString);
 
@@ -137,15 +135,13 @@ public class ShaderProgram {
         //Check compile status.
         int[] compiled = new int[1];
         gl.glGetShaderiv(shader, GL2ES2.GL_COMPILE_STATUS, compiled,0);
-        if (compiled[0] != 0) {
-            System.out.println("Shader compiled sucessfully");}
-        else {
+        if (compiled[0] == 0) {
             // read and print compiler log to console
             int[] logLength = new int[1];
             gl.glGetShaderiv(shader, GL2ES2.GL_INFO_LOG_LENGTH, logLength, 0);
 
             byte[] log = new byte[logLength[0]];
-            gl.glGetShaderInfoLog(shader, logLength[0], (int[])null, 0, log, 0);
+            gl.glGetShaderInfoLog(shader, logLength[0], null, 0, log, 0);
 
             System.err.println("Error compiling shader: " + new String(log));
             System.exit(1);
@@ -163,8 +159,7 @@ public class ShaderProgram {
     private String loadFileToString(String fileName) {
         String fileContent = "";
 
-        try
-        {
+        try {
             StringBuffer buffer = new StringBuffer();
             FileReader charStream = new FileReader(fileName);
 
@@ -177,13 +172,11 @@ public class ShaderProgram {
             charStream.close();
             fileContent = buffer.toString();
         }
-        catch(FileNotFoundException e)
-        {
+        catch(FileNotFoundException e) {
             System.err.println("File \"" + fileName + "\" not found!");
             System.exit(1);
         }
-        catch(IOException e)
-        {
+        catch(IOException e) {
             System.err.println("IO Expection encountered when reading file!");
             System.exit(1);
         }

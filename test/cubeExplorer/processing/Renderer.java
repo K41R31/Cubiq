@@ -1,4 +1,4 @@
-package cubiq.renderer;
+package cubeExplorer.processing;
 
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
@@ -6,36 +6,33 @@ import com.jogamp.newt.Screen;
 import com.jogamp.newt.javafx.NewtCanvasJFX;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.PMVMatrix;
-import cubiq.cube.Cube;
-import cubiq.io.InteractionHandler;
-import cubiq.models.GuiModel;
-import javafx.application.Platform;
-import javafx.scene.layout.AnchorPane;
+import cubeExplorer.cube.Cube;
+import cubeExplorer.io.InteractionHandler;
+import cubeExplorer.model.Model;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
-import static com.jogamp.opengl.GL.GL_LESS;
+import static com.jogamp.opengl.GL.*;
 
-public class CubeRenderer implements GLEventListener, Observer {
+public class Renderer implements GLEventListener, Observer {
 
-    private GuiModel guiModel;
+    private Model model;
     private final GLWindow glWindow;
     private Cube cube;
     private InteractionHandler interactionHandler;
-    private int deviceWidth;
-    private int deviceHeight;
-    private float[] camPos;
-    private List<int[][]> colorScheme;
-    private float fovy;
+    private int DEVICE_WIDTH = 1920;
+    private int DEVICE_HEIGHT = 1080;
+    private float[] CAM_POS = new float[] {-9.5f, 6.1f, 9.5f};
+    private int counter = 0;
 
-    private ShaderProgram shaderProgram;
+    private ShaderProgram shaderBlack;
+    private ShaderProgram[] stickerShaders;
 
     // Pointers (names) for data transfer and handling on GPU
     private int[] vaoName;  // Names of vertex array objects
@@ -46,7 +43,7 @@ public class CubeRenderer implements GLEventListener, Observer {
     PMVMatrix pmvMatrix;
 
 
-    public CubeRenderer() {
+    public Renderer() {
         Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
         Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
@@ -58,46 +55,33 @@ public class CubeRenderer implements GLEventListener, Observer {
         glWindow = GLWindow.create(screen, caps);
     }
 
-    private void startRenderer(AnchorPane renderPane, List<int[][]> colorScheme) {
-        this.colorScheme = colorScheme;
+    private void startRenderer() {
         NewtCanvasJFX glCanvas = new NewtCanvasJFX(glWindow);
 
-        glCanvas.setWidth(deviceWidth);
-        glCanvas.setHeight(deviceHeight);
-        Platform.runLater(() -> {
-            renderPane.getChildren().add(glCanvas);
-            FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
-            animator.start();
-        });
+        glCanvas.setWidth(DEVICE_WIDTH);
+        glCanvas.setHeight(DEVICE_HEIGHT);
+        model.getRendererPane().getChildren().add(glCanvas);
 
-        interactionHandler = new InteractionHandler(camPos, deviceWidth, deviceHeight);
+        FPSAnimator animator = new FPSAnimator(glWindow, 60, true);
+        animator.start();
+
+        interactionHandler = new InteractionHandler(CAM_POS, DEVICE_WIDTH, DEVICE_HEIGHT);
 
         glWindow.addMouseListener(interactionHandler);
         glWindow.addGLEventListener(this);
     }
-
-//    private void initObject(float[] vertices, int[] indices, int index) {
-//        gl.glBindVertexArray(vaoName[index]);
-//        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[index]);
-//        gl.glBufferData(GL.GL_ARRAY_BUFFER, vertices.length * 4L,
-//                FloatBuffer.wrap(vertices), GL.GL_STATIC_DRAW);
-//        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[index]);
-//        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indices.length * 4L,
-//                IntBuffer.wrap(indices), GL.GL_STATIC_DRAW);
-//        gl.glEnableVertexAttribArray(0);
-//        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
-//        gl.glEnableVertexAttribArray(1);
-//        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-//    }
 
     @Override
     public void init(GLAutoDrawable drawable) {
         // Retrieve the OpenGL graphics context
         GL3 gl = drawable.getGL().getGL3();
 
+        cube = new Cube(3, model.getColorScheme());
+
         // BEGIN: Preparing scene
         // BEGIN: Allocating vertex array objects and buffers for each object
-        int noOfObjects = 81;
+        // TODO Auf cubeLAyers anpassen
+        int noOfObjects = 7;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -117,19 +101,14 @@ public class CubeRenderer implements GLEventListener, Observer {
             System.err.println("Error allocating index buffer object.");
         // END: Allocating vertex array objects and buffers for each object
 
+        initShaders(gl);
+
         // Initialize cubie
-        cube = new Cube(3, colorScheme);
-        cube.initCubies(gl, vaoName, vboName, iboName);
-
-        // Shader program
-        shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram(
-                getClass().getResource("/shaders/").getPath().replace("%20", " "),
-                "Basic.vert", "Black.frag");
-
+        initCubie(gl);
+        initStickers(gl);
+        // END: Preparing scene
 
         interactionHandler.setCube(cube);
-
 
         // Create object for projection-model-view matrix calculation.
         pmvMatrix = new PMVMatrix();
@@ -145,7 +124,74 @@ public class CubeRenderer implements GLEventListener, Observer {
         gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
 
         // Set background color of the GLCanvas.
-        gl.glClearColor(0.098f, 0.106f, 0.114f, 1.0f);
+        gl.glClearColor(0.04f, 0.07f, 0.12f, 1.0f);
+    }
+
+    private void initShaders(GL3 gl) {
+        shaderBlack = new ShaderProgram(gl);
+        shaderBlack.loadShaderAndCreateProgram(
+                getClass().getResource("/shaders/").getPath().replace("%20", " "),
+                "Basic.vert", "Black.frag");
+
+        stickerShaders = new ShaderProgram[6];
+        for (int i = 0; i < 6; i++) {
+            stickerShaders[i] = new ShaderProgram(gl);
+            stickerShaders[i].loadShaderAndCreateProgram(
+                    getClass().getResource("/shaders/").getPath().replace("%20", " "),
+                    "Basic.vert", i + ".frag");
+        }
+    }
+
+    private void initStickers(GL3 gl) {
+        // 1 because cubie is 0
+        for (int i = 0; i < 6; i++) {
+            gl.glBindVertexArray(vaoName[i+1]);
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i+1]);
+            gl.glBufferData(GL.GL_ARRAY_BUFFER, 108 * Float.BYTES,
+                    FloatBuffer.wrap(cube.getStickerVertices(i)), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[i+1]);
+            gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, 56 * Integer.BYTES,
+                    IntBuffer.wrap(cube.getStickerIndices()), GL.GL_STATIC_DRAW);
+            gl.glEnableVertexAttribArray(0);
+            gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 3 * Float.BYTES, 0);
+        }
+    }
+
+    private void initCubie(GL3 gl) {
+        gl.glBindVertexArray(vaoName[0]);
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[0]);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cube.getCubieVertices().length * 4L,
+                FloatBuffer.wrap(cube.getCubieVertices()), GL.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[0]);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cube.getCubieIndices().length * 4L,
+                IntBuffer.wrap(cube.getCubieIndices()), GL.GL_STATIC_DRAW);
+        gl.glEnableVertexAttribArray(0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 3 * Float.BYTES, 0);
+    }
+
+    private void displaySticker(GL3 gl, int color) {
+        for (int i = 1; i < 7; i++) {
+            gl.glUseProgram(stickerShaders[color].getShaderProgramID());
+            gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+            gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+            gl.glBindVertexArray(vaoName[i]);
+            // Draw the five rectangles
+            for (int j = 0; j < 5; j++) {
+                gl.glDrawElements(GL.GL_TRIANGLE_STRIP, 4, GL.GL_UNSIGNED_INT, j * 4 * Integer.BYTES);
+            }
+            // Draw the four corner fans
+            for (int j = 0; j < 4; j++) {
+                gl.glDrawElements(GL.GL_TRIANGLE_FAN, 9, GL.GL_UNSIGNED_INT, 20 * Integer.BYTES + j * 9 * Integer.BYTES);
+            }
+        }
+    }
+
+    private void displayCubie(GL3 gl) {
+        gl.glUseProgram(shaderBlack.getShaderProgramID());
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+        gl.glBindVertexArray(vaoName[0]);
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices().length, GL.GL_UNSIGNED_INT, 0);
     }
 
     /**
@@ -177,7 +223,7 @@ public class CubeRenderer implements GLEventListener, Observer {
         //          fovy (field of view), aspect ratio,
         //          zNear (near clipping plane), zFar (far clipping plane)
         float aspectRatio = (float)width / (float)height;
-        pmvMatrix.gluPerspective(fovy, aspectRatio, 0.1f, 1000f);
+        pmvMatrix.gluPerspective(30f, aspectRatio, 0.1f, 1000f);
 
         // Switch to model-view transform
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
@@ -196,7 +242,7 @@ public class CubeRenderer implements GLEventListener, Observer {
         // Apply view transform using the PMV-Tool
         // Camera positioning is steered by the interaction handler
         pmvMatrix.glLoadIdentity();
-        pmvMatrix.gluLookAt(camPos[0], camPos[1], camPos[2], 0f, 0f, 0f, 0f, 1.0f, 0f);
+        pmvMatrix.gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2], 0f, 0f, 0f, 0f, 1.0f, 0f);
 
         // Set matrices in the interaction handler
         float[] pMatrix = new float[16];
@@ -207,30 +253,28 @@ public class CubeRenderer implements GLEventListener, Observer {
         System.arraycopy(pmvMatrix.glGetPMvMatrixf().array(), 16, mvMatrix, 0, 16);
         interactionHandler.setModelviewMatrix(mvMatrix);
 
-        displayCubies(gl);
-    }
+        cube.rotateLayer(0, 1, new Quaternion().setFromEuler(0.0174533f, 0, 0));
+        counter++;
+        if (counter == 90) {
+            cube.updateCubieRelPos();
+            counter = 0;
+        }
 
-    private void displayCubies(GL3 gl) {
-        cube.updateVerticesBuffer(gl, vboName);
-        for (int i = 0; i < cube.getTotalCubies(); i++) {
-            gl.glUseProgram(shaderProgram.getShaderProgramID());
-            // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-            gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-            gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-            gl.glBindVertexArray(vaoName[i]);
-
-            // Draws the elements in the order defined by the index buffer object (IBO)
-            gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubieIndices(i).length, GL.GL_UNSIGNED_INT, 0);
-
-            for (int j = 0; j < cube.getCubie(i).getTotalStickers(); j++) {
-                gl.glUseProgram(shaderProgram.getShaderProgramID());
-                // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-                gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-                gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-                gl.glBindVertexArray(vaoName[j]);
-
-                // Draws the elements in the order defined by the index buffer object (IBO)
-                gl.glDrawElements(GL.GL_TRIANGLE_STRIP, cube.getCubie(i).getStickerIndices(j).length, GL.GL_UNSIGNED_INT, 0);
+//        displayTestIntersectionObject(gl);
+        for (int x = 0; x < cube.getCubeLayers(); x++) {
+            for (int y = 0; y < cube.getCubeLayers(); y++) {
+                for (int z = 0; z < cube.getCubeLayers(); z++) {
+                    pmvMatrix.glPushMatrix();
+                    // Cubie rotation
+//                    pmvMatrix.glRotate(interactionHandler.getActualQuat());
+                    pmvMatrix.glRotate(cube.getCubieRotation(x, y, z));
+                    // Cubie translation
+                    pmvMatrix.glTranslatef(x-1, y-1, z-1);
+                    // Display Cubie
+                    displayCubie(gl);
+                    displaySticker(gl, 4);
+                    pmvMatrix.glPopMatrix();
+                }
             }
         }
     }
@@ -242,7 +286,10 @@ public class CubeRenderer implements GLEventListener, Observer {
 
         // Detach and delete shader program
         gl.glUseProgram(0);
-        shaderProgram.deleteShaderProgram();
+        shaderBlack.deleteShaderProgram();
+        for (int i = 0; i < 6; i++) {
+            stickerShaders[i].deleteShaderProgram();
+        }
 
         // deactivate VAO and VBO
         gl.glBindVertexArray(0);
@@ -257,26 +304,13 @@ public class CubeRenderer implements GLEventListener, Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch ((String)arg) {
-            case "renderCubeExplorer":
-                deviceWidth = 1800;
-                deviceHeight = 900;
-                camPos = new float[] {-9.5f, 6.1f, 9.5f};
-                fovy = 30f;
-                startRenderer(guiModel.getRendererPaneExplorer(), null);
+            case "startRenderer":
+                startRenderer();
                 break;
-            case "renderCubeSolver":
-                deviceWidth = 1800;
-                deviceHeight = 600;
-                camPos = new float[] {-15f, 4.6f, 5f};
-                fovy = 20f;
-                startRenderer(guiModel.getRendererPaneSolver(), guiModel.getColorScheme());
-                break;
-            case "nextSolveStep":
-                cube.rotateLayer(guiModel.getActualSolveStep());
         }
     }
 
-    public void initModel(GuiModel guiModel) {
-        this.guiModel = guiModel;
+    public void initModel(Model model) {
+        this.model = model;
     }
 }
