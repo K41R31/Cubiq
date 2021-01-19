@@ -70,7 +70,7 @@ public class TimerController implements Observer {
                 new KeyFrame(new Duration(0), e -> {
                     before = System.nanoTime();
                 }),
-                new KeyFrame(new Duration(100), e -> {
+                new KeyFrame(new Duration(30), e -> {
                     double msFrame, ssFrame, mFrame;
                     after = System.nanoTime();
                     Math.floor(msFrame = (after - before) / 1e6d);

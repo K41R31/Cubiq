@@ -12,11 +12,11 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="1057.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cubiq.gui.TimerController">
+<AnchorPane maxWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.TimerView">
    <children>
       <VBox alignment="BOTTOM_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane fx:id="topAnchorPane" style="-fx-background-color: #191b1d; -fx-view-order: -1;" VBox.vgrow="ALWAYS">
+            <AnchorPane fx:id="topAnchorPane" prefHeight="505.0" prefWidth="1920.0" style="-fx-background-color: #191b1d; -fx-view-order: -1;">
                <children>
                   <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="200.0">
                      <children>
@@ -58,20 +58,20 @@
                   <StackPane alignment="CENTER_LEFT" prefHeight="1.0" prefWidth="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Line endX="1920.0" stroke="WHITE" strokeWidth="2.0" translateY="-9.0" />
-                        <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="1920.0" progress="0.41" scaleX="1.2" styleClass="progressGlowBar" stylesheets="@../css/TimerStyle.css" translateY="-7.0">
+                        <ProgressBar fx:id="progBarGauss" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="1920.0" progress="0.41" scaleX="1.2" styleClass="progressGlowBar" stylesheets="@../css/TimerStyle.css" translateY="-7.0">
                            <effect>
                               <GaussianBlur radius="63.0" />
                            </effect>
                         </ProgressBar>
-                        <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="8.0" prefWidth="1920.0" progress="0.41" scaleX="1.2" styleClass="progressGlowBar" stylesheets="@../css/TimerStyle.css">
+                        <ProgressBar fx:id="progBarBlur" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="8.0" prefWidth="1920.0" progress="0.41" scaleX="1.2" styleClass="progressGlowBar" stylesheets="@../css/TimerStyle.css">
                            <effect>
                               <BoxBlur height="98.88" iterations="2" width="60.71" />
                            </effect>
                         </ProgressBar>
-                        <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2.0" prefWidth="1920.0" progress="0.41" scaleX="1.3" styleClass="progressBar" stylesheets="@../css/TimerStyle.css" translateY="-9.0" />
+                        <ProgressBar fx:id="progBar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2.0" prefWidth="1920.0" progress="0.41" scaleX="1.3" styleClass="progressBar" stylesheets="@../css/TimerStyle.css" translateY="-9.0" />
                      </children>
                   </StackPane>
-                  <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="22.0">
+                  <StackPane prefHeight="30.0" prefWidth="200.0" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="22.0">
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
