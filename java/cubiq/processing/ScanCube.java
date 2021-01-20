@@ -23,6 +23,7 @@ public class ScanCube implements Observer {
     private int sameSideCounter = 0;
     private int[][] foundCubeSide;
     private String solveString;
+    private Mat labMat;
 
 
     private void startWebcamLoop() {
@@ -48,6 +49,8 @@ public class ScanCube implements Observer {
     }
 
     private void processFrame(Mat frame) {
+        labMat = frame.clone();
+        Imgproc.cvtColor(labMat, labMat, Imgproc.COLOR_BGR2Lab);
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
         guiModel.setOriginalFrame(frame);
 
@@ -464,6 +467,17 @@ public class ScanCube implements Observer {
                 colors[x][y] = new Scalar(hue, sat, val);
             }
         }
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                for (int i = 0; i < 3; i++) {
+                    System.out.print(Math.round(labMat.get((int)scanpoints[x][y].y, (int)scanpoints[x][y].x)[i]));
+                    if (i < 2) System.out.print(", ");
+                    else System.out.println();
+                }
+            }
+        }
+        System.out.println("\n\n\n\n\n\n\n\n\n");
+
         return colors;
     }
 
@@ -471,6 +485,9 @@ public class ScanCube implements Observer {
         int[][] normalizedColors = new int[3][3];
 //        float[][] calibrationValues = guiModel.getScanCalibrationValues();
         float[] calibrationValues = new float[] {5, 10, 30, 60, 120, 160};
+
+
+
         float threshold = guiModel.getColorThreshold();
         for (int y  = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
